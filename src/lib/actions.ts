@@ -181,12 +181,26 @@ export async function exportAttendanceAction(classId: string): Promise<{ success
         return { success: false, message: "Class not found." };
     }
 
-    const classSessions = getSessionsByClass(classId);
-    if (classSessions.length === 0) {
-        return { success: false, message: "No attendance sessions found for this class." };
-    }
-
     const classStudents = studentData.filter(s => selectedClass.studentIds.includes(s.id));
+    const classSessions = getSessionsByClass(classId);
+    
+    // If there are no sessions, we can still export the student roster.
+    if (classSessions.length === 0) {
+        try {
+            const result = await generateAttendanceTable({
+                studentDetails: classStudents.map(s => ({id: s.id, name: s.name, major: ''})), // pass needed fields
+                attendanceRecords: {}, // No records yet
+            });
+             return {
+                success: true,
+                message: 'No sessions found for this class. Exporting student roster.',
+                csvData: result.csvData,
+            };
+        } catch (error) {
+            console.error(error);
+            return { success: false, message: 'An unexpected error occurred while generating the roster.' };
+        }
+    }
 
     const attendanceRecords: Record<string, string[]> = {};
     for (const session of classSessions) {
