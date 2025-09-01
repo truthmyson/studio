@@ -102,14 +102,14 @@ export default function StudentRegisterPage() {
                 <Input name="studentId" id="studentId" placeholder="STU001" required />
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="email">University Email</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input name="email" id="email" type="email" placeholder="name@university.edu" required />
                 </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                    <Label htmlFor="contact">Contact Number <span className="text-muted-foreground">(optional)</span></Label>
-                    <Input name="contact" id="contact" type="tel" placeholder="+1234567890" />
+                    <Label htmlFor="contact">Contact Number</Label>
+                    <Input name="contact" id="contact" type="tel" placeholder="+1234567890" required/>
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="gender">Gender <span className="text-muted-foreground">(optional)</span></Label>

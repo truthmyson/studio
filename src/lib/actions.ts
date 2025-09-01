@@ -302,7 +302,7 @@ const userSchema = z.object({
   middleName: z.string().optional(),
   lastName: z.string().min(1, "Last Name is required."),
   email: z.string().email("Invalid email address."),
-  contact: z.string().optional(),
+  contact: z.string().min(1, "Contact number is required."),
   gender: z.enum(['male', 'female']).optional(),
   courseName: z.string().min(1, "Course/Department is required."),
   password: z.string().min(6, "Password must be at least 6 characters."),
@@ -329,17 +329,22 @@ async function handleUserRegistration(formData: FormData, isRep: boolean): Promi
     
       const { studentId, firstName, middleName, lastName, email, courseName, contact, gender } = result.data;
       
-      // Check if student ID or email already exists
+      // Check for uniqueness
       const existingStudentById = await getStudentById(studentId);
-      const existingStudentByEmail = studentData.find(s => s.email.toLowerCase() === email.toLowerCase());
-    
       if (existingStudentById) {
           return { status: 'error', message: 'A user with this School ID already exists.' };
       }
+      
+      const existingStudentByEmail = studentData.find(s => s.email.toLowerCase() === email.toLowerCase());
       if (existingStudentByEmail) {
           return { status: 'error', message: 'A user with this email address already exists.' };
       }
-      
+
+      const existingStudentByContact = studentData.find(s => s.contact === contact);
+      if (existingStudentByContact) {
+        return { status: 'error', message: 'A user with this contact number already exists.' };
+      }
+
       const newUser: Student = {
         id: studentId,
         firstName,
