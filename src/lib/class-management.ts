@@ -40,15 +40,22 @@ export async function createClass(name: string): Promise<Class> {
 }
 
 export async function deleteClass(id: string): Promise<void> {
-    const classToDelete = classes.find(c => c.id === id);
-    if (classToDelete) {
+    const classIndex = classes.findIndex(c => c.id === id);
+    if (classIndex > -1) {
+        const classToDelete = classes[classIndex];
+        
         // Notify all students in the class that it's been deleted
-        classToDelete.studentIds.forEach(studentId => {
-            createRepNotification(studentId, `The class "${classToDelete.name}" has been deleted by the representative.`);
-        });
+        if (classToDelete.studentIds && classToDelete.studentIds.length > 0) {
+            classToDelete.studentIds.forEach(studentId => {
+                createRepNotification(studentId, `The class "${classToDelete.name}" has been deleted by the representative.`);
+            });
+        }
+        
+        // Remove the class from the array
+        classes.splice(classIndex, 1);
     }
-    classes = classes.filter(c => c.id !== id);
 }
+
 
 export async function getStudentsByClassId(classId: string): Promise<Student[]> {
     const cls = await getClassById(classId);
