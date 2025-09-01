@@ -11,9 +11,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useFormState, useFormStatus } from 'react-dom';
 import { registerStudentAction, type StudentFormState } from '@/lib/actions';
 import { useToast } from "@/hooks/use-toast";
-import { useEffect, useRef } from "react";
-import { Loader2, AlertCircle } from 'lucide-react';
+import { useEffect, useRef, useState } from "react";
+import { Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useRouter } from "next/navigation";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -30,15 +31,37 @@ export default function StudentRegisterPage() {
   const [state, formAction] = useFormState(registerStudentAction, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
+  const router = useRouter();
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     if (state.status === 'success') {
-        toast({ title: 'Success!', description: state.message });
         formRef.current?.reset();
+        setShowSuccess(true);
+        const timer = setTimeout(() => {
+            router.push('/student-dashboard');
+        }, 2000); // Redirect after 2 seconds
+        return () => clearTimeout(timer);
     } else if (state.status === 'error') {
-        toast({ variant: 'destructive', title: 'Error', description: state.message });
+        // The error alert is already shown below the form
     }
-  }, [state, toast]);
+  }, [state, router]);
+
+  if (showSuccess) {
+    return (
+        <div className="flex flex-col items-center justify-center flex-1 text-center">
+            <Card className="max-w-md mx-auto p-8">
+                <div className="flex flex-col items-center space-y-4">
+                    <CheckCircle className="h-16 w-16 text-green-500" />
+                    <h2 className="text-2xl font-bold">Registration Successful!</h2>
+                    <p className="text-muted-foreground">{state.message}</p>
+                    <p className="text-sm text-muted-foreground">Redirecting you to your dashboard...</p>
+                    <Loader2 className="mt-4 h-6 w-6 animate-spin text-primary" />
+                </div>
+            </Card>
+        </div>
+    );
+  }
 
   return (
     <div className="flex-1 space-y-4">
