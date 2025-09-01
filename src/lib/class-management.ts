@@ -48,7 +48,7 @@ export async function getStudentsByClassId(classId: string): Promise<Student[]> 
 }
 
 export async function enrollStudentInClass(studentId: string, joinCode: string): Promise<{ success: boolean; message: string; className?: string }> {
-    const classToJoin = classes.find(c => c.joinCode === joinCode);
+    const classToJoin = classes.find(c => c.joinCode.trim().toLowerCase() === joinCode.trim().toLowerCase());
     if (!classToJoin) {
         return { success: false, message: "Invalid join code." };
     }
@@ -92,3 +92,4 @@ export async function removeStudentFromClass(classId: string, studentId: string)
     }
     return { success: false, message: "Student not found in this class." };
 }
+
