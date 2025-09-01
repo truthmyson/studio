@@ -9,6 +9,7 @@ import { createSessionNotifications, getStudentNotifications, markNotificationAs
 import { format } from 'date-fns';
 import { getClassById, enrollStudentInClass, getClassesByStudent, studentLeaveClass, removeStudentFromClass, getStudentsByClassId } from './class-management';
 import { Student } from './types';
+import { sendMessage, getMessagesForSession, Message } from './messaging';
 
 const studentDetailsSchema = z.array(
   z.object({
@@ -134,7 +135,7 @@ export async function startGeofencingAction(formData: FormData) {
     return { success: false, message: 'Invalid student ID format.' };
   }
 
-  const session = startSession({ latitude, longitude }, radius, timeLimit, topic, studentIds, classId);
+  const session = startSession({ latitude, longitude }, radius, timeLimit, topic, studentIds, classId, repId);
 
   // Create notifications for all students in the selected class
   createSessionNotifications(session.id, session.topic, studentIds);
@@ -263,4 +264,16 @@ export async function studentLeaveClassAction(classId: string, studentId: string
 
 export async function removeStudentFromClassAction(classId: string, studentId: string) {
     return removeStudentFromClass(classId, studentId);
+}
+
+export async function sendMessageAction(senderId: string, receiverId: string, sessionId: string, content: string): Promise<{ success: boolean, message?: string }> {
+    if (!senderId || !receiverId || !sessionId || !content.trim()) {
+        return { success: false, message: "Missing required fields." };
+    }
+    await sendMessage(senderId, receiverId, sessionId, content);
+    return { success: true };
+}
+
+export async function getMessagesForSessionAction(sessionId: string): Promise<Message[]> {
+    return getMessagesForSession(sessionId);
 }

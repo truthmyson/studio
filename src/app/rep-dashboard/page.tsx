@@ -25,6 +25,7 @@ import {
   Users,
   Bell,
   Check,
+  MessageSquare,
 } from 'lucide-react';
 import Link from 'next/link';
 import { PageHeader, PageHeaderHeading, PageHeaderDescription } from '@/components/page-header';
@@ -36,6 +37,7 @@ import { format, formatDistanceToNow } from 'date-fns';
 import type { Notification } from '@/lib/notifications';
 import type { Student } from '@/lib/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { MessagingDialog } from '@/components/feature/messaging-dialog';
 
 export default function RepDashboardPage() {
   const repId = '24275016'; // Mock rep ID, now aligned with student data
@@ -43,6 +45,8 @@ export default function RepDashboardPage() {
   const [sessions, setSessions] = useState<AttendanceSession[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
+  const [isMessagingDialogOpen, setIsMessagingDialogOpen] = useState(false);
+  const [selectedSessionForMessages, setSelectedSessionForMessages] = useState<AttendanceSession | null>(null);
 
   const fetchDashboardData = useCallback(async () => {
     const [allSessions, repNotifications, allStudents] = await Promise.all([
@@ -67,6 +71,11 @@ export default function RepDashboardPage() {
   const handleMarkAsRead = async (notificationId: string) => {
     await markNotificationRead(notificationId);
     fetchDashboardData(); // Refresh notifications
+  };
+
+  const handleOpenMessages = (session: AttendanceSession) => {
+    setSelectedSessionForMessages(session);
+    setIsMessagingDialogOpen(true);
   };
 
   const totalStudents = students.length;
@@ -163,6 +172,7 @@ export default function RepDashboardPage() {
                     <TableHead>Present</TableHead>
                     <TableHead>Absent</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -189,6 +199,12 @@ export default function RepDashboardPage() {
                         </TableCell>
                         <TableCell>
                         <Badge variant={isSessionActive ? 'default' : 'outline'}>{isSessionActive ? "Active" : "Completed"}</Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="outline" size="sm" onClick={() => handleOpenMessages(session)}>
+                            <MessageSquare className="mr-2 h-4 w-4" />
+                            Messages
+                          </Button>
                         </TableCell>
                     </TableRow>
                     );
@@ -240,6 +256,14 @@ export default function RepDashboardPage() {
         onClose={() => setIsGeofencingDialogOpen(false)}
         repId={repId}
       />
+      {selectedSessionForMessages && (
+        <MessagingDialog
+            isOpen={isMessagingDialogOpen}
+            onClose={() => setIsMessagingDialogOpen(false)}
+            session={selectedSessionForMessages}
+            currentUserId={repId}
+         />
+      )}
     </div>
   );
 }

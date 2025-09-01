@@ -7,6 +7,7 @@ interface Location {
 export interface AttendanceSession {
     id: string;
     classId: string;
+    repId: string; // The ID of the user who created the session
     location: Location;
     radius: number; // in meters
     startTime: number; // Unix timestamp
@@ -19,7 +20,7 @@ export interface AttendanceSession {
 export let activeSession: AttendanceSession | null = null;
 export const allSessions: AttendanceSession[] = [];
 
-export function startSession(location: Location, radius: number, timeLimit: number, topic: string, studentIds: string[], classId: string) {
+export function startSession(location: Location, radius: number, timeLimit: number, topic: string, studentIds: string[], classId: string, repId: string) {
     // Deactivate previous session if any, you might want to allow multiple active sessions in a real app
     if (activeSession) {
         // This is a simple implementation. A better one might check for sessions of the same class.
@@ -30,6 +31,7 @@ export function startSession(location: Location, radius: number, timeLimit: numb
     const newSession: AttendanceSession = {
         id: `session-${Date.now()}`,
         classId,
+        repId,
         location,
         radius,
         startTime: Date.now(),

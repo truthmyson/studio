@@ -18,7 +18,7 @@ import {
   } from '@/components/ui/table';
   import { Badge } from '@/components/ui/badge';
   import { Button } from '@/components/ui/button';
-  import { ClipboardList, Loader2, UserCheck, Bell, Check, PlusCircle, LogOut } from 'lucide-react';
+  import { ClipboardList, Loader2, UserCheck, Bell, Check, PlusCircle, LogOut, MessageSquare } from 'lucide-react';
   import { recentAttendance, studentData } from '@/lib/constants';
   import { PageHeader, PageHeaderHeading, PageHeaderDescription } from '@/components/page-header';
   import { useEffect, useState, useCallback } from 'react';
@@ -32,6 +32,8 @@ import { Label } from '@/components/ui/label';
 import type { Class } from '@/lib/class-management';
 import type { Student } from '@/lib/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import type { AttendanceSession } from '@/lib/attendance-session';
+import { MessagingDialog } from '@/components/feature/messaging-dialog';
   
   // Haversine formula to calculate distance between two lat/lon points
   function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -59,6 +61,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
     const [joinCode, setJoinCode] = useState('');
     const [isJoining, setIsJoining] = useState(false);
     const [joinedClasses, setJoinedClasses] = useState<Class[]>([]);
+    const [activeSessionData, setActiveSessionData] = useState<AttendanceSession | null>(null);
+    const [isMessagingDialogOpen, setIsMessagingDialogOpen] = useState(false);
 
     useEffect(() => {
         // In a real app, you'd fetch the current user. Here, we find them from mock data.
@@ -69,14 +73,17 @@ import { ScrollArea } from '@/components/ui/scroll-area';
     }, [studentId]);
 
     const fetchStudentData = useCallback(async () => {
-        const [notifs, classes] = await Promise.all([
+        const [notifs, classes, session] = await Promise.all([
             getNotifications(studentId),
-            getStudentClassesAction(studentId)
+            getStudentClassesAction(studentId),
+            getActiveSession()
         ]);
         setNotifications(notifs);
         if (classes.success) {
             setJoinedClasses(classes.data);
         }
+        setActiveSessionData(session);
+
     }, [studentId]);
 
     useEffect(() => {
@@ -201,39 +208,39 @@ import { ScrollArea } from '@/components/ui/scroll-area';
         </PageHeader>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium">
-                    Upcoming Lecture
+                        {activeSessionData ? "Active Session" : "Upcoming Lecture"}
                     </CardTitle>
-                    <ClipboardList className="h-4 w-4 text-muted-foreground" />
+                    <CardDescription>
+                        {activeSessionData ? `Session for "${activeSessionData.topic}" is live.` : "No session currently active."}
+                    </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">Today 2:00PM</div>
-                    <p className="text-xs text-muted-foreground">
-                    Data Structures - Hall 4B
-                    </p>
+                    {activeSessionData ? (
+                        <div className='space-y-2'>
+                           <Button onClick={handleSignIn} disabled={isLoading} className='w-full'>
+                                {isLoading ? (
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                ) : (
+                                    <UserCheck className="mr-2 h-4 w-4" />
+                                )}
+                                Sign In Now
+                            </Button>
+                             <Button variant="outline" className='w-full' onClick={() => setIsMessagingDialogOpen(true)}>
+                                <MessageSquare className="mr-2 h-4 w-4" />
+                                Message Rep
+                            </Button>
+                        </div>
+                    ) : (
+                       <div className="flex items-center text-sm text-muted-foreground">
+                            <ClipboardList className="mr-2 h-4 w-4" />
+                            <span>Check back later.</span>
+                       </div>
+                    )}
                 </CardContent>
             </Card>
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Sign Attendance</CardTitle>
-                    <UserCheck className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                    <Button onClick={handleSignIn} disabled={isLoading}>
-                        {isLoading ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                            <UserCheck className="mr-2 h-4 w-4" />
-                        )}
-                        Sign In for Today's Lecture
-                    </Button>
-                    <p className="text-xs text-muted-foreground mt-2">
-                        Available when session is active
-                    </p>
-                </CardContent>
-            </Card>
-            <Card className="lg:col-span-1">
+            <Card className="lg:col-span-2">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Notifications</CardTitle>
                     <Bell className="h-4 w-4 text-muted-foreground" />
@@ -370,6 +377,15 @@ import { ScrollArea } from '@/components/ui/scroll-area';
                 </DialogFooter>
             </DialogContent>
         </Dialog>
+
+        {activeSessionData && (
+             <MessagingDialog
+                isOpen={isMessagingDialogOpen}
+                onClose={() => setIsMessagingDialogOpen(false)}
+                session={activeSessionData}
+                currentUserId={studentId}
+            />
+        )}
       </div>
     );
   }
