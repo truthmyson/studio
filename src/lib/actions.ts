@@ -3,7 +3,7 @@
 
 import { generateAttendanceTable } from '@/ai/flows/attendance-table-generator';
 import { z } from 'zod';
-import { activeSession, startSession, allSessions, signInStudent, getSessionById, getSessionsByClass } from '@/lib/attendance-session';
+import { activeSession, startSession, getSessions, signInStudent, getSessionById, getSessionsByClass, toggleSessionStatus } from '@/lib/attendance-session';
 import { getStudentById, studentData } from './constants';
 import { createSessionNotifications, getStudentNotifications, markNotificationAsRead, createRepNotification } from './notifications';
 import { format } from 'date-fns';
@@ -105,7 +105,7 @@ export async function getActiveSession() {
 }
 
 export async function getAllSessions() {
-  return allSessions;
+  return getSessions();
 }
 
 export async function getAllStudentsAction(): Promise<Student[]> {
@@ -276,4 +276,13 @@ export async function sendMessageAction(senderId: string, receiverId: string, se
 
 export async function getMessagesForSessionAction(sessionId: string): Promise<Message[]> {
     return getMessagesForSession(sessionId);
+}
+
+export async function toggleSessionStatusAction(sessionId: string, newStatus: boolean): Promise<{ success: boolean, message: string }> {
+    const result = toggleSessionStatus(sessionId, newStatus);
+    if (result.success && result.session && newStatus === true) {
+        // If a session is reactivated, notify students
+        createSessionNotifications(result.session.id, result.session.topic, result.session.students.map(s => s.studentId));
+    }
+    return { success: result.success, message: result.message };
 }

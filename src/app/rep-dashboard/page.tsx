@@ -31,13 +31,15 @@ import Link from 'next/link';
 import { PageHeader, PageHeaderHeading, PageHeaderDescription } from '@/components/page-header';
 import { GeofencingDialog } from '@/components/feature/geofencing-dialog';
 import { useEffect, useState, useCallback } from 'react';
-import { getAllSessions, getNotifications, markNotificationRead, getAllStudentsAction } from '@/lib/actions';
+import { getAllSessions, getNotifications, markNotificationRead, getAllStudentsAction, toggleSessionStatusAction } from '@/lib/actions';
 import type { AttendanceSession } from '@/lib/attendance-session';
 import { format, formatDistanceToNow } from 'date-fns';
 import type { Notification } from '@/lib/notifications';
 import type { Student } from '@/lib/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessagingDialog } from '@/components/feature/messaging-dialog';
+import { Switch } from '@/components/ui/switch';
+import { useToast } from '@/hooks/use-toast';
 
 export default function RepDashboardPage() {
   const repId = '24275016'; // Mock rep ID, now aligned with student data
@@ -47,6 +49,7 @@ export default function RepDashboardPage() {
   const [students, setStudents] = useState<Student[]>([]);
   const [isMessagingDialogOpen, setIsMessagingDialogOpen] = useState(false);
   const [selectedSessionForMessages, setSelectedSessionForMessages] = useState<AttendanceSession | null>(null);
+  const { toast } = useToast();
 
   const fetchDashboardData = useCallback(async () => {
     const [allSessions, repNotifications, allStudents] = await Promise.all([
@@ -54,7 +57,7 @@ export default function RepDashboardPage() {
         getNotifications(repId),
         getAllStudentsAction()
     ]);
-    setSessions(allSessions);
+    setSessions(allSessions.sort((a,b) => b.startTime - a.startTime)); // Sort by most recent
     setNotifications(repNotifications);
     setStudents(allStudents);
   }, [repId]);
@@ -77,6 +80,16 @@ export default function RepDashboardPage() {
     setSelectedSessionForMessages(session);
     setIsMessagingDialogOpen(true);
   };
+  
+  const handleToggleSessionStatus = async (sessionId: string, currentStatus: boolean) => {
+    const result = await toggleSessionStatusAction(sessionId, !currentStatus);
+    toast({
+        title: result.success ? 'Success' : 'Error',
+        description: result.message,
+        variant: result.success ? 'default' : 'destructive',
+    });
+    fetchDashboardData(); // Refresh sessions
+  }
 
   const totalStudents = students.length;
   const overallAttendanceRate = sessions.length > 0 ? sessions.reduce((acc, session) => {
@@ -154,7 +167,7 @@ export default function RepDashboardPage() {
             <div className="grid gap-2">
                 <CardTitle>Attendance History</CardTitle>
                 <CardDescription>
-                Summary of all created attendance sessions.
+                Summary of all created attendance sessions. Records auto-delete after 14 days.
                 </CardDescription>
             </div>
             <Button asChild size="sm" className="ml-auto gap-1">
@@ -198,7 +211,15 @@ export default function RepDashboardPage() {
                         {absentCount}
                         </TableCell>
                         <TableCell>
-                        <Badge variant={isSessionActive ? 'default' : 'outline'}>{isSessionActive ? "Active" : "Completed"}</Badge>
+                            <div className='flex items-center gap-2'>
+                                <Switch
+                                    id={`session-status-${session.id}`}
+                                    checked={session.active}
+                                    onCheckedChange={() => handleToggleSessionStatus(session.id, session.active)}
+                                    aria-label={`Toggle session ${session.topic}`}
+                                />
+                                <Badge variant={session.active ? 'default' : 'outline'}>{session.active ? "Active" : "Inactive"}</Badge>
+                            </div>
                         </TableCell>
                         <TableCell className="text-right">
                           <Button variant="outline" size="sm" onClick={() => handleOpenMessages(session)}>

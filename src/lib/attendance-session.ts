@@ -18,14 +18,21 @@ export interface AttendanceSession {
 }
   
 export let activeSession: AttendanceSession | null = null;
-export const allSessions: AttendanceSession[] = [];
+export let allSessions: AttendanceSession[] = [];
+
+// Auto-delete sessions older than 14 days
+function cleanupOldSessions() {
+    const fourteenDaysAgo = Date.now() - 14 * 24 * 60 * 60 * 1000;
+    allSessions = allSessions.filter(session => session.startTime >= fourteenDaysAgo);
+}
 
 export function startSession(location: Location, radius: number, timeLimit: number, topic: string, studentIds: string[], classId: string, repId: string) {
-    // Deactivate previous session if any, you might want to allow multiple active sessions in a real app
+    // Deactivate any other active session before starting a new one
     if (activeSession) {
-        // This is a simple implementation. A better one might check for sessions of the same class.
-        // For now, we just deactivate any active session.
-        // activeSession.active = false;
+        const currentActive = allSessions.find(s => s.id === activeSession?.id);
+        if (currentActive) {
+            currentActive.active = false;
+        }
     }
 
     const newSession: AttendanceSession = {
@@ -41,9 +48,8 @@ export function startSession(location: Location, radius: number, timeLimit: numb
         students: studentIds.map(id => ({ studentId: id, signedInAt: null })),
     };
     
-    // In this simple model, only one session can be "active" for sign-in at a time
     activeSession = newSession; 
-    allSessions.unshift(newSession); // Add to the beginning of the list
+    allSessions.unshift(newSession);
 
     console.log('Session started:', activeSession);
     return newSession;
@@ -58,10 +64,17 @@ export function endSession() {
 }
 
 export function getSessionById(sessionId: string) {
+    cleanupOldSessions();
     return allSessions.find(s => s.id === sessionId);
 }
 
+export function getSessions() {
+    cleanupOldSessions();
+    return allSessions;
+}
+
 export function getSessionsByClass(classId: string) {
+    cleanupOldSessions();
     return allSessions.filter(s => s.classId === classId);
 }
 
@@ -80,10 +93,36 @@ export function signInStudent(sessionId: string, studentId: string): boolean {
 
     if (session.students[studentIndex].signedInAt !== null) {
         console.log(`Student ${studentId} has already signed in.`);
-        return false; // Or handle as a success if re-signing is allowed
+        return false;
     }
 
     session.students[studentIndex].signedInAt = Date.now();
     console.log(`Student ${studentId} signed in successfully at ${session.students[studentIndex].signedInAt}`);
     return true;
+}
+
+export function toggleSessionStatus(sessionId: string, newStatus: boolean): { success: boolean; message: string, session?: AttendanceSession } {
+    const session = allSessions.find(s => s.id === sessionId);
+    if (!session) {
+        return { success: false, message: 'Session not found.' };
+    }
+
+    // If activating a session, deactivate any other currently active session.
+    if (newStatus === true) {
+        allSessions.forEach(s => {
+            if (s.active) {
+                s.active = false;
+            }
+        });
+        activeSession = session;
+    } else {
+        // If the session being deactivated is the active one, clear it.
+        if (activeSession?.id === sessionId) {
+            activeSession = null;
+        }
+    }
+    
+    session.active = newStatus;
+    console.log(`Session ${sessionId} has been ${newStatus ? 'activated' : 'deactivated'}.`);
+    return { success: true, message: `Session status updated.`, session: session };
 }
