@@ -5,7 +5,7 @@ import { generateAttendanceTable } from '@/ai/flows/attendance-table-generator';
 import { z } from 'zod';
 import { activeSession, startSession, allSessions, signInStudent, getSessionById, getSessionsByClass } from '@/lib/attendance-session';
 import { studentData } from './constants';
-import { createSessionNotifications, getStudentNotifications, markNotificationAsRead } from './notifications';
+import { createSessionNotifications, getStudentNotifications, markNotificationAsRead, createRepNotification } from './notifications';
 import { format } from 'date-fns';
 
 const studentDetailsSchema = z.array(
@@ -112,9 +112,10 @@ export async function startGeofencingAction(formData: FormData) {
   const topic = formData.get('topic') as string;
   const classId = formData.get('classId') as string;
   const studentIdsRaw = formData.get('studentIds') as string;
+  const repId = formData.get('repId') as string;
 
 
-  if (isNaN(radius) || isNaN(timeLimit) || isNaN(latitude) || isNaN(longitude) || !topic || !classId || !studentIdsRaw) {
+  if (isNaN(radius) || isNaN(timeLimit) || isNaN(latitude) || isNaN(longitude) || !topic || !classId || !studentIdsRaw || !repId) {
     return { success: false, message: 'Invalid data provided.' };
   }
   
@@ -129,6 +130,9 @@ export async function startGeofencingAction(formData: FormData) {
 
   // Create notifications for all students in the selected class
   createSessionNotifications(session.id, session.topic, studentIds);
+
+  // Create a notification for the rep who started the session
+  createRepNotification(repId, `Successfully started session for "${session.topic}".`);
 
   return { success: true, message: 'Geo-fencing session started!' };
 }
@@ -149,14 +153,16 @@ export async function markStudentAttendance(sessionId: string, studentId: string
   
   const success = signInStudent(sessionId, studentId);
   if (success) {
+    // Create a success notification for the student
+    createRepNotification(studentId, `Attendance marked for "${session.topic}".`);
     return { success: true, message: 'Attendance marked successfully.' };
   }
   
   return { success: false, message: 'Failed to mark attendance.' };
 }
 
-export async function getNotifications(studentId: string) {
-    return getStudentNotifications(studentId);
+export async function getNotifications(userId: string) {
+    return getStudentNotifications(userId);
 }
 
 export async function markNotificationRead(notificationId: string) {

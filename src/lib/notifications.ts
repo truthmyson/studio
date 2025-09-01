@@ -1,11 +1,11 @@
 
 export interface Notification {
     id: string;
-    studentId: string;
+    userId: string;
     message: string;
     createdAt: number;
     read: boolean;
-    sessionId: string;
+    sessionId?: string;
 }
 
 // In-memory store for notifications
@@ -17,7 +17,7 @@ let notifications: Notification[] = [];
 export function createSessionNotifications(sessionId: string, topic: string, studentIds: string[]) {
     const newNotifications: Notification[] = studentIds.map(studentId => ({
         id: `notif-${Date.now()}-${studentId}`,
-        studentId,
+        userId: studentId,
         message: `An attendance session for "${topic}" has started.`,
         createdAt: Date.now(),
         read: false,
@@ -28,11 +28,27 @@ export function createSessionNotifications(sessionId: string, topic: string, stu
 }
 
 /**
- * Retrieves all notifications for a specific student, sorted by most recent.
+ * Creates a notification for a specific user (rep or student).
  */
-export function getStudentNotifications(studentId: string): Notification[] {
+export function createRepNotification(userId: string, message: string) {
+    const newNotification: Notification = {
+        id: `notif-${Date.now()}-${userId}`,
+        userId: userId,
+        message: message,
+        createdAt: Date.now(),
+        read: false,
+    };
+    notifications.push(newNotification);
+    console.log(`Created notification for user ${userId}: "${message}"`);
+}
+
+
+/**
+ * Retrieves all notifications for a specific user, sorted by most recent.
+ */
+export function getStudentNotifications(userId: string): Notification[] {
     return notifications
-        .filter(n => n.studentId === studentId)
+        .filter(n => n.userId === userId)
         .sort((a, b) => b.createdAt - a.createdAt);
 }
 

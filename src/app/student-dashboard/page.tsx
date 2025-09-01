@@ -81,6 +81,7 @@ import { Label } from '@/components/ui/label';
             return;
         }
         // In a real app, you'd call an action to validate the code and join the class.
+        // For now, we just show a success toast.
         toast({ title: 'Success!', description: `Successfully joined class with code: ${joinCode}` });
         setJoinCode('');
         setIsJoinClassOpen(false);
@@ -120,7 +121,7 @@ import { Label } from '@/components/ui/label';
             if (distance <= session.radius) {
                 const result = await markStudentAttendance(session.id, studentId);
                 if (result.success) {
-                  toast({ title: 'Success!', description: 'Attendance marked successfully!' });
+                  // Success is now handled via notification
                 } else {
                   toast({ variant: 'destructive', title: 'Error', description: result.message });
                 }

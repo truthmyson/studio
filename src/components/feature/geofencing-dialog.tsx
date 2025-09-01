@@ -28,9 +28,10 @@ const classes = [
 interface GeofencingDialogProps {
   isOpen: boolean;
   onClose: () => void;
+  repId: string;
 }
 
-export function GeofencingDialog({ isOpen, onClose }: GeofencingDialogProps) {
+export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogProps) {
   const [radius, setRadius] = useState('100'); // Default radius in meters
   const [timeLimit, setTimeLimit] = useState('15'); // Default time limit in minutes
   const [topic, setTopic] = useState(''); // Lecture topic
@@ -78,14 +79,12 @@ export function GeofencingDialog({ isOpen, onClose }: GeofencingDialogProps) {
         formData.append('topic', topic);
         formData.append('classId', selectedClassId);
         formData.append('studentIds', JSON.stringify(selectedClass.studentIds));
+        formData.append('repId', repId);
         
         const result = await startGeofencingAction(formData);
 
         if (result.success) {
-          toast({
-            title: 'Success!',
-            description: result.message,
-          });
+          // No toast for success, the notification on the dashboard is enough
           setTopic('');
           setSelectedClassId('');
           onClose();
