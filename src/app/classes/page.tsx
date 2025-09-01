@@ -5,7 +5,7 @@ import { PageHeader, PageHeaderHeading, PageHeaderDescription } from "@/componen
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { PlusCircle, Users, Copy, Trash2, Eye, Download, Loader2 } from "lucide-react";
+import { PlusCircle, Users, Copy, Trash2, Eye, Download, Loader2, FileCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,6 +31,7 @@ import {
 import { studentData } from "@/lib/constants";
 import { StudentsTable } from "@/components/feature/students-table";
 import { exportAttendanceAction } from "@/lib/actions";
+import { Textarea } from "@/components/ui/textarea";
 
 // Mock class structure
 interface Class {
@@ -50,10 +51,13 @@ export default function ClassesPage() {
     const [classes, setClasses] = useState(initialClasses);
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
     const [isRosterDialogOpen, setIsRosterDialogOpen] = useState(false);
-    const [isExporting, setIsExporting] = useState(false);
+    const [isExporting, setIsExporting] = useState<string | null>(null);
     const [selectedClass, setSelectedClass] = useState<Class | null>(null);
     const [newClassName, setNewClassName] = useState('');
     const { toast } = useToast();
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+    const [previewData, setPreviewData] = useState('');
+    const [classForExport, setClassForExport] = useState<Class | null>(null);
 
     const handleCreateClass = () => {
         if (!newClassName.trim()) {
@@ -94,24 +98,32 @@ export default function ClassesPage() {
         setIsRosterDialogOpen(true);
     }
 
-    const handleExport = async (cls: Class) => {
-        setIsExporting(true);
+    const handleExportPreview = async (cls: Class) => {
+        setIsExporting(cls.id);
         const result = await exportAttendanceAction(cls.id);
         if (result.success && result.csvData) {
-            const blob = new Blob([result.csvData], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', `${cls.name.replace(/ /g, '_')}_attendance.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            toast({ title: 'Success!', description: 'Attendance data exported.' });
+            setPreviewData(result.csvData);
+            setClassForExport(cls);
+            setIsPreviewOpen(true);
         } else {
             toast({ variant: 'destructive', title: 'Error', description: result.message });
         }
-        setIsExporting(false);
+        setIsExporting(null);
+    }
+
+    const downloadCsv = () => {
+        if (!previewData || !classForExport) return;
+        const blob = new Blob([previewData], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `${classForExport.name.replace(/ /g, '_')}_attendance.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast({ title: 'Success!', description: 'Attendance data exported.' });
+        setIsPreviewOpen(false);
     }
 
     const copyToClipboard = (text: string) => {
@@ -167,8 +179,8 @@ export default function ClassesPage() {
                                 <Eye className="mr-2 h-4 w-4"/>
                                 View Roster
                             </Button>
-                             <Button variant="secondary" className="w-full" onClick={() => handleExport(cls)} disabled={isExporting}>
-                                {isExporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Download className="mr-2 h-4 w-4" />}
+                             <Button variant="secondary" className="w-full" onClick={() => handleExportPreview(cls)} disabled={isExporting === cls.id}>
+                                {isExporting === cls.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileCheck className="mr-2 h-4 w-4" />}
                                 Export
                             </Button>
                             <AlertDialog>
@@ -237,6 +249,33 @@ export default function ClassesPage() {
                     </div>
                     <DialogFooter>
                         <Button onClick={() => setIsRosterDialogOpen(false)}>Close</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+             {/* Export Preview Dialog */}
+             <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+                <DialogContent className="max-w-3xl">
+                    <DialogHeader>
+                        <DialogTitle>Export Preview: {classForExport?.name}</DialogTitle>
+                        <DialogDescription>
+                           Preview of the attendance data. You can download it as a CSV file.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <Textarea
+                            readOnly
+                            value={previewData}
+                            rows={15}
+                            className="font-mono text-sm bg-muted"
+                        />
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsPreviewOpen(false)}>Cancel</Button>
+                        <Button onClick={downloadCsv}>
+                            <Download className="mr-2 h-4 w-4"/>
+                            Download CSV
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
