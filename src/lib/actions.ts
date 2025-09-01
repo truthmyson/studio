@@ -40,7 +40,7 @@ export async function generateAttendanceAction(
     if (!validationResultStudents.success) {
       return {
         status: 'error',
-        message: `Invalid student details format: ${validationResultStudents.error.flatten().fieldErrors,}`,
+        message: `Invalid student details format: ${JSON.stringify(validationResultStudents.error.flatten().fieldErrors)}`,
       };
     }
     studentDetails = validationResultStudents.data;
@@ -54,7 +54,7 @@ export async function generateAttendanceAction(
     if(!validationResultAttendance.success) {
         return {
             status: 'error',
-            message: `Invalid attendance records format: ${validationResultAttendance.error.flatten().fieldErrors,}`,
+            message: `Invalid attendance records format: ${JSON.stringify(validationResultAttendance.error.flatten().fieldErrors)}`,
           };
     }
     attendanceRecords = validationResultAttendance.data;
