@@ -3,7 +3,8 @@
 
 import { generateAttendanceTable } from '@/ai/flows/attendance-table-generator';
 import { z } from 'zod';
-import { activeSession, startSession } from '@/lib/attendance-session';
+import { activeSession, startSession, allSessions, signInStudent, getSessionById } from '@/lib/attendance-session';
+import { studentData } from './constants';
 
 const studentDetailsSchema = z.array(
   z.object({
@@ -86,19 +87,48 @@ export async function generateAttendanceAction(
 
 
 export async function getActiveSession() {
-  return activeSession;
+  // The active session is always the first one if it's currently active.
+  if (activeSession && activeSession.active) {
+    const timeSinceStart = (Date.now() - activeSession.startTime) / (1000 * 60); // in minutes
+    if (timeSinceStart <= activeSession.timeLimit) {
+      return activeSession;
+    }
+  }
+  return null;
 }
+
+export async function getAllSessions() {
+  return allSessions;
+}
+
 
 export async function startGeofencingAction(formData: FormData) {
   const radius = parseFloat(formData.get('radius') as string);
   const timeLimit = parseInt(formData.get('timeLimit') as string, 10);
   const latitude = parseFloat(formData.get('latitude') as string);
   const longitude = parseFloat(formData.get('longitude') as string);
+  const topic = formData.get('topic') as string;
 
-  if (isNaN(radius) || isNaN(timeLimit) || isNaN(latitude) || isNaN(longitude)) {
+  if (isNaN(radius) || isNaN(timeLimit) || isNaN(latitude) || isNaN(longitude) || !topic) {
     return { success: false, message: 'Invalid data provided.' };
   }
   
-  startSession({ latitude, longitude }, radius, timeLimit);
+  const studentIds = studentData.map(s => s.id);
+  startSession({ latitude, longitude }, radius, timeLimit, topic, studentIds);
   return { success: true, message: 'Geo-fencing session started!' };
+}
+
+
+export async function markStudentAttendance(sessionId: string, studentId: string) {
+  const session = getSessionById(sessionId);
+  if (!session) {
+    return { success: false, message: 'Session not found.' };
+  }
+  
+  const success = signInStudent(sessionId, studentId);
+  if (success) {
+    return { success: true, message: 'Attendance marked successfully.' };
+  }
+  
+  return { success: false, message: 'Failed to mark attendance.' };
 }

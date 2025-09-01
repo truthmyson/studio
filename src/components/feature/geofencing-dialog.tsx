@@ -25,11 +25,22 @@ interface GeofencingDialogProps {
 export function GeofencingDialog({ isOpen, onClose }: GeofencingDialogProps) {
   const [radius, setRadius] = useState('100'); // Default radius in meters
   const [timeLimit, setTimeLimit] = useState('15'); // Default time limit in minutes
+  const [topic, setTopic] = useState(''); // Lecture topic
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const handleStartSession = async () => {
     setIsLoading(true);
+    if (!topic) {
+        toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'Please enter a lecture topic.',
+        });
+        setIsLoading(false);
+        return;
+    }
+
     if (!navigator.geolocation) {
       toast({
         variant: 'destructive',
@@ -48,6 +59,7 @@ export function GeofencingDialog({ isOpen, onClose }: GeofencingDialogProps) {
         formData.append('timeLimit', timeLimit);
         formData.append('latitude', latitude.toString());
         formData.append('longitude', longitude.toString());
+        formData.append('topic', topic);
         
         const result = await startGeofencingAction(formData);
 
@@ -56,6 +68,7 @@ export function GeofencingDialog({ isOpen, onClose }: GeofencingDialogProps) {
             title: 'Success!',
             description: result.message,
           });
+          setTopic('');
           onClose();
         } else {
           toast({
@@ -83,10 +96,19 @@ export function GeofencingDialog({ isOpen, onClose }: GeofencingDialogProps) {
         <DialogHeader>
           <DialogTitle>Start Geo-fencing Session</DialogTitle>
           <DialogDescription>
-            Set the radius and time limit for students to mark their attendance.
+            Set the lecture topic, radius, and time limit for students to mark their attendance.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="topic">Lecture Topic</Label>
+            <Input
+              id="topic"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              placeholder="e.g., Introduction to Algorithms"
+            />
+          </div>
           <div className="space-y-2">
             <Label htmlFor="radius">Radius (in meters)</Label>
             <Input

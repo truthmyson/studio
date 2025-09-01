@@ -23,7 +23,7 @@ import {
   import { PageHeader, PageHeaderHeading, PageHeaderDescription } from '@/components/page-header';
   import { useEffect, useState } from 'react';
   import { useToast } from '@/hooks/use-toast';
-  import { getActiveSession } from '@/lib/actions';
+  import { getActiveSession, markStudentAttendance } from '@/lib/actions';
   
   // Haversine formula to calculate distance between two lat/lon points
   function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -83,8 +83,12 @@ import {
 
             const distance = getDistance(latitude, longitude, session.location.latitude, session.location.longitude);
             if (distance <= session.radius) {
-                toast({ title: 'Success!', description: 'Attendance marked successfully!' });
-                // Here you would typically update the student's attendance record in a database
+                const result = await markStudentAttendance(session.id, studentId);
+                if (result.success) {
+                  toast({ title: 'Success!', description: 'Attendance marked successfully!' });
+                } else {
+                  toast({ variant: 'destructive', title: 'Error', description: result.message });
+                }
             } else {
                 toast({ variant: 'destructive', title: 'Out of Range', description: `You are ${distance.toFixed(0)} meters away. You must be within ${session.radius} meters.` });
             }
@@ -139,7 +143,7 @@ import {
                         Sign In for Today's Lecture
                     </Button>
                     <p className="text-xs text-muted-foreground mt-2">
-                        Available 15 mins before lecture
+                        Available when session is active
                     </p>
                 </CardContent>
             </Card>
@@ -179,4 +183,3 @@ import {
       </div>
     );
   }
-  

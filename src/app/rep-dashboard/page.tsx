@@ -25,23 +25,36 @@ import {
   UserCheck,
   Users,
 } from 'lucide-react';
-import { studentData, recentAttendance } from '@/lib/constants';
+import { studentData } from '@/lib/constants';
 import Link from 'next/link';
 import { PageHeader, PageHeaderHeading } from '@/components/page-header';
 import { GeofencingDialog } from '@/components/feature/geofencing-dialog';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getAllSessions } from '@/lib/actions';
+import type { AttendanceSession } from '@/lib/attendance-session';
+import { format } from 'date-fns';
 
 export default function RepDashboardPage() {
   const [isGeofencingDialogOpen, setIsGeofencingDialogOpen] = useState(false);
+  const [sessions, setSessions] = useState<AttendanceSession[]>([]);
+
+  useEffect(() => {
+    async function fetchSessions() {
+      const allSessions = await getAllSessions();
+      setSessions(allSessions);
+    }
+    fetchSessions();
+    
+    // Periodically refresh sessions to update status
+    const interval = setInterval(fetchSessions, 5000);
+    return () => clearInterval(interval);
+  }, [isGeofencingDialogOpen]);
 
   const totalStudents = studentData.length;
-  const attendanceRate =
-    recentAttendance.reduce((acc, record) => {
-      const present = Object.values(record.status).filter(
-        (s) => s === 'Present'
-      ).length;
-      return acc + present / totalStudents;
-    }, 0) / recentAttendance.length;
+  const overallAttendanceRate = sessions.length > 0 ? sessions.reduce((acc, session) => {
+    const presentCount = session.students.filter(s => s.signedInAt).length;
+    return acc + (presentCount / (session.students.length || 1));
+  }, 0) / sessions.length : 0;
 
   return (
     <div className="flex-1 space-y-4">
@@ -59,7 +72,7 @@ export default function RepDashboardPage() {
           <CardContent>
             <div className="text-2xl font-bold">{totalStudents}</div>
             <p className="text-xs text-muted-foreground">
-              Enrolled in Computer Science 101
+              Enrolled in your courses
             </p>
           </CardContent>
         </Card>
@@ -72,7 +85,7 @@ export default function RepDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {(attendanceRate * 100).toFixed(1)}%
+              {(overallAttendanceRate * 100).toFixed(1)}%
             </div>
             <p className="text-xs text-muted-foreground">
               Average across all lectures
@@ -82,28 +95,28 @@ export default function RepDashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Upcoming Lecture
+              Total Sessions
             </CardTitle>
             <ClipboardList className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">Today 2:00PM</div>
+            <div className="text-2xl font-bold">{sessions.length}</div>
             <p className="text-xs text-muted-foreground">
-              Data Structures - Hall 4B
+              Created to date
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Mark Attendance</CardTitle>
+            <CardTitle className="text-sm font-medium">New Attendance</CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <Button size="sm" onClick={() => setIsGeofencingDialogOpen(true)}>
-              <UserCheck className="mr-2 h-4 w-4" /> Start Geo-fencing
+              <UserCheck className="mr-2 h-4 w-4" /> Start Session
             </Button>
             <p className="text-xs text-muted-foreground mt-2">
-              For today's lecture
+              Start a new geo-fenced session
             </p>
           </CardContent>
         </Card>
@@ -111,14 +124,14 @@ export default function RepDashboardPage() {
       <Card>
         <CardHeader className="flex flex-row items-center">
           <div className="grid gap-2">
-            <CardTitle>Recent Attendance</CardTitle>
+            <CardTitle>Attendance History</CardTitle>
             <CardDescription>
-              Summary of the last 5 lectures.
+              Summary of all created attendance sessions.
             </CardDescription>
           </div>
           <Button asChild size="sm" className="ml-auto gap-1">
             <Link href="/students">
-              View All
+              View Students
               <ArrowUpRight className="h-4 w-4" />
             </Link>
           </Button>
@@ -127,24 +140,26 @@ export default function RepDashboardPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Lecture Date</TableHead>
+                <TableHead>Lecture</TableHead>
                 <TableHead>Present</TableHead>
                 <TableHead>Absent</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {recentAttendance.map((record) => {
-                const presentCount = Object.values(record.status).filter(
-                  (s) => s === 'Present'
+              {sessions.map((session) => {
+                const presentCount = session.students.filter(
+                  (s) => s.signedInAt
                 ).length;
-                const absentCount = totalStudents - presentCount;
+                const absentCount = session.students.length - presentCount;
+                const isSessionActive = session.active && (Date.now() - session.startTime) < session.timeLimit * 60 * 1000;
+
                 return (
-                  <TableRow key={record.date}>
+                  <TableRow key={session.id}>
                     <TableCell>
-                      <div className="font-medium">{record.topic}</div>
+                      <div className="font-medium">{session.topic}</div>
                       <div className="text-sm text-muted-foreground">
-                        {record.date}
+                        {format(new Date(session.startTime), "PPP p")}
                       </div>
                     </TableCell>
                     <TableCell className="text-green-600">
@@ -154,7 +169,7 @@ export default function RepDashboardPage() {
                       {absentCount}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">Completed</Badge>
+                      <Badge variant={isSessionActive ? "default" : "outline"}>{isSessionActive ? "Active" : "Completed"}</Badge>
                     </TableCell>
                   </TableRow>
                 );
