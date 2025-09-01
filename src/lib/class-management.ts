@@ -14,8 +14,9 @@ export interface Class {
 
 // In-memory store for classes
 let classes: Class[] = [
-    { id: 'CLS001', name: 'Software Engineering Q', studentIds: ['24275016', 'STU002', 'STU004'], joinCode: 'SWEQ-2024' },
-    { id: 'CLS002', name: 'Intro to AI', studentIds: ['24275016', 'STU003', 'STU005', 'STU006', 'STU007'], joinCode: 'AINT-2024' },
+    { id: 'CLS001', name: 'Software Engineering Q', studentIds: ['24275016', 'STU002', 'STU004'], joinCode: 'SWEQ2024' },
+    { id: 'CLS002', name: 'Intro to AI', studentIds: ['24275016', 'STU003', 'STU005', 'STU006', 'STU007'], joinCode: 'AINT2024' },
+    { id: 'CLS003', name: 'My Course', studentIds: ['24275016'], joinCode: 'MYCO5702' },
 ];
 
 export async function getAllClasses(): Promise<Class[]> {
