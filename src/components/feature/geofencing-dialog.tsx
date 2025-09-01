@@ -18,6 +18,7 @@ import { startGeofencingAction } from '@/lib/actions';
 import { Loader2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { getAllClasses, type Class } from '@/lib/class-management';
+import { Checkbox } from '../ui/checkbox';
 
 interface GeofencingDialogProps {
   isOpen: boolean;
@@ -32,6 +33,7 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
   const [selectedClassId, setSelectedClassId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [classes, setClasses] = useState<Class[]>([]);
+  const [includeSelf, setIncludeSelf] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -85,6 +87,7 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
         formData.append('classId', selectedClassId);
         formData.append('studentIds', JSON.stringify(selectedClass.students.map(s => s.studentId)));
         formData.append('repId', repId);
+        formData.append('includeRep', includeSelf.toString());
         
         const result = await startGeofencingAction(formData);
 
@@ -92,6 +95,7 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
           // No toast for success, the notification on the dashboard is enough
           setTopic('');
           setSelectedClassId('');
+          setIncludeSelf(false);
           onClose();
         } else {
           toast({
@@ -166,6 +170,12 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
               onChange={(e) => setTimeLimit(e.target.value)}
               placeholder="e.g., 15"
             />
+          </div>
+           <div className="flex items-center space-x-2">
+            <Checkbox id="include-self" checked={includeSelf} onCheckedChange={(checked) => setIncludeSelf(checked as boolean)} />
+            <Label htmlFor="include-self" className="text-sm font-normal">
+              Sign me in for this session
+            </Label>
           </div>
         </div>
         <DialogFooter>

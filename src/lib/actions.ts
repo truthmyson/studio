@@ -130,6 +130,7 @@ export async function startGeofencingAction(formData: FormData) {
   const classId = formData.get('classId') as string;
   const studentIdsRaw = formData.get('studentIds') as string;
   const repId = formData.get('repId') as string;
+  const includeRep = formData.get('includeRep') === 'true';
 
 
   if (isNaN(radius) || isNaN(timeLimit) || isNaN(latitude) || isNaN(longitude) || !topic || !classId || !studentIdsRaw || !repId) {
@@ -143,7 +144,7 @@ export async function startGeofencingAction(formData: FormData) {
     return { success: false, message: 'Invalid student ID format.' };
   }
 
-  const session = startSession({ latitude, longitude }, radius, timeLimit, topic, studentIds, classId, repId);
+  const session = startSession({ latitude, longitude }, radius, timeLimit, topic, studentIds, classId, repId, includeRep);
 
   // Create notifications for all students in the selected class
   createSessionNotifications(session.id, session.topic, studentIds);

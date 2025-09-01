@@ -26,12 +26,27 @@ function cleanupOldSessions() {
     allSessions = allSessions.filter(session => session.startTime >= fourteenDaysAgo);
 }
 
-export function startSession(location: Location, radius: number, timeLimit: number, topic: string, studentIds: string[], classId: string, repId: string) {
+export function startSession(location: Location, radius: number, timeLimit: number, topic: string, studentIds: string[], classId: string, repId: string, includeRep = false) {
     // Deactivate any other active session before starting a new one
     if (activeSession) {
         const currentActive = allSessions.find(s => s.id === activeSession?.id);
         if (currentActive) {
             currentActive.active = false;
+        }
+    }
+
+    const initialStudents = studentIds.map(id => ({ studentId: id, signedInAt: null }));
+    
+    // If rep wants to be included, add them to the list and sign them in immediately.
+    if (includeRep) {
+        // Check if rep is already in the student list to avoid duplicates
+        if (!initialStudents.some(s => s.studentId === repId)) {
+            initialStudents.push({ studentId: repId, signedInAt: Date.now() });
+        } else {
+             const repInList = initialStudents.find(s => s.studentId === repId);
+             if (repInList) {
+                repInList.signedInAt = Date.now();
+             }
         }
     }
 
@@ -45,7 +60,7 @@ export function startSession(location: Location, radius: number, timeLimit: numb
         timeLimit,
         active: true,
         topic,
-        students: studentIds.map(id => ({ studentId: id, signedInAt: null })),
+        students: initialStudents,
     };
     
     activeSession = newSession; 
