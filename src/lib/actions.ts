@@ -4,7 +4,7 @@
 import { generateAttendanceTable } from '@/ai/flows/attendance-table-generator';
 import { z } from 'zod';
 import { activeSession, startSession, getSessions, signInStudent, getSessionById, getSessionsByClass, toggleSessionStatus } from '@/lib/attendance-session';
-import { getStudentById, studentData } from './constants';
+import { getStudentById, studentData, addStudent } from './constants';
 import { createSessionNotifications, getStudentNotifications, markNotificationAsRead, createRepNotification } from './notifications';
 import { format } from 'date-fns';
 import { getClassById, enrollStudentInClass, getClassesByStudent, studentLeaveClass, removeStudentFromClass, getStudentsByClassId, getAllClasses, Class } from './class-management';
@@ -27,6 +27,11 @@ export type FormState = {
   status: 'error' | 'success' | 'idle';
   message: string;
   csvData?: string;
+};
+
+export type StudentFormState = {
+  status: 'error' | 'success' | 'idle';
+  message: string;
 };
 
 export async function generateAttendanceAction(
@@ -288,4 +293,69 @@ export async function toggleSessionStatusAction(sessionId: string, newStatus: bo
         createSessionNotifications(result.session.id, result.session.topic, result.session.students.map(s => s.studentId));
     }
     return { success: result.success, message: result.message };
+}
+
+const studentSchema = z.object({
+  studentId: z.string().min(1, "School ID is required."),
+  firstName: z.string().min(1, "First Name is required."),
+  middleName: z.string().optional(),
+  lastName: z.string().min(1, "Last Name is required."),
+  email: z.string().email("Invalid email address."),
+  contact: z.string().optional(),
+  gender: z.enum(['male', 'female']).optional(),
+  courseName: z.string().min(1, "Course Name is required."),
+  password: z.string().min(6, "Password must be at least 6 characters."),
+});
+
+export async function registerStudentAction(
+  prevState: StudentFormState,
+  formData: FormData
+): Promise<StudentFormState> {
+  const result = studentSchema.safeParse({
+    studentId: formData.get('studentId'),
+    firstName: formData.get('firstName'),
+    middleName: formData.get('middleName'),
+    lastName: formData.get('lastName'),
+    email: formData.get('email'),
+    contact: formData.get('contact'),
+    gender: formData.get('gender') || undefined,
+    courseName: formData.get('courseName'),
+    password: formData.get('password'),
+  });
+
+  if (!result.success) {
+    // Return the first error message
+    const firstError = Object.values(result.error.flatten().fieldErrors)[0]?.[0];
+    return { status: 'error', message: firstError || "Validation failed." };
+  }
+
+  const { studentId, firstName, middleName, lastName, email, courseName, contact, gender } = result.data;
+  
+  // Check if student ID or email already exists
+  const existingStudentById = await getStudentById(studentId);
+  const existingStudentByEmail = studentData.find(s => s.email.toLowerCase() === email.toLowerCase());
+
+  if (existingStudentById) {
+      return { status: 'error', message: 'A student with this School ID already exists.' };
+  }
+  if (existingStudentByEmail) {
+      return { status: 'error', message: 'A student with this email address already exists.' };
+  }
+  
+  const newStudent: Student = {
+    id: studentId,
+    firstName,
+    middleName,
+    lastName,
+    major: courseName, // Assuming major and courseName are the same for this context
+    email,
+    courseName,
+    contact,
+    gender: gender === 'male' ? 'Male' : 'Female',
+    isRep: false
+  };
+
+  addStudent(newStudent);
+
+  return { status: 'success', message: 'Registration successful! You can now log in.' };
 }

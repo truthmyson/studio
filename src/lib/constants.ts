@@ -18,6 +18,10 @@ export async function getStudentById(id: string): Promise<Student | undefined> {
     return studentData.find(s => s.id === id);
 }
 
+export function addStudent(student: Student) {
+    studentData.push(student);
+}
+
 export const recentAttendance = [
     {
         topic: 'Introduction to Algorithms',
