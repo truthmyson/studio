@@ -18,12 +18,14 @@ import {
   } from '@/components/ui/table';
   import { Badge } from '@/components/ui/badge';
   import { Button } from '@/components/ui/button';
-  import { ClipboardList, Loader2, UserCheck } from 'lucide-react';
+  import { ClipboardList, Loader2, UserCheck, Bell, Check } from 'lucide-react';
   import { recentAttendance } from '@/lib/constants';
   import { PageHeader, PageHeaderHeading, PageHeaderDescription } from '@/components/page-header';
-  import { useEffect, useState } from 'react';
+  import { useEffect, useState, useCallback } from 'react';
   import { useToast } from '@/hooks/use-toast';
-  import { getActiveSession, markStudentAttendance } from '@/lib/actions';
+  import { getActiveSession, markStudentAttendance, getNotifications, markNotificationRead } from '@/lib/actions';
+  import type { Notification } from '@/lib/notifications';
+  import { formatDistanceToNow } from 'date-fns';
   
   // Haversine formula to calculate distance between two lat/lon points
   function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -45,11 +47,28 @@ import {
     const studentId = 'STU001'; // Mock student ID
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+
+    const fetchNotifications = useCallback(async () => {
+        const notifs = await getNotifications(studentId);
+        setNotifications(notifs);
+    }, [studentId]);
+
+    useEffect(() => {
+        fetchNotifications();
+        const interval = setInterval(fetchNotifications, 5000); // Poll for new notifications
+        return () => clearInterval(interval);
+    }, [fetchNotifications]);
   
     const myAttendance = recentAttendance.map(record => ({
       ...record,
       myStatus: record.status[studentId] || 'N/A',
     }));
+
+    const handleMarkAsRead = async (notificationId: string) => {
+        await markNotificationRead(notificationId);
+        fetchNotifications();
+    };
 
     const handleSignIn = () => {
         setIsLoading(true);
@@ -113,7 +132,7 @@ import {
                 <PageHeaderDescription>Welcome, John Doe!</PageHeaderDescription>
             </div>
         </PageHeader>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
@@ -145,6 +164,38 @@ import {
                     <p className="text-xs text-muted-foreground mt-2">
                         Available when session is active
                     </p>
+                </CardContent>
+            </Card>
+            <Card className="lg:col-span-1">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Notifications</CardTitle>
+                    <Bell className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-4">
+                    {notifications.length > 0 ? (
+                        notifications.map((notif) => (
+                        <div key={notif.id} className="flex items-start gap-4">
+                            <div className="flex-1">
+                                <p className={`text-sm ${notif.read ? 'text-muted-foreground' : 'font-semibold'}`}>
+                                    {notif.message}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                    {formatDistanceToNow(notif.createdAt, { addSuffix: true })}
+                                </p>
+                            </div>
+                            {!notif.read && (
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleMarkAsRead(notif.id)}>
+                                <Check className="h-4 w-4" />
+                                <span className="sr-only">Mark as read</span>
+                            </Button>
+                            )}
+                        </div>
+                        ))
+                    ) : (
+                        <p className="text-sm text-muted-foreground">No new notifications.</p>
+                    )}
+                    </div>
                 </CardContent>
             </Card>
         </div>

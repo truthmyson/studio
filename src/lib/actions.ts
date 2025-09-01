@@ -5,6 +5,7 @@ import { generateAttendanceTable } from '@/ai/flows/attendance-table-generator';
 import { z } from 'zod';
 import { activeSession, startSession, allSessions, signInStudent, getSessionById } from '@/lib/attendance-session';
 import { studentData } from './constants';
+import { createSessionNotifications, getStudentNotifications, markNotificationAsRead } from './notifications';
 
 const studentDetailsSchema = z.array(
   z.object({
@@ -114,7 +115,11 @@ export async function startGeofencingAction(formData: FormData) {
   }
   
   const studentIds = studentData.map(s => s.id);
-  startSession({ latitude, longitude }, radius, timeLimit, topic, studentIds);
+  const session = startSession({ latitude, longitude }, radius, timeLimit, topic, studentIds);
+
+  // Create notifications for all students
+  createSessionNotifications(session.id, session.topic, studentIds);
+
   return { success: true, message: 'Geo-fencing session started!' };
 }
 
@@ -131,4 +136,13 @@ export async function markStudentAttendance(sessionId: string, studentId: string
   }
   
   return { success: false, message: 'Failed to mark attendance.' };
+}
+
+export async function getNotifications(studentId: string) {
+    return getStudentNotifications(studentId);
+}
+
+export async function markNotificationRead(notificationId: string) {
+    markNotificationAsRead(notificationId);
+    return { success: true };
 }
