@@ -48,14 +48,6 @@ export default function RepRegisterPage() {
               <Label htmlFor="course">Course/Program</Label>
               <Input id="course" placeholder="B.Sc. Computer Science" required defaultValue="Computer Science" />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="reason">Reason for application</Label>
-              <textarea
-                id="reason"
-                className="w-full min-h-[100px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                placeholder="Briefly explain why you want to be a class representative."
-              />
-            </div>
             <Button type="submit" className="w-full">Submit Application</Button>
              <p className="text-center text-sm text-muted-foreground">
                 Already have a rep account?{' '}
