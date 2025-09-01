@@ -37,7 +37,7 @@ import {
 import { StudentsTable } from "@/components/feature/students-table";
 import { exportAttendanceAction, removeStudentFromClassAction } from "@/lib/actions";
 import { Textarea } from "@/components/ui/textarea";
-import { getAllClasses, createClass, deleteClass, getStudentsByClass, type Class } from "@/lib/class-management";
+import { getAllClasses, createClass, deleteClass, getStudentsByClassId, type Class } from "@/lib/class-management";
 import type { Student } from "@/lib/types";
 
 export default function ClassesPage() {
@@ -94,7 +94,7 @@ export default function ClassesPage() {
     
     const viewRoster = async (cls: Class) => {
         setSelectedClass(cls);
-        const students = await getStudentsByClass(cls.id);
+        const students = await getStudentsByClassId(cls.id);
         setClassStudents(students);
         setIsRosterDialogOpen(true);
     }
@@ -105,7 +105,7 @@ export default function ClassesPage() {
         if (result.success) {
             toast({ title: "Student Removed", description: result.message });
             // Refresh student list for the roster
-            const updatedStudents = await getStudentsByClass(selectedClass.id);
+            const updatedStudents = await getStudentsByClassId(selectedClass.id);
             setClassStudents(updatedStudents);
              // Also refresh the main classes list to update student count
             await refreshClasses();
