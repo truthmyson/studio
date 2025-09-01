@@ -18,15 +18,15 @@ let classes: Class[] = [
     { id: 'CLS002', name: 'Intro to AI', studentIds: ['STU001', 'STU003', 'STU005', 'STU006', 'STU007'], joinCode: 'AI-INTRO-2024' },
 ];
 
-export function getAllClasses(): Class[] {
+export async function getAllClasses(): Promise<Class[]> {
     return classes;
 }
 
-export function getClassById(id: string): Class | undefined {
+export async function getClassById(id: string): Promise<Class | undefined> {
     return classes.find(c => c.id === id);
 }
 
-export function createClass(name: string): Class {
+export async function createClass(name: string): Promise<Class> {
     const newClass: Class = {
         id: `CLS${(classes.length + 1).toString().padStart(3, '0')}`,
         name: name,
@@ -37,17 +37,17 @@ export function createClass(name: string): Class {
     return newClass;
 }
 
-export function deleteClass(id: string): void {
+export async function deleteClass(id: string): Promise<void> {
     classes = classes.filter(c => c.id !== id);
 }
 
-export function getStudentsByClass(classId: string): Student[] {
-    const cls = getClassById(classId);
+export async function getStudentsByClass(classId: string): Promise<Student[]> {
+    const cls = await getClassById(classId);
     if (!cls) return [];
     return studentData.filter(student => cls.studentIds.includes(student.id));
 }
 
-export function enrollStudentInClass(studentId: string, joinCode: string): { success: boolean; message: string; className?: string } {
+export async function enrollStudentInClass(studentId: string, joinCode: string): Promise<{ success: boolean; message: string; className?: string }> {
     const classToJoin = classes.find(c => c.joinCode === joinCode);
     if (!classToJoin) {
         return { success: false, message: "Invalid join code." };
