@@ -296,7 +296,7 @@ export async function toggleSessionStatusAction(sessionId: string, newStatus: bo
     return { success: result.success, message: result.message };
 }
 
-const studentSchema = z.object({
+const userSchema = z.object({
   studentId: z.string().min(1, "School ID is required."),
   firstName: z.string().min(1, "First Name is required."),
   middleName: z.string().optional(),
@@ -304,59 +304,71 @@ const studentSchema = z.object({
   email: z.string().email("Invalid email address."),
   contact: z.string().optional(),
   gender: z.enum(['male', 'female']).optional(),
-  courseName: z.string().min(1, "Course Name is required."),
+  courseName: z.string().min(1, "Course/Department is required."),
   password: z.string().min(6, "Password must be at least 6 characters."),
 });
+
+async function handleUserRegistration(formData: FormData, isRep: boolean): Promise<StudentFormState> {
+    const result = userSchema.safeParse({
+        studentId: formData.get('studentId'),
+        firstName: formData.get('firstName'),
+        middleName: formData.get('middleName'),
+        lastName: formData.get('lastName'),
+        email: formData.get('email'),
+        contact: formData.get('contact'),
+        gender: formData.get('gender') || undefined,
+        courseName: formData.get('courseName'),
+        password: formData.get('password'),
+      });
+    
+      if (!result.success) {
+        // Return the first error message
+        const firstError = Object.values(result.error.flatten().fieldErrors)[0]?.[0];
+        return { status: 'error', message: firstError || "Validation failed." };
+      }
+    
+      const { studentId, firstName, middleName, lastName, email, courseName, contact, gender } = result.data;
+      
+      // Check if student ID or email already exists
+      const existingStudentById = await getStudentById(studentId);
+      const existingStudentByEmail = studentData.find(s => s.email.toLowerCase() === email.toLowerCase());
+    
+      if (existingStudentById) {
+          return { status: 'error', message: 'A user with this School ID already exists.' };
+      }
+      if (existingStudentByEmail) {
+          return { status: 'error', message: 'A user with this email address already exists.' };
+      }
+      
+      const newUser: Student = {
+        id: studentId,
+        firstName,
+        middleName,
+        lastName,
+        major: courseName,
+        email,
+        courseName,
+        contact,
+        gender: gender === 'male' ? 'Male' : 'Female',
+        isRep,
+      };
+    
+      addStudent(newUser);
+    
+      const userType = isRep ? 'Representative' : 'Student';
+      return { status: 'success', message: `${userType} account created successfully!` };
+}
 
 export async function registerStudentAction(
   prevState: StudentFormState,
   formData: FormData
 ): Promise<StudentFormState> {
-  const result = studentSchema.safeParse({
-    studentId: formData.get('studentId'),
-    firstName: formData.get('firstName'),
-    middleName: formData.get('middleName'),
-    lastName: formData.get('lastName'),
-    email: formData.get('email'),
-    contact: formData.get('contact'),
-    gender: formData.get('gender') || undefined,
-    courseName: formData.get('courseName'),
-    password: formData.get('password'),
-  });
+  return handleUserRegistration(formData, false);
+}
 
-  if (!result.success) {
-    // Return the first error message
-    const firstError = Object.values(result.error.flatten().fieldErrors)[0]?.[0];
-    return { status: 'error', message: firstError || "Validation failed." };
-  }
-
-  const { studentId, firstName, middleName, lastName, email, courseName, contact, gender } = result.data;
-  
-  // Check if student ID or email already exists
-  const existingStudentById = await getStudentById(studentId);
-  const existingStudentByEmail = studentData.find(s => s.email.toLowerCase() === email.toLowerCase());
-
-  if (existingStudentById) {
-      return { status: 'error', message: 'A student with this School ID already exists.' };
-  }
-  if (existingStudentByEmail) {
-      return { status: 'error', message: 'A student with this email address already exists.' };
-  }
-  
-  const newStudent: Student = {
-    id: studentId,
-    firstName,
-    middleName,
-    lastName,
-    major: courseName, // Assuming major and courseName are the same for this context
-    email,
-    courseName,
-    contact,
-    gender: gender === 'male' ? 'Male' : 'Female',
-    isRep: false
-  };
-
-  addStudent(newStudent);
-
-  return { status: 'success', message: 'Registration successful! You can now log in.' };
+export async function registerRepAction(
+    prevState: StudentFormState,
+    formData: FormData
+  ): Promise<StudentFormState> {
+    return handleUserRegistration(formData, true);
 }
