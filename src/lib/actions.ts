@@ -14,8 +14,10 @@ import { Student } from './types';
 const studentDetailsSchema = z.array(
   z.object({
     id: z.string(),
-    name: z.string(),
-    major: z.string(),
+    'First Name': z.string(),
+    'Middle Name': z.string().optional(),
+    'Last Name': z.string(),
+    'Course Name': z.string(),
   })
 );
 
@@ -182,17 +184,10 @@ export async function exportAttendanceAction(classId: string): Promise<{ success
 
     const classStudents = studentData.filter(s => selectedClass.studentIds.includes(s.id));
     const classSessions = getSessionsByClass(classId);
-
-    const getFullName = (student: Student) => {
-      return [student.firstName, student.middleName, student.lastName].filter(Boolean).join(' ');
-    }
     
     // Map student details for the AI flow
     const studentDetailsForFlow = classStudents.map(s => ({
         id: s.id,
-        // The flow expects a 'name' field, so we construct it.
-        name: getFullName(s), 
-        // Pass other relevant details.
         'First Name': s.firstName,
         'Middle Name': s.middleName || '',
         'Last Name': s.lastName,
@@ -248,7 +243,7 @@ export async function exportAttendanceAction(classId: string): Promise<{ success
 
 export async function joinClassAction(studentId: string, joinCode: string): Promise<{ success: boolean, message: string }> {
     const result = await enrollStudentInClass(studentId, joinCode);
-    if (result.success) {
+    if (result.success && result.className) {
         createRepNotification(studentId, `You have successfully joined the class: ${result.className}`);
     }
     return { success: result.success, message: result.message };
@@ -265,3 +260,5 @@ export async function studentLeaveClassAction(classId: string, studentId: string
 export async function removeStudentFromClassAction(classId: string, studentId: string) {
     return removeStudentFromClass(classId, studentId);
 }
+
+    

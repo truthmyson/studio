@@ -18,7 +18,7 @@ import {
   } from '@/components/ui/table';
   import { Badge } from '@/components/ui/badge';
   import { Button } from '@/components/ui/button';
-  import { ClipboardList, Loader2, UserCheck, Bell, Check, PlusCircle, LogOut } from 'lucide-react';
+  import { ClipboardList, Loader2, UserCheck, Bell, Check, PlusCircle, LogOut, User as UserIcon } from 'lucide-react';
   import { recentAttendance } from '@/lib/constants';
   import { PageHeader, PageHeaderHeading, PageHeaderDescription } from '@/components/page-header';
   import { useEffect, useState, useCallback } from 'react';
@@ -48,7 +48,7 @@ import type { Class } from '@/lib/class-management';
   }
   
   export default function StudentDashboardPage() {
-    const studentId = 'STU001'; // Mock student ID
+    const studentId = '24254016'; // Mock student ID
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
     const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -177,12 +177,18 @@ import type { Class } from '@/lib/class-management';
         <PageHeader>
             <div>
                 <PageHeaderHeading>Student Dashboard</PageHeaderHeading>
-                <PageHeaderDescription>Welcome, John Doe!</PageHeaderDescription>
+                <PageHeaderDescription>Welcome, Kofi Akoto!</PageHeaderDescription>
             </div>
-            <Button onClick={() => setIsJoinClassOpen(true)}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Join a Class
-            </Button>
+            <div className='flex gap-2'>
+                 <Button variant="outline">
+                    <UserIcon className="mr-2 h-4 w-4" />
+                    View Profile
+                </Button>
+                <Button onClick={() => setIsJoinClassOpen(true)}>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Join a Class
+                </Button>
+            </div>
         </PageHeader>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Card>
@@ -355,3 +361,5 @@ import type { Class } from '@/lib/class-management';
       </div>
     );
   }
+
+    
