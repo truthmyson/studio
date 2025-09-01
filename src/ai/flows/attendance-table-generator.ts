@@ -42,26 +42,23 @@ const attendanceTableGeneratorFlow = ai.defineFlow(
     outputSchema: AttendanceTableOutputSchema,
   },
   async input => {
-    // Extract student details and attendance records from the input
     const {studentDetails, attendanceRecords} = input;
 
-    // Extract all unique studentIds
-    const allStudentIds = studentDetails.map(student => student.id);
+    // Sort dates chronologically
+    const sortedDates = Object.keys(attendanceRecords).sort();
 
     // Create the CSV header row
-    const header = ['Student Details', ...Object.keys(attendanceRecords)];
+    const header = ['Student ID', 'Student Name', ...sortedDates];
 
     // Create the CSV data rows
     const dataRows = studentDetails.map(student => {
       const studentId = student.id;
-      const attendanceValues = Object.keys(attendanceRecords).map(date => {
-        return attendanceRecords[date].includes(studentId) ? 1 : 0;
+      const studentName = student.name;
+      const attendanceValues = sortedDates.map(date => {
+        return attendanceRecords[date]?.includes(studentId) ? 'Present' : 'Absent';
       });
 
-      // Combine student details and attendance values into a single row
-      const studentDetailsString = JSON.stringify(student);
-
-      return [studentDetailsString, ...attendanceValues];
+      return [studentId, studentName, ...attendanceValues];
     });
 
     // Combine header and data rows

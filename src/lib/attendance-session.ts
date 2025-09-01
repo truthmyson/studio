@@ -59,6 +59,10 @@ export function getSessionById(sessionId: string) {
     return allSessions.find(s => s.id === sessionId);
 }
 
+export function getSessionsByClass(classId: string) {
+    return allSessions.filter(s => s.classId === classId);
+}
+
 export function signInStudent(sessionId: string, studentId: string): boolean {
     const session = getSessionById(sessionId);
     if (!session) {
@@ -81,5 +85,3 @@ export function signInStudent(sessionId: string, studentId: string): boolean {
     console.log(`Student ${studentId} signed in successfully at ${session.students[studentIndex].signedInAt}`);
     return true;
 }
-
-    

@@ -3,9 +3,10 @@
 
 import { generateAttendanceTable } from '@/ai/flows/attendance-table-generator';
 import { z } from 'zod';
-import { activeSession, startSession, allSessions, signInStudent, getSessionById } from '@/lib/attendance-session';
+import { activeSession, startSession, allSessions, signInStudent, getSessionById, getSessionsByClass } from '@/lib/attendance-session';
 import { studentData } from './constants';
 import { createSessionNotifications, getStudentNotifications, markNotificationAsRead } from './notifications';
+import { format } from 'date-fns';
 
 const studentDetailsSchema = z.array(
   z.object({
@@ -163,4 +164,55 @@ export async function markNotificationRead(notificationId: string) {
     return { success: true };
 }
 
+// In a real app, this would probably be a database query
+const getClassById = (id: string) => {
+    return initialClasses.find(c => c.id === id);
+}
+
+// Mock data for classes - in a real app, this would come from a database
+const initialClasses = [
+    { id: 'CLS001', name: 'Software Engineering Q', studentIds: ['STU001', 'STU002', 'STU004'], joinCode: 'SWE-Q-2024' },
+    { id: 'CLS002', name: 'Intro to AI', studentIds: ['STU001', 'STU003', 'STU005', 'STU006', 'STU007'], joinCode: 'AI-INTRO-2024' },
+];
+
+export async function exportAttendanceAction(classId: string): Promise<{ success: boolean, message: string, csvData?: string }> {
+    const selectedClass = getClassById(classId);
+    if (!selectedClass) {
+        return { success: false, message: "Class not found." };
+    }
+
+    const classSessions = getSessionsByClass(classId);
+    if (classSessions.length === 0) {
+        return { success: false, message: "No attendance sessions found for this class." };
+    }
+
+    const classStudents = studentData.filter(s => selectedClass.studentIds.includes(s.id));
+
+    const attendanceRecords: Record<string, string[]> = {};
+    for (const session of classSessions) {
+        const date = format(new Date(session.startTime), "yyyy-MM-dd");
+        attendanceRecords[date] = session.students
+            .filter(s => s.signedInAt !== null)
+            .map(s => s.studentId);
+    }
     
+    try {
+        const result = await generateAttendanceTable({
+            studentDetails: classStudents,
+            attendanceRecords: attendanceRecords,
+        });
+
+        if (result.csvData) {
+            return {
+                success: true,
+                message: 'CSV file generated successfully.',
+                csvData: result.csvData,
+            };
+        } else {
+            return { success: false, message: 'Failed to generate CSV data.' };
+        }
+    } catch (error) {
+        console.error(error);
+        return { success: false, message: 'An unexpected error occurred while generating the report.' };
+    }
+}

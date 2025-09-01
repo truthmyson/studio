@@ -5,7 +5,7 @@ import { PageHeader, PageHeaderHeading, PageHeaderDescription } from "@/componen
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { PlusCircle, Users, Copy, Trash2, Eye } from "lucide-react";
+import { PlusCircle, Users, Copy, Trash2, Eye, Download, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { studentData } from "@/lib/constants";
 import { StudentsTable } from "@/components/feature/students-table";
+import { exportAttendanceAction } from "@/lib/actions";
 
 // Mock class structure
 interface Class {
@@ -49,6 +50,7 @@ export default function ClassesPage() {
     const [classes, setClasses] = useState(initialClasses);
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
     const [isRosterDialogOpen, setIsRosterDialogOpen] = useState(false);
+    const [isExporting, setIsExporting] = useState(false);
     const [selectedClass, setSelectedClass] = useState<Class | null>(null);
     const [newClassName, setNewClassName] = useState('');
     const { toast } = useToast();
@@ -90,6 +92,26 @@ export default function ClassesPage() {
     const viewRoster = (cls: Class) => {
         setSelectedClass(cls);
         setIsRosterDialogOpen(true);
+    }
+
+    const handleExport = async (cls: Class) => {
+        setIsExporting(true);
+        const result = await exportAttendanceAction(cls.id);
+        if (result.success && result.csvData) {
+            const blob = new Blob([result.csvData], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `${cls.name.replace(/ /g, '_')}_attendance.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            toast({ title: 'Success!', description: 'Attendance data exported.' });
+        } else {
+            toast({ variant: 'destructive', title: 'Error', description: result.message });
+        }
+        setIsExporting(false);
     }
 
     const copyToClipboard = (text: string) => {
@@ -144,6 +166,10 @@ export default function ClassesPage() {
                              <Button variant="outline" className="w-full" onClick={() => viewRoster(cls)}>
                                 <Eye className="mr-2 h-4 w-4"/>
                                 View Roster
+                            </Button>
+                             <Button variant="secondary" className="w-full" onClick={() => handleExport(cls)} disabled={isExporting}>
+                                {isExporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Download className="mr-2 h-4 w-4" />}
+                                Export
                             </Button>
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
@@ -217,5 +243,3 @@ export default function ClassesPage() {
         </div>
     );
 }
-
-    
