@@ -45,7 +45,7 @@ export function MessagingDialog({ isOpen, onClose, session, currentUserId }: Mes
             const interval = setInterval(fetchMessages, 3000);
             return () => clearInterval(interval);
         }
-    }, [isOpen, session]);
+    }, [isOpen, session.id]);
 
      useEffect(() => {
         // Scroll to bottom when new messages arrive
@@ -93,7 +93,7 @@ export function MessagingDialog({ isOpen, onClose, session, currentUserId }: Mes
             <DialogTitle>Session Chat: {session.topic}</DialogTitle>
             <DialogDescription>
                 {isRep ? "Review messages from students for this session." : "Communicate with the session representative."}
-            </DailogDescription>
+            </DialogDescription>
             </DialogHeader>
             <div className="py-4 space-y-4">
                 <ScrollArea className="h-72 w-full rounded-md border p-4" ref={scrollAreaRef}>
