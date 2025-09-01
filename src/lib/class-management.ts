@@ -14,8 +14,8 @@ export interface Class {
 
 // In-memory store for classes
 let classes: Class[] = [
-    { id: 'CLS001', name: 'Software Engineering Q', studentIds: ['24254016', 'STU002', 'STU004'], joinCode: 'SWE-Q-2024' },
-    { id: 'CLS002', name: 'Intro to AI', studentIds: ['24254016', 'STU003', 'STU005', 'STU006', 'STU007'], joinCode: 'AI-INTRO-2024' },
+    { id: 'CLS001', name: 'Software Engineering Q', studentIds: ['24275016', 'STU002', 'STU004'], joinCode: 'SWE-Q-2024' },
+    { id: 'CLS002', name: 'Intro to AI', studentIds: ['24275016', 'STU003', 'STU005', 'STU006', 'STU007'], joinCode: 'AI-INTRO-2024' },
 ];
 
 export async function getAllClasses(): Promise<Class[]> {
@@ -92,5 +92,7 @@ export async function removeStudentFromClass(classId: string, studentId: string)
     }
     return { success: false, message: "Student not found in this class." };
 }
+
+    
 
     

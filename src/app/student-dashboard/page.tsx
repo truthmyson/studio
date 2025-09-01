@@ -48,7 +48,7 @@ import type { Class } from '@/lib/class-management';
   }
   
   export default function StudentDashboardPage() {
-    const studentId = '24254016'; // Mock student ID
+    const studentId = '24275016'; // Mock student ID
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
     const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -177,7 +177,7 @@ import type { Class } from '@/lib/class-management';
         <PageHeader>
             <div>
                 <PageHeaderHeading>Student Dashboard</PageHeaderHeading>
-                <PageHeaderDescription>Welcome, Kofi Akoto!</PageHeaderDescription>
+                <PageHeaderDescription>Welcome, Chris Mensah!</PageHeaderDescription>
             </div>
             <div className='flex gap-2'>
                  <Button variant="outline">
@@ -361,5 +361,7 @@ import type { Class } from '@/lib/class-management';
       </div>
     );
   }
+
+    
 
     
