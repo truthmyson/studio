@@ -1,4 +1,5 @@
 
+
 'use server';
 
 import { generateAttendanceTable } from '@/ai/flows/attendance-table-generator';
@@ -8,6 +9,7 @@ import { studentData } from './constants';
 import { createSessionNotifications, getStudentNotifications, markNotificationAsRead, createRepNotification } from './notifications';
 import { format } from 'date-fns';
 import { getClassById, enrollStudentInClass, getClassesByStudent, studentLeaveClass, removeStudentFromClass } from './class-management';
+import { Student } from './types';
 
 const studentDetailsSchema = z.array(
   z.object({
@@ -180,12 +182,28 @@ export async function exportAttendanceAction(classId: string): Promise<{ success
 
     const classStudents = studentData.filter(s => selectedClass.studentIds.includes(s.id));
     const classSessions = getSessionsByClass(classId);
+
+    const getFullName = (student: Student) => {
+      return [student.firstName, student.middleName, student.lastName].filter(Boolean).join(' ');
+    }
+    
+    // Map student details for the AI flow
+    const studentDetailsForFlow = classStudents.map(s => ({
+        id: s.id,
+        // The flow expects a 'name' field, so we construct it.
+        name: getFullName(s), 
+        // Pass other relevant details.
+        'First Name': s.firstName,
+        'Middle Name': s.middleName || '',
+        'Last Name': s.lastName,
+        'Course Name': s.courseName,
+    }));
     
     // If there are no sessions, we can still export the student roster.
     if (classSessions.length === 0) {
         try {
             const result = await generateAttendanceTable({
-                studentDetails: classStudents.map(s => ({id: s.id, name: s.name, major: ''})), // pass needed fields
+                studentDetails: studentDetailsForFlow,
                 attendanceRecords: {}, // No records yet
             });
              return {
@@ -209,7 +227,7 @@ export async function exportAttendanceAction(classId: string): Promise<{ success
     
     try {
         const result = await generateAttendanceTable({
-            studentDetails: classStudents,
+            studentDetails: studentDetailsForFlow,
             attendanceRecords: attendanceRecords,
         });
 

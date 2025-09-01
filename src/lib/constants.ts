@@ -1,16 +1,17 @@
+
 import type { Student } from './types';
 
 export const studentData: Student[] = [
-  { id: 'STU001', name: 'John Doe', major: 'Computer Science' },
-  { id: 'STU002', name: 'Jane Smith', major: 'Computer Science' },
-  { id: 'STU003', name: 'Peter Jones', major: 'Software Engineering' },
-  { id: 'STU004', name: 'Mary Johnson', major: 'Computer Science' },
-  { id: 'STU005', name: 'David Williams', major: 'Information Technology' },
-  { id: 'STU006', name: 'Emily Brown', major: 'Computer Science' },
-  { id: 'STU007', name: 'Michael Davis', major: 'Software Engineering' },
-  { id: 'STU008', name: 'Sarah Miller', major: 'Computer Science' },
-  { id: 'STU009', name: 'Chris Wilson', major: 'Information Technology' },
-  { id: 'STU010', name: 'Jessica Taylor', major: 'Computer Science' },
+  { id: 'STU001', firstName: 'John', lastName: 'Doe', major: 'Computer Science', email: 'john.doe@university.edu', courseName: 'Computer Science' },
+  { id: 'STU002', firstName: 'Jane', lastName: 'Smith', major: 'Computer Science', email: 'jane.smith@university.edu', courseName: 'Computer Science' },
+  { id: 'STU003', firstName: 'Peter', lastName: 'Jones', major: 'Software Engineering', email: 'peter.jones@university.edu', courseName: 'Software Engineering' },
+  { id: 'STU004', firstName: 'Mary', lastName: 'Johnson', major: 'Computer Science', email: 'mary.johnson@university.edu', courseName: 'Computer Science' },
+  { id: 'STU005', firstName: 'David', lastName: 'Williams', major: 'Information Technology', email: 'david.williams@university.edu', courseName: 'Information Technology' },
+  { id: 'STU006', firstName: 'Emily', lastName: 'Brown', major: 'Computer Science', email: 'emily.brown@university.edu', courseName: 'Computer Science' },
+  { id: 'STU007', firstName: 'Michael', lastName: 'Davis', major: 'Software Engineering', email: 'michael.davis@university.edu', courseName: 'Software Engineering' },
+  { id: 'STU008', firstName: 'Sarah', lastName: 'Miller', major: 'Computer Science', email: 'sarah.miller@university.edu', courseName: 'Computer Science' },
+  { id: 'STU009', firstName: 'Chris', lastName: 'Wilson', major: 'Information Technology', email: 'chris.wilson@university.edu', courseName: 'Information Technology' },
+  { id: 'STU010', firstName: 'Jessica', lastName: 'Taylor', major: 'Computer Science', email: 'jessica.taylor@university.edu', courseName: 'Computer Science' },
 ];
 
 export const recentAttendance = [

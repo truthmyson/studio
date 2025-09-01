@@ -1,3 +1,4 @@
+
 import {
     Table,
     TableBody,
@@ -23,6 +24,11 @@ import {
   }
   
   export function StudentsTable({ data, actions = [] }: StudentsTableProps) {
+    // Helper to construct full name
+    const getFullName = (student: Student) => {
+        return [student.firstName, student.middleName, student.lastName].filter(Boolean).join(' ');
+    }
+
     return (
       <div className="rounded-md border">
         <Table>
@@ -30,7 +36,7 @@ import {
             <TableRow>
               <TableHead>Student ID</TableHead>
               <TableHead>Full Name</TableHead>
-              <TableHead>Major</TableHead>
+              <TableHead>Course</TableHead>
               {actions.length > 0 && <TableHead className="text-right">Actions</TableHead>}
             </TableRow>
           </TableHeader>
@@ -41,8 +47,8 @@ import {
                   <TableCell>
                     <Badge variant="secondary">{student.id}</Badge>
                   </TableCell>
-                  <TableCell className="font-medium">{student.name}</TableCell>
-                  <TableCell>{student.major}</TableCell>
+                  <TableCell className="font-medium">{getFullName(student)}</TableCell>
+                  <TableCell>{student.courseName}</TableCell>
                   {actions.length > 0 && (
                     <TableCell className="text-right">
                         {actions.map(action => (
@@ -73,4 +79,3 @@ import {
       </div>
     );
   }
-  

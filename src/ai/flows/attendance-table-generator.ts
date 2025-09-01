@@ -47,18 +47,22 @@ const attendanceTableGeneratorFlow = ai.defineFlow(
     // Sort dates chronologically
     const sortedDates = Object.keys(attendanceRecords).sort();
 
-    // Create the CSV header row
-    const header = ['Student ID', 'Student Name', ...sortedDates];
+    // Create the CSV header row. Now includes more student details.
+    const header = ['Student ID', 'First Name', 'Middle Name', 'Last Name', 'Course Name', ...sortedDates];
 
     // Create the CSV data rows
     const dataRows = studentDetails.map(student => {
       const studentId = student.id;
-      const studentName = student.name;
+      const firstName = student['First Name'] || '';
+      const middleName = student['Middle Name'] || '';
+      const lastName = student['Last Name'] || '';
+      const courseName = student['Course Name'] || '';
+      
       const attendanceValues = sortedDates.map(date => {
         return attendanceRecords[date]?.includes(studentId) ? 'Present' : 'Absent';
       });
 
-      return [studentId, studentName, ...attendanceValues];
+      return [studentId, firstName, middleName, lastName, courseName, ...attendanceValues];
     });
 
     // Combine header and data rows
