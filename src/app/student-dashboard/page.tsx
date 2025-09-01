@@ -23,7 +23,7 @@ import {
   import { PageHeader, PageHeaderHeading, PageHeaderDescription } from '@/components/page-header';
   import { useEffect, useState, useCallback } from 'react';
   import { useToast } from '@/hooks/use-toast';
-  import { getActiveSession, markStudentAttendance, getNotifications, markNotificationRead } from '@/lib/actions';
+  import { getActiveSession, markStudentAttendance, getNotifications, markNotificationRead, joinClassAction } from '@/lib/actions';
   import type { Notification } from '@/lib/notifications';
   import { formatDistanceToNow } from 'date-fns';
   import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -53,6 +53,7 @@ import { Label } from '@/components/ui/label';
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [isJoinClassOpen, setIsJoinClassOpen] = useState(false);
     const [joinCode, setJoinCode] = useState('');
+    const [isJoining, setIsJoining] = useState(false);
 
     const fetchNotifications = useCallback(async () => {
         const notifs = await getNotifications(studentId);
@@ -75,16 +76,21 @@ import { Label } from '@/components/ui/label';
         fetchNotifications();
     };
 
-    const handleJoinClass = () => {
+    const handleJoinClass = async () => {
         if (!joinCode.trim()) {
             toast({ variant: 'destructive', title: 'Error', description: 'Join code cannot be empty.' });
             return;
         }
-        // In a real app, you'd call an action to validate the code and join the class.
-        // For now, we just show a success toast.
-        toast({ title: 'Success!', description: `Successfully joined class with code: ${joinCode}` });
+        setIsJoining(true);
+        const result = await joinClassAction(studentId, joinCode);
+        if (result.success) {
+            // Success is handled by notification
+        } else {
+            toast({ variant: 'destructive', title: 'Error', description: result.message });
+        }
         setJoinCode('');
         setIsJoinClassOpen(false);
+        setIsJoining(false);
     }
 
     const handleSignIn = () => {
@@ -272,8 +278,11 @@ import { Label } from '@/components/ui/label';
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button variant="outline" onClick={() => setIsJoinClassOpen(false)}>Cancel</Button>
-                    <Button onClick={handleJoinClass}>Join Class</Button>
+                    <Button variant="outline" onClick={() => setIsJoinClassOpen(false)} disabled={isJoining}>Cancel</Button>
+                    <Button onClick={handleJoinClass} disabled={isJoining}>
+                        {isJoining && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Join Class
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

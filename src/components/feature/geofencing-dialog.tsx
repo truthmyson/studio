@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -17,13 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 import { startGeofencingAction } from '@/lib/actions';
 import { Loader2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-
-// Mock data, should be fetched in a real app
-const classes = [
-    { id: 'CLS001', name: 'Software Engineering Q', studentIds: ['STU001', 'STU002', 'STU004'] },
-    { id: 'CLS002', name: 'Intro to AI', studentIds: ['STU001', 'STU003', 'STU005', 'STU006', 'STU007'] },
-];
-
+import { getAllClasses, type Class } from '@/lib/class-management';
 
 interface GeofencingDialogProps {
   isOpen: boolean;
@@ -37,7 +31,14 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
   const [topic, setTopic] = useState(''); // Lecture topic
   const [selectedClassId, setSelectedClassId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const [classes, setClasses] = useState<Class[]>([]);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (isOpen) {
+        setClasses(getAllClasses());
+    }
+  }, [isOpen]);
 
   const handleStartSession = async () => {
     setIsLoading(true);
@@ -176,5 +177,3 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
     </Dialog>
   );
 }
-
-    

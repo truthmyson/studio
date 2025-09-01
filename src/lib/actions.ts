@@ -7,6 +7,7 @@ import { activeSession, startSession, allSessions, signInStudent, getSessionById
 import { studentData } from './constants';
 import { createSessionNotifications, getStudentNotifications, markNotificationAsRead, createRepNotification } from './notifications';
 import { format } from 'date-fns';
+import { getClassById, enrollStudentInClass } from './class-management';
 
 const studentDetailsSchema = z.array(
   z.object({
@@ -170,16 +171,6 @@ export async function markNotificationRead(notificationId: string) {
     return { success: true };
 }
 
-// In a real app, this would probably be a database query
-const getClassById = (id: string) => {
-    return initialClasses.find(c => c.id === id);
-}
-
-// Mock data for classes - in a real app, this would come from a database
-const initialClasses = [
-    { id: 'CLS001', name: 'Software Engineering Q', studentIds: ['STU001', 'STU002', 'STU004'], joinCode: 'SWE-Q-2024' },
-    { id: 'CLS002', name: 'Intro to AI', studentIds: ['STU001', 'STU003', 'STU005', 'STU006', 'STU007'], joinCode: 'AI-INTRO-2024' },
-];
 
 export async function exportAttendanceAction(classId: string): Promise<{ success: boolean, message: string, csvData?: string }> {
     const selectedClass = getClassById(classId);
@@ -235,4 +226,12 @@ export async function exportAttendanceAction(classId: string): Promise<{ success
         console.error(error);
         return { success: false, message: 'An unexpected error occurred while generating the report.' };
     }
+}
+
+export async function joinClassAction(studentId: string, joinCode: string): Promise<{ success: boolean, message: string }> {
+    const result = enrollStudentInClass(studentId, joinCode);
+    if (result.success) {
+        createRepNotification(studentId, `You have successfully joined the class: ${result.className}`);
+    }
+    return { success: result.success, message: result.message };
 }

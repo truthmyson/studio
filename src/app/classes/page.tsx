@@ -4,7 +4,7 @@
 import { PageHeader, PageHeaderHeading, PageHeaderDescription } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PlusCircle, Users, Copy, Trash2, Eye, Download, Loader2, FileCheck, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
@@ -34,27 +34,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { studentData } from "@/lib/constants";
 import { StudentsTable } from "@/components/feature/students-table";
 import { exportAttendanceAction } from "@/lib/actions";
 import { Textarea } from "@/components/ui/textarea";
-
-// Mock class structure
-interface Class {
-  id: string;
-  name: string;
-  studentIds: string[];
-  joinCode: string;
-}
-
-// Mock data for classes - in a real app, this would come from a database
-const initialClasses: Class[] = [
-    { id: 'CLS001', name: 'Software Engineering Q', studentIds: ['STU001', 'STU002', 'STU004'], joinCode: 'SWE-Q-2024' },
-    { id: 'CLS002', name: 'Intro to AI', studentIds: ['STU001', 'STU003', 'STU005', 'STU006', 'STU007'], joinCode: 'AI-INTRO-2024' },
-];
+import { getAllClasses, createClass, deleteClass, getStudentsByClass, type Class } from "@/lib/class-management";
 
 export default function ClassesPage() {
-    const [classes, setClasses] = useState(initialClasses);
+    const [classes, setClasses] = useState<Class[]>([]);
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
     const [isRosterDialogOpen, setIsRosterDialogOpen] = useState(false);
     const [isExporting, setIsExporting] = useState<string | null>(null);
@@ -64,6 +50,14 @@ export default function ClassesPage() {
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [previewData, setPreviewData] = useState<string[][]>([]);
     const [classForExport, setClassForExport] = useState<Class | null>(null);
+
+    useEffect(() => {
+        setClasses(getAllClasses());
+    }, []);
+
+    const refreshClasses = () => {
+        setClasses(getAllClasses());
+    };
 
     const handleCreateClass = () => {
         if (!newClassName.trim()) {
@@ -75,14 +69,9 @@ export default function ClassesPage() {
             return;
         }
 
-        const newClass: Class = {
-            id: `CLS${(classes.length + 1).toString().padStart(3, '0')}`,
-            name: newClassName,
-            studentIds: [],
-            joinCode: `${newClassName.slice(0, 4).toUpperCase().replace(/\s/g, '')}-${Date.now().toString().slice(-4)}`
-        };
+        createClass(newClassName);
+        refreshClasses();
 
-        setClasses([...classes, newClass]);
         setNewClassName('');
         setIsCreateDialogOpen(false);
         toast({
@@ -92,7 +81,8 @@ export default function ClassesPage() {
     };
 
     const handleDeleteClass = (classId: string) => {
-        setClasses(classes.filter(c => c.id !== classId));
+        deleteClass(classId);
+        refreshClasses();
         toast({
             title: 'Class Deleted',
             description: 'The class has been removed.',
@@ -162,7 +152,7 @@ export default function ClassesPage() {
 
     const getRosterData = () => {
         if (!selectedClass) return [];
-        return studentData.filter(student => selectedClass.studentIds.includes(student.id));
+        return getStudentsByClass(selectedClass.id);
     }
 
 
