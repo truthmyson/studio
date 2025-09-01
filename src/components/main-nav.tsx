@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -6,15 +7,8 @@ import { useEffect, useState } from 'react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import {
-  LayoutDashboard,
-  Users,
-  Settings,
-  FileText,
-  User,
-  UserPlus,
-  BookOpenCheck,
-} from 'lucide-react';
+import { getNavLinks } from '@/lib/nav-links';
+
 
 export function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
   const pathname = usePathname();
@@ -24,32 +18,7 @@ export function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElemen
     setIsClient(true);
   }, []);
 
-  // A little helper to manage which links to show based on a "role"
-  // In a real app, this would come from an auth context.
-  const getLinksForRole = () => {
-      if (pathname.includes('student')) {
-          return [
-            { href: '/student-dashboard', label: 'Dashboard', icon: LayoutDashboard },
-            { href: '/settings', label: 'Settings', icon: Settings },
-          ]
-      }
-       if (pathname.includes('rep') || pathname.includes('classes') || pathname.includes('students') || pathname.includes('attendance')) {
-           return [
-            { href: '/rep-dashboard', label: 'Dashboard', icon: LayoutDashboard },
-            { href: '/classes', label: 'My Classes', icon: BookOpenCheck },
-            { href: '/students', label: 'Students', icon: Users },
-            { href: '/attendance', label: 'Attendance AI', icon: FileText },
-            { href: '/settings', label: 'Settings', icon: Settings },
-           ]
-       }
-       // Fallback for home page etc.
-       return [
-            { href: '/student-dashboard', label: 'Student View', icon: User },
-            { href: '/rep-dashboard', label: 'Rep View', icon: LayoutDashboard },
-       ]
-  }
-
-  const navLinks = getLinksForRole();
+  const navLinks = getNavLinks(pathname);
 
   if (!isClient) {
     // Render nothing on the server to avoid mismatch
