@@ -18,17 +18,18 @@ import {
   } from '@/components/ui/table';
   import { Badge } from '@/components/ui/badge';
   import { Button } from '@/components/ui/button';
-  import { ClipboardList, Loader2, UserCheck, Bell, Check, PlusCircle } from 'lucide-react';
+  import { ClipboardList, Loader2, UserCheck, Bell, Check, PlusCircle, LogOut } from 'lucide-react';
   import { recentAttendance } from '@/lib/constants';
   import { PageHeader, PageHeaderHeading, PageHeaderDescription } from '@/components/page-header';
   import { useEffect, useState, useCallback } from 'react';
   import { useToast } from '@/hooks/use-toast';
-  import { getActiveSession, markStudentAttendance, getNotifications, markNotificationRead, joinClassAction } from '@/lib/actions';
+  import { getActiveSession, markStudentAttendance, getNotifications, markNotificationRead, joinClassAction, getStudentClassesAction, studentLeaveClassAction } from '@/lib/actions';
   import type { Notification } from '@/lib/notifications';
   import { formatDistanceToNow } from 'date-fns';
   import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import type { Class } from '@/lib/class-management';
   
   // Haversine formula to calculate distance between two lat/lon points
   function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -54,17 +55,22 @@ import { Label } from '@/components/ui/label';
     const [isJoinClassOpen, setIsJoinClassOpen] = useState(false);
     const [joinCode, setJoinCode] = useState('');
     const [isJoining, setIsJoining] = useState(false);
+    const [joinedClasses, setJoinedClasses] = useState<Class[]>([]);
 
-    const fetchNotifications = useCallback(async () => {
-        const notifs = await getNotifications(studentId);
+    const fetchStudentData = useCallback(async () => {
+        const [notifs, classes] = await Promise.all([
+            getNotifications(studentId),
+            getStudentClassesAction(studentId)
+        ]);
         setNotifications(notifs);
+        setJoinedClasses(classes);
     }, [studentId]);
 
     useEffect(() => {
-        fetchNotifications();
-        const interval = setInterval(fetchNotifications, 5000); // Poll for new notifications
+        fetchStudentData();
+        const interval = setInterval(fetchStudentData, 5000); // Poll for new data
         return () => clearInterval(interval);
-    }, [fetchNotifications]);
+    }, [fetchStudentData]);
   
     const myAttendance = recentAttendance.map(record => ({
       ...record,
@@ -73,7 +79,7 @@ import { Label } from '@/components/ui/label';
 
     const handleMarkAsRead = async (notificationId: string) => {
         await markNotificationRead(notificationId);
-        fetchNotifications();
+        fetchStudentData();
     };
 
     const handleJoinClass = async () => {
@@ -85,6 +91,7 @@ import { Label } from '@/components/ui/label';
         const result = await joinClassAction(studentId, joinCode);
         if (result.success) {
             // Success is handled by notification
+            fetchStudentData(); // Re-fetch classes
         } else {
             toast({ variant: 'destructive', title: 'Error', description: result.message });
         }
@@ -92,6 +99,16 @@ import { Label } from '@/components/ui/label';
         setIsJoinClassOpen(false);
         setIsJoining(false);
     }
+
+    const handleLeaveClass = async (classId: string) => {
+        const result = await studentLeaveClassAction(classId, studentId);
+        if (result.success) {
+            toast({ title: "Success", description: result.message });
+            fetchStudentData(); // Re-fetch classes
+        } else {
+            toast({ variant: 'destructive', title: 'Error', description: result.message });
+        }
+    };
 
     const handleSignIn = () => {
         setIsLoading(true);
@@ -114,6 +131,14 @@ import { Label } from '@/components/ui/label';
               toast({ variant: 'destructive', title: 'Not Available', description: 'No active attendance session found.' });
               setIsLoading(false);
               return;
+            }
+
+            // Check if student is in the class for the session
+            const studentIsInClass = session.students.some(s => s.studentId === studentId);
+            if (!studentIsInClass) {
+                toast({ variant: 'destructive', title: 'Not Enrolled', description: `You are not enrolled in the class for the "${session.topic}" session.` });
+                setIsLoading(false);
+                return;
             }
 
             const timeSinceStart = (Date.now() - session.startTime) / (1000 * 60); // in minutes
@@ -199,7 +224,7 @@ import { Label } from '@/components/ui/label';
                     <Bell className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="space-y-4">
+                    <div className="space-y-4 max-h-48 overflow-y-auto">
                     {notifications.length > 0 ? (
                         notifications.map((notif) => (
                         <div key={notif.id} className="flex items-start gap-4">
@@ -226,38 +251,79 @@ import { Label } from '@/components/ui/label';
                 </CardContent>
             </Card>
         </div>
-        <Card>
-          <CardHeader>
-            <CardTitle>My Attendance History</CardTitle>
-            <CardDescription>
-              Your attendance for the last 5 lectures.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Lecture</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {myAttendance.map((record) => (
-                  <TableRow key={record.date}>
-                    <TableCell className="font-medium">{record.topic}</TableCell>
-                    <TableCell>{record.date}</TableCell>
-                    <TableCell>
-                      <Badge variant={record.myStatus === 'Present' ? 'default' : 'destructive'}>
-                        {record.myStatus}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+        <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+                <CardHeader>
+                    <CardTitle>My Attendance History</CardTitle>
+                    <CardDescription>
+                    Your attendance for the last 5 lectures.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                    <TableHeader>
+                        <TableRow>
+                        <TableHead>Lecture</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Status</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {myAttendance.map((record) => (
+                        <TableRow key={record.date}>
+                            <TableCell className="font-medium">{record.topic}</TableCell>
+                            <TableCell>{record.date}</TableCell>
+                            <TableCell>
+                            <Badge variant={record.myStatus === 'Present' ? 'default' : 'destructive'}>
+                                {record.myStatus}
+                            </Badge>
+                            </TableCell>
+                        </TableRow>
+                        ))}
+                    </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle>My Joined Classes</CardTitle>
+                    <CardDescription>
+                    Manage your class enrollments.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                        <TableHead>Class Name</TableHead>
+                        <TableHead>Join Code</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {joinedClasses.length > 0 ? (
+                            joinedClasses.map((cls) => (
+                                <TableRow key={cls.id}>
+                                <TableCell className="font-medium">{cls.name}</TableCell>
+                                <TableCell><Badge variant="secondary">{cls.joinCode}</Badge></TableCell>
+                                <TableCell className="text-right">
+                                    <Button variant="destructive" size="sm" onClick={() => handleLeaveClass(cls.id)}>
+                                        <LogOut className="mr-2 h-4 w-4"/>
+                                        Leave
+                                    </Button>
+                                </TableCell>
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={3} className="text-center">You haven't joined any classes yet.</TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+        </div>
         <Dialog open={isJoinClassOpen} onOpenChange={setIsJoinClassOpen}>
             <DialogContent>
                 <DialogHeader>

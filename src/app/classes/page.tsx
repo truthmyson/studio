@@ -35,9 +35,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { StudentsTable } from "@/components/feature/students-table";
-import { exportAttendanceAction } from "@/lib/actions";
+import { exportAttendanceAction, removeStudentFromClassAction } from "@/lib/actions";
 import { Textarea } from "@/components/ui/textarea";
 import { getAllClasses, createClass, deleteClass, getStudentsByClass, type Class } from "@/lib/class-management";
+import type { Student } from "@/lib/types";
 
 export default function ClassesPage() {
     const [classes, setClasses] = useState<Class[]>([]);
@@ -45,21 +46,23 @@ export default function ClassesPage() {
     const [isRosterDialogOpen, setIsRosterDialogOpen] = useState(false);
     const [isExporting, setIsExporting] = useState<string | null>(null);
     const [selectedClass, setSelectedClass] = useState<Class | null>(null);
+    const [classStudents, setClassStudents] = useState<Student[]>([]);
     const [newClassName, setNewClassName] = useState('');
     const { toast } = useToast();
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [previewData, setPreviewData] = useState<string[][]>([]);
     const [classForExport, setClassForExport] = useState<Class | null>(null);
 
-    useEffect(() => {
-        setClasses(getAllClasses());
-    }, []);
-
-    const refreshClasses = () => {
-        setClasses(getAllClasses());
+    const refreshClasses = async () => {
+        const updatedClasses = await getAllClasses();
+        setClasses(updatedClasses);
     };
 
-    const handleCreateClass = () => {
+    useEffect(() => {
+        refreshClasses();
+    }, []);
+
+    const handleCreateClass = async () => {
         if (!newClassName.trim()) {
             toast({
                 variant: 'destructive',
@@ -69,8 +72,8 @@ export default function ClassesPage() {
             return;
         }
 
-        createClass(newClassName);
-        refreshClasses();
+        await createClass(newClassName);
+        await refreshClasses();
 
         setNewClassName('');
         setIsCreateDialogOpen(false);
@@ -80,19 +83,36 @@ export default function ClassesPage() {
         });
     };
 
-    const handleDeleteClass = (classId: string) => {
-        deleteClass(classId);
-        refreshClasses();
+    const handleDeleteClass = async (classId: string) => {
+        await deleteClass(classId);
+        await refreshClasses();
         toast({
             title: 'Class Deleted',
             description: 'The class has been removed.',
         });
     };
     
-    const viewRoster = (cls: Class) => {
+    const viewRoster = async (cls: Class) => {
         setSelectedClass(cls);
+        const students = await getStudentsByClass(cls.id);
+        setClassStudents(students);
         setIsRosterDialogOpen(true);
     }
+
+    const handleRemoveStudent = async (studentId: string) => {
+        if (!selectedClass) return;
+        const result = await removeStudentFromClassAction(selectedClass.id, studentId);
+        if (result.success) {
+            toast({ title: "Student Removed", description: result.message });
+            // Refresh student list for the roster
+            const updatedStudents = await getStudentsByClass(selectedClass.id);
+            setClassStudents(updatedStudents);
+             // Also refresh the main classes list to update student count
+            await refreshClasses();
+        } else {
+            toast({ variant: 'destructive', title: "Error", description: result.message });
+        }
+    };
 
     const handleExportPreview = async (cls: Class) => {
         setIsExporting(cls.id);
@@ -149,12 +169,6 @@ export default function ClassesPage() {
             description: 'Join code copied to clipboard.',
         });
     }
-
-    const getRosterData = () => {
-        if (!selectedClass) return [];
-        return getStudentsByClass(selectedClass.id);
-    }
-
 
     return (
         <div className="flex-1 space-y-4">
@@ -253,15 +267,22 @@ export default function ClassesPage() {
 
             {/* View Roster Dialog */}
             <Dialog open={isRosterDialogOpen} onOpenChange={setIsRosterDialogOpen}>
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="max-w-3xl">
                     <DialogHeader>
                         <DialogTitle>Class Roster: {selectedClass?.name}</DialogTitle>
                         <DialogDescription>
-                            Here are the students currently enrolled in this class.
+                            Here are the students currently enrolled in this class. You can remove students if needed.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="py-4">
-                        <StudentsTable data={getRosterData()} />
+                        <StudentsTable 
+                            data={classStudents}
+                            actions={[{
+                                label: "Remove",
+                                onClick: handleRemoveStudent,
+                                variant: "destructive"
+                            }]}
+                         />
                     </div>
                     <DialogFooter>
                         <Button onClick={() => setIsRosterDialogOpen(false)}>Close</Button>

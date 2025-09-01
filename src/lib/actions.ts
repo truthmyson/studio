@@ -7,7 +7,7 @@ import { activeSession, startSession, allSessions, signInStudent, getSessionById
 import { studentData } from './constants';
 import { createSessionNotifications, getStudentNotifications, markNotificationAsRead, createRepNotification } from './notifications';
 import { format } from 'date-fns';
-import { getClassById, enrollStudentInClass } from './class-management';
+import { getClassById, enrollStudentInClass, getClassesByStudent, studentLeaveClass, removeStudentFromClass } from './class-management';
 
 const studentDetailsSchema = z.array(
   z.object({
@@ -173,7 +173,7 @@ export async function markNotificationRead(notificationId: string) {
 
 
 export async function exportAttendanceAction(classId: string): Promise<{ success: boolean, message: string, csvData?: string }> {
-    const selectedClass = getClassById(classId);
+    const selectedClass = await getClassById(classId);
     if (!selectedClass) {
         return { success: false, message: "Class not found." };
     }
@@ -229,9 +229,21 @@ export async function exportAttendanceAction(classId: string): Promise<{ success
 }
 
 export async function joinClassAction(studentId: string, joinCode: string): Promise<{ success: boolean, message: string }> {
-    const result = enrollStudentInClass(studentId, joinCode);
+    const result = await enrollStudentInClass(studentId, joinCode);
     if (result.success) {
         createRepNotification(studentId, `You have successfully joined the class: ${result.className}`);
     }
     return { success: result.success, message: result.message };
+}
+
+export async function getStudentClassesAction(studentId: string) {
+    return getClassesByStudent(studentId);
+}
+
+export async function studentLeaveClassAction(classId: string, studentId: string) {
+    return studentLeaveClass(classId, studentId);
+}
+
+export async function removeStudentFromClassAction(classId: string, studentId: string) {
+    return removeStudentFromClass(classId, studentId);
 }

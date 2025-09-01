@@ -60,3 +60,34 @@ export async function enrollStudentInClass(studentId: string, joinCode: string):
     classToJoin.studentIds.push(studentId);
     return { success: true, message: `Successfully joined class: ${classToJoin.name}`, className: classToJoin.name };
 }
+
+export async function getClassesByStudent(studentId: string): Promise<Class[]> {
+    return classes.filter(c => c.studentIds.includes(studentId));
+}
+
+export async function studentLeaveClass(classId: string, studentId: string): Promise<{ success: boolean; message: string }> {
+    const classToLeave = await getClassById(classId);
+    if (!classToLeave) {
+        return { success: false, message: "Class not found." };
+    }
+    const studentIndex = classToLeave.studentIds.indexOf(studentId);
+    if (studentIndex > -1) {
+        classToLeave.studentIds.splice(studentIndex, 1);
+        return { success: true, message: `You have left the class: ${classToLeave.name}` };
+    }
+    return { success: false, message: "You were not enrolled in this class." };
+}
+
+export async function removeStudentFromClass(classId: string, studentId: string): Promise<{ success: boolean; message: string }> {
+    const classToEdit = await getClassById(classId);
+    if (!classToEdit) {
+        return { success: false, message: "Class not found." };
+    }
+    const studentIndex = classToEdit.studentIds.indexOf(studentId);
+    if (studentIndex > -1) {
+        classToEdit.studentIds.splice(studentIndex, 1);
+        const student = studentData.find(s => s.id === studentId);
+        return { success: true, message: `Removed ${student?.name || 'student'} from the class.` };
+    }
+    return { success: false, message: "Student not found in this class." };
+}
