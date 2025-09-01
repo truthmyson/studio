@@ -3,6 +3,7 @@
 
 import type { Student } from "./types";
 import { studentData, getStudentById } from "./constants";
+import { createRepNotification } from "./notifications";
 
 // Mock class structure
 export interface Class {
@@ -39,6 +40,13 @@ export async function createClass(name: string): Promise<Class> {
 }
 
 export async function deleteClass(id: string): Promise<void> {
+    const classToDelete = classes.find(c => c.id === id);
+    if (classToDelete) {
+        // Notify all students in the class that it's been deleted
+        classToDelete.studentIds.forEach(studentId => {
+            createRepNotification(studentId, `The class "${classToDelete.name}" has been deleted by the representative.`);
+        });
+    }
     classes = classes.filter(c => c.id !== id);
 }
 
