@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -10,7 +11,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import {convertArrayToCsv} from '@/src/services/csv-converter';
+import {convertArrayToCsv} from '@/services/csv-converter';
 
 const AttendanceTableInputSchema = z.object({
   studentDetails: z.array(
