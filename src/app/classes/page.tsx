@@ -9,7 +9,6 @@ import { PlusCircle, Users, Copy, Trash2, Eye, Download, Loader2, FileCheck, Che
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import * as XLSX from 'xlsx';
 import {
   Dialog,
   DialogContent,
@@ -140,8 +139,9 @@ export default function ClassesPage() {
         setIsPreviewOpen(false);
     }
 
-    const downloadXlsx = () => {
+    const downloadXlsx = async () => {
         if (!previewData.length || !classForExport) return;
+        const XLSX = await import('xlsx');
         const worksheet = XLSX.utils.aoa_to_sheet(previewData);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Attendance');
