@@ -5,10 +5,11 @@ import { PageHeader, PageHeaderHeading, PageHeaderDescription } from "@/componen
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { PlusCircle, Users, Copy, Trash2, Eye, Download, Loader2, FileCheck } from "lucide-react";
+import { PlusCircle, Users, Copy, Trash2, Eye, Download, Loader2, FileCheck, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import * as XLSX from 'xlsx';
 import {
   Dialog,
   DialogContent,
@@ -17,6 +18,12 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+  } from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -56,7 +63,7 @@ export default function ClassesPage() {
     const [newClassName, setNewClassName] = useState('');
     const { toast } = useToast();
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-    const [previewData, setPreviewData] = useState('');
+    const [previewData, setPreviewData] = useState<string[][]>([]);
     const [classForExport, setClassForExport] = useState<Class | null>(null);
 
     const handleCreateClass = () => {
@@ -102,7 +109,9 @@ export default function ClassesPage() {
         setIsExporting(cls.id);
         const result = await exportAttendanceAction(cls.id);
         if (result.success && result.csvData) {
-            setPreviewData(result.csvData);
+            // Simple CSV string to array of arrays parser
+            const parsedData = result.csvData.split('\n').map(row => row.split(','));
+            setPreviewData(parsedData);
             setClassForExport(cls);
             setIsPreviewOpen(true);
         } else {
@@ -111,18 +120,35 @@ export default function ClassesPage() {
         setIsExporting(null);
     }
 
-    const downloadCsv = () => {
-        if (!previewData || !classForExport) return;
-        const blob = new Blob([previewData], { type: 'text/csv;charset=utf-8;' });
+    const downloadFile = (blob: Blob, filename: string) => {
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
         link.setAttribute('href', url);
-        link.setAttribute('download', `${classForExport.name.replace(/ /g, '_')}_attendance.csv`);
+        link.setAttribute('download', filename);
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        toast({ title: 'Success!', description: 'Attendance data exported.' });
+    }
+
+    const downloadCsv = () => {
+        if (!previewData.length || !classForExport) return;
+        const csvContent = previewData.map(row => row.join(',')).join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        downloadFile(blob, `${classForExport.name.replace(/ /g, '_')}_attendance.csv`);
+        toast({ title: 'Success!', description: 'Attendance data exported as CSV.' });
+        setIsPreviewOpen(false);
+    }
+
+    const downloadXlsx = () => {
+        if (!previewData.length || !classForExport) return;
+        const worksheet = XLSX.utils.aoa_to_sheet(previewData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Attendance');
+        const xlsxBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([xlsxBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        downloadFile(blob, `${classForExport.name.replace(/ /g, '_')}_attendance.xlsx`);
+        toast({ title: 'Success!', description: 'Attendance data exported as Excel.' });
         setIsPreviewOpen(false);
     }
 
@@ -259,23 +285,36 @@ export default function ClassesPage() {
                     <DialogHeader>
                         <DialogTitle>Export Preview: {classForExport?.name}</DialogTitle>
                         <DialogDescription>
-                           Preview of the attendance data. You can download it as a CSV file.
+                           Preview of the attendance data. You can download it as a CSV or Excel file.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="py-4">
                         <Textarea
                             readOnly
-                            value={previewData}
+                            value={previewData.map(row => row.join('\t')).join('\n')}
                             rows={15}
                             className="font-mono text-sm bg-muted"
                         />
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsPreviewOpen(false)}>Cancel</Button>
-                        <Button onClick={downloadCsv}>
-                            <Download className="mr-2 h-4 w-4"/>
-                            Download CSV
-                        </Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button>
+                                    <Download className="mr-2 h-4 w-4"/>
+                                    Download
+                                    <ChevronDown className="ml-2 h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem onClick={downloadCsv}>
+                                    Download as CSV
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={downloadXlsx}>
+                                    Download as Excel
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
