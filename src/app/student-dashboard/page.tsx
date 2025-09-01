@@ -352,8 +352,9 @@ import type { Student } from '@/lib/types';
                         <Input
                             id="joinCode"
                             value={joinCode}
-                            onChange={(e) => setJoinCode(e.target.value)}
-                            placeholder="e.g., SWE-Q-2024"
+                            onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                            placeholder="e.g., SWEQ1234"
+                            autoCapitalize="characters"
                         />
                     </div>
                 </div>

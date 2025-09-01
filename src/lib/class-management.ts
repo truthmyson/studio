@@ -14,8 +14,8 @@ export interface Class {
 
 // In-memory store for classes
 let classes: Class[] = [
-    { id: 'CLS001', name: 'Software Engineering Q', studentIds: ['24275016', 'STU002', 'STU004'], joinCode: 'SWE-Q-2024' },
-    { id: 'CLS002', name: 'Intro to AI', studentIds: ['24275016', 'STU003', 'STU005', 'STU006', 'STU007'], joinCode: 'AI-INTRO-2024' },
+    { id: 'CLS001', name: 'Software Engineering Q', studentIds: ['24275016', 'STU002', 'STU004'], joinCode: 'SWEQ-2024' },
+    { id: 'CLS002', name: 'Intro to AI', studentIds: ['24275016', 'STU003', 'STU005', 'STU006', 'STU007'], joinCode: 'AINT-2024' },
 ];
 
 export async function getAllClasses(): Promise<Class[]> {
@@ -31,7 +31,7 @@ export async function createClass(name: string): Promise<Class> {
         id: `CLS${(classes.length + 1).toString().padStart(3, '0')}`,
         name: name,
         studentIds: [],
-        joinCode: `${name.slice(0, 4).toUpperCase().replace(/\s/g, '')}-${Date.now().toString().slice(-4)}`
+        joinCode: `${name.replace(/[^a-zA-Z0-9]/g, '').slice(0, 4).toUpperCase()}${Math.floor(1000 + Math.random() * 9000)}`
     };
     classes.push(newClass);
     return newClass;
@@ -48,7 +48,7 @@ export async function getStudentsByClassId(classId: string): Promise<Student[]> 
 }
 
 export async function enrollStudentInClass(studentId: string, joinCode: string): Promise<{ success: boolean; message: string; className?: string }> {
-    const classToJoin = classes.find(c => c.joinCode.trim().toLowerCase() === joinCode.trim().toLowerCase());
+    const classToJoin = classes.find(c => c.joinCode.trim().toUpperCase() === joinCode.trim().toUpperCase());
     if (!classToJoin) {
         return { success: false, message: "Invalid join code." };
     }
@@ -92,4 +92,3 @@ export async function removeStudentFromClass(classId: string, studentId: string)
     }
     return { success: false, message: "Student not found in this class." };
 }
-
