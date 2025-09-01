@@ -54,14 +54,25 @@ export function getSessionById(sessionId: string) {
     return allSessions.find(s => s.id === sessionId);
 }
 
-export function signInStudent(sessionId: string, studentId: string) {
+export function signInStudent(sessionId: string, studentId: string): boolean {
     const session = getSessionById(sessionId);
-    if (session) {
-        const student = session.students.find(s => s.studentId === studentId);
-        if (student) {
-            student.signedInAt = Date.now();
-            return true;
-        }
+    if (!session) {
+        console.error(`Session with ID ${sessionId} not found.`);
+        return false;
     }
-    return false;
+
+    const studentIndex = session.students.findIndex(s => s.studentId === studentId);
+    if (studentIndex === -1) {
+        console.error(`Student with ID ${studentId} not found in session ${sessionId}.`);
+        return false;
+    }
+
+    if (session.students[studentIndex].signedInAt !== null) {
+        console.log(`Student ${studentId} has already signed in.`);
+        return false; // Or handle as a success if re-signing is allowed
+    }
+
+    session.students[studentIndex].signedInAt = Date.now();
+    console.log(`Student ${studentId} signed in successfully at ${session.students[studentIndex].signedInAt}`);
+    return true;
 }

@@ -90,8 +90,8 @@ export async function generateAttendanceAction(
 export async function getActiveSession() {
   // The active session is always the first one if it's currently active.
   if (activeSession && activeSession.active) {
-    const timeSinceStart = (Date.now() - activeSession.startTime) / (1000 * 60); // in minutes
-    if (timeSinceStart <= activeSession.timeLimit) {
+    const timeSinceStart = (Date.now() - activeSession.startTime); // in ms
+    if (timeSinceStart <= activeSession.timeLimit * 60 * 1000) {
       return activeSession;
     }
   }
@@ -128,6 +128,13 @@ export async function markStudentAttendance(sessionId: string, studentId: string
   const session = getSessionById(sessionId);
   if (!session) {
     return { success: false, message: 'Session not found.' };
+  }
+  if(!session.active){
+    return { success: false, message: 'This session is no longer active.' };
+  }
+  const student = session.students.find(s => s.studentId === studentId);
+  if(student?.signedInAt){
+    return { success: false, message: 'You have already signed in for this session.' };
   }
   
   const success = signInStudent(sessionId, studentId);
