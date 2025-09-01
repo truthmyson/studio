@@ -15,11 +15,11 @@ export function getNavLinks(pathname: string) {
           { href: '/settings', label: 'Settings', icon: Settings },
         ]
     }
-     if (pathname.includes('rep-dashboard') || pathname.includes('classes') || pathname.includes('students') || pathname.includes('attendance')) {
+     if (pathname.includes('rep-dashboard') || pathname.includes('classes') || pathname.includes('students') || pathname.includes('attendance') || pathname.includes('all-students')) {
          return [
           { href: '/rep-dashboard', label: 'Dashboard', icon: LayoutDashboard },
           { href: '/classes', label: 'My Classes', icon: BookOpenCheck },
-          { href: '/students', label: 'Students', icon: Users },
+          { href: '/all-students', label: 'All Students', icon: Users },
           { href: '/attendance', label: 'Attendance AI', icon: FileText },
           { href: '/settings', label: 'Settings', icon: Settings },
          ]

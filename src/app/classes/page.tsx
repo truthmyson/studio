@@ -201,7 +201,7 @@ export default function ClassesPage() {
                         <CardContent className="flex-grow">
                             <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                                 <Users className="h-4 w-4" />
-                                <span>{cls.studentIds.length} students enrolled</span>
+                                <span>{cls.students.length} students enrolled</span>
                             </div>
                         </CardContent>
                         <CardFooter className="flex gap-2">

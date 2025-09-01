@@ -31,35 +31,42 @@ import Link from 'next/link';
 import { PageHeader, PageHeaderHeading, PageHeaderDescription } from '@/components/page-header';
 import { GeofencingDialog } from '@/components/feature/geofencing-dialog';
 import { useEffect, useState, useCallback } from 'react';
-import { getAllSessions, getNotifications, markNotificationRead, getAllStudentsAction, toggleSessionStatusAction } from '@/lib/actions';
+import { getAllSessions, getNotifications, markNotificationRead, getAllStudentsAction, toggleSessionStatusAction, getAllClassesAction } from '@/lib/actions';
 import type { AttendanceSession } from '@/lib/attendance-session';
 import { format, formatDistanceToNow } from 'date-fns';
 import type { Notification } from '@/lib/notifications';
-import type { Student } from '@/lib/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessagingDialog } from '@/components/feature/messaging-dialog';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
+import type { Class } from '@/lib/class-management';
 
 export default function RepDashboardPage() {
   const repId = '24275016'; // Mock rep ID, now aligned with student data
   const [isGeofencingDialogOpen, setIsGeofencingDialogOpen] = useState(false);
   const [sessions, setSessions] = useState<AttendanceSession[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [students, setStudents] = useState<Student[]>([]);
+  const [totalStudents, setTotalStudents] = useState(0);
   const [isMessagingDialogOpen, setIsMessagingDialogOpen] = useState(false);
   const [selectedSessionForMessages, setSelectedSessionForMessages] = useState<AttendanceSession | null>(null);
   const { toast } = useToast();
 
   const fetchDashboardData = useCallback(async () => {
-    const [allSessions, repNotifications, allStudents] = await Promise.all([
+    const [allSessions, repNotifications, allClasses] = await Promise.all([
         getAllSessions(),
         getNotifications(repId),
-        getAllStudentsAction()
+        getAllClassesAction()
     ]);
     setSessions(allSessions.sort((a,b) => b.startTime - a.startTime)); // Sort by most recent
     setNotifications(repNotifications);
-    setStudents(allStudents);
+
+    // Calculate unique students across all classes
+    const uniqueStudentIds = new Set<string>();
+    allClasses.forEach(cls => {
+      cls.students.forEach(s => uniqueStudentIds.add(s.studentId));
+    });
+    setTotalStudents(uniqueStudentIds.size);
+
   }, [repId]);
 
 
@@ -91,7 +98,6 @@ export default function RepDashboardPage() {
     fetchDashboardData(); // Refresh sessions
   }
 
-  const totalStudents = students.length;
   const overallAttendanceRate = sessions.length > 0 ? sessions.reduce((acc, session) => {
     const presentCount = session.students.filter(s => s.signedInAt).length;
     return acc + (presentCount / (session.students.length || 1));

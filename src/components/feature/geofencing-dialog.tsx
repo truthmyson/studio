@@ -83,7 +83,7 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
         formData.append('longitude', longitude.toString());
         formData.append('topic', topic);
         formData.append('classId', selectedClassId);
-        formData.append('studentIds', JSON.stringify(selectedClass.studentIds));
+        formData.append('studentIds', JSON.stringify(selectedClass.students.map(s => s.studentId)));
         formData.append('repId', repId);
         
         const result = await startGeofencingAction(formData);

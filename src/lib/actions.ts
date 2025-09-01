@@ -7,7 +7,7 @@ import { activeSession, startSession, getSessions, signInStudent, getSessionById
 import { getStudentById, studentData } from './constants';
 import { createSessionNotifications, getStudentNotifications, markNotificationAsRead, createRepNotification } from './notifications';
 import { format } from 'date-fns';
-import { getClassById, enrollStudentInClass, getClassesByStudent, studentLeaveClass, removeStudentFromClass, getStudentsByClassId } from './class-management';
+import { getClassById, enrollStudentInClass, getClassesByStudent, studentLeaveClass, removeStudentFromClass, getStudentsByClassId, getAllClasses, Class } from './class-management';
 import { Student } from './types';
 import { sendMessage, getMessagesForSession, Message } from './messaging';
 
@@ -112,6 +112,9 @@ export async function getAllStudentsAction(): Promise<Student[]> {
     return studentData;
 }
 
+export async function getAllClassesAction(): Promise<Class[]> {
+    return getAllClasses();
+}
 
 export async function startGeofencingAction(formData: FormData) {
   const radius = parseFloat(formData.get('radius') as string);
