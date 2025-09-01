@@ -16,6 +16,14 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { startGeofencingAction } from '@/lib/actions';
 import { Loader2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+
+// Mock data, should be fetched in a real app
+const classes = [
+    { id: 'CLS001', name: 'Software Engineering Q', studentIds: ['STU001', 'STU002', 'STU004'] },
+    { id: 'CLS002', name: 'Intro to AI', studentIds: ['STU001', 'STU003', 'STU005', 'STU006', 'STU007'] },
+];
+
 
 interface GeofencingDialogProps {
   isOpen: boolean;
@@ -26,16 +34,17 @@ export function GeofencingDialog({ isOpen, onClose }: GeofencingDialogProps) {
   const [radius, setRadius] = useState('100'); // Default radius in meters
   const [timeLimit, setTimeLimit] = useState('15'); // Default time limit in minutes
   const [topic, setTopic] = useState(''); // Lecture topic
+  const [selectedClassId, setSelectedClassId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const handleStartSession = async () => {
     setIsLoading(true);
-    if (!topic) {
+    if (!topic || !selectedClassId) {
         toast({
             variant: 'destructive',
             title: 'Error',
-            description: 'Please enter a lecture topic.',
+            description: 'Please enter a lecture topic and select a class.',
         });
         setIsLoading(false);
         return;
@@ -54,12 +63,21 @@ export function GeofencingDialog({ isOpen, onClose }: GeofencingDialogProps) {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
+        const selectedClass = classes.find(c => c.id === selectedClassId);
+        if (!selectedClass) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Selected class not found.' });
+            setIsLoading(false);
+            return;
+        }
+
         const formData = new FormData();
         formData.append('radius', radius);
         formData.append('timeLimit', timeLimit);
         formData.append('latitude', latitude.toString());
         formData.append('longitude', longitude.toString());
         formData.append('topic', topic);
+        formData.append('classId', selectedClassId);
+        formData.append('studentIds', JSON.stringify(selectedClass.studentIds));
         
         const result = await startGeofencingAction(formData);
 
@@ -69,6 +87,7 @@ export function GeofencingDialog({ isOpen, onClose }: GeofencingDialogProps) {
             description: result.message,
           });
           setTopic('');
+          setSelectedClassId('');
           onClose();
         } else {
           toast({
@@ -100,6 +119,21 @@ export function GeofencingDialog({ isOpen, onClose }: GeofencingDialogProps) {
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
+        <div className="space-y-2">
+            <Label htmlFor="class">Class</Label>
+            <Select onValueChange={setSelectedClassId} value={selectedClassId}>
+              <SelectTrigger id="class">
+                <SelectValue placeholder="Select a class" />
+              </SelectTrigger>
+              <SelectContent>
+                {classes.map((cls) => (
+                  <SelectItem key={cls.id} value={cls.id}>
+                    {cls.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-2">
             <Label htmlFor="topic">Lecture Topic</Label>
             <Input
@@ -143,3 +177,5 @@ export function GeofencingDialog({ isOpen, onClose }: GeofencingDialogProps) {
     </Dialog>
   );
 }
+
+    

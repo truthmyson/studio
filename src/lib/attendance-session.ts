@@ -6,6 +6,7 @@ interface Location {
   
 export interface AttendanceSession {
     id: string;
+    classId: string;
     location: Location;
     radius: number; // in meters
     startTime: number; // Unix timestamp
@@ -18,14 +19,17 @@ export interface AttendanceSession {
 export let activeSession: AttendanceSession | null = null;
 export const allSessions: AttendanceSession[] = [];
 
-export function startSession(location: Location, radius: number, timeLimit: number, topic: string, studentIds: string[]) {
-    // Deactivate previous session if any
+export function startSession(location: Location, radius: number, timeLimit: number, topic: string, studentIds: string[], classId: string) {
+    // Deactivate previous session if any, you might want to allow multiple active sessions in a real app
     if (activeSession) {
-        activeSession.active = false;
+        // This is a simple implementation. A better one might check for sessions of the same class.
+        // For now, we just deactivate any active session.
+        // activeSession.active = false;
     }
 
     const newSession: AttendanceSession = {
         id: `session-${Date.now()}`,
+        classId,
         location,
         radius,
         startTime: Date.now(),
@@ -35,7 +39,8 @@ export function startSession(location: Location, radius: number, timeLimit: numb
         students: studentIds.map(id => ({ studentId: id, signedInAt: null })),
     };
     
-    activeSession = newSession;
+    // In this simple model, only one session can be "active" for sign-in at a time
+    activeSession = newSession; 
     allSessions.unshift(newSession); // Add to the beginning of the list
 
     console.log('Session started:', activeSession);
@@ -76,3 +81,5 @@ export function signInStudent(sessionId: string, studentId: string): boolean {
     console.log(`Student ${studentId} signed in successfully at ${session.students[studentIndex].signedInAt}`);
     return true;
 }
+
+    

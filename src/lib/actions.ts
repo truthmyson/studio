@@ -109,15 +109,24 @@ export async function startGeofencingAction(formData: FormData) {
   const latitude = parseFloat(formData.get('latitude') as string);
   const longitude = parseFloat(formData.get('longitude') as string);
   const topic = formData.get('topic') as string;
+  const classId = formData.get('classId') as string;
+  const studentIdsRaw = formData.get('studentIds') as string;
 
-  if (isNaN(radius) || isNaN(timeLimit) || isNaN(latitude) || isNaN(longitude) || !topic) {
+
+  if (isNaN(radius) || isNaN(timeLimit) || isNaN(latitude) || isNaN(longitude) || !topic || !classId || !studentIdsRaw) {
     return { success: false, message: 'Invalid data provided.' };
   }
   
-  const studentIds = studentData.map(s => s.id);
-  const session = startSession({ latitude, longitude }, radius, timeLimit, topic, studentIds);
+  let studentIds: string[];
+  try {
+    studentIds = JSON.parse(studentIdsRaw);
+  } catch (error) {
+    return { success: false, message: 'Invalid student ID format.' };
+  }
 
-  // Create notifications for all students
+  const session = startSession({ latitude, longitude }, radius, timeLimit, topic, studentIds, classId);
+
+  // Create notifications for all students in the selected class
   createSessionNotifications(session.id, session.topic, studentIds);
 
   return { success: true, message: 'Geo-fencing session started!' };
@@ -153,3 +162,5 @@ export async function markNotificationRead(notificationId: string) {
     markNotificationAsRead(notificationId);
     return { success: true };
 }
+
+    
