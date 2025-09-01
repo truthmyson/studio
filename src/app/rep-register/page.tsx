@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -28,16 +29,16 @@ export default function RepRegisterPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="fullName">Full Name</Label>
-                    <Input id="fullName" placeholder="John Doe" required />
+                    <Input id="fullName" placeholder="John Doe" required defaultValue="Chris Mensah" />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="studentId">Student ID</Label>
-                    <Input id="studentId" placeholder="STU001" required />
+                    <Input id="studentId" placeholder="STU001" required defaultValue="24275016" />
                 </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">University Email</Label>
-              <Input id="email" type="email" placeholder="name@university.edu" required />
+              <Input id="email" type="email" placeholder="name@university.edu" required defaultValue="chris.mensah@university.edu" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -45,7 +46,7 @@ export default function RepRegisterPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="course">Course/Program</Label>
-              <Input id="course" placeholder="B.Sc. Computer Science" required />
+              <Input id="course" placeholder="B.Sc. Computer Science" required defaultValue="Computer Science" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="reason">Reason for application</Label>
