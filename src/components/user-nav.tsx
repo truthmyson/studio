@@ -36,9 +36,9 @@ export function UserNav() {
       }
     } else if (pathname.includes('rep')) {
       setUser({
-        name: 'Class Rep',
-        email: 'rep@university.edu',
-        fallback: 'CR',
+        name: 'Chris Mensah',
+        email: 'chris.mensah@university.edu',
+        fallback: 'CM',
       });
     } else {
         // Default user for other pages
