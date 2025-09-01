@@ -18,7 +18,7 @@ import {
   } from '@/components/ui/table';
   import { Badge } from '@/components/ui/badge';
   import { Button } from '@/components/ui/button';
-  import { ClipboardList, Loader2, UserCheck, Bell, Check, PlusCircle, LogOut, User as UserIcon } from 'lucide-react';
+  import { ClipboardList, Loader2, UserCheck, Bell, Check, PlusCircle, LogOut } from 'lucide-react';
   import { recentAttendance, studentData } from '@/lib/constants';
   import { PageHeader, PageHeaderHeading, PageHeaderDescription } from '@/components/page-header';
   import { useEffect, useState, useCallback } from 'react';
@@ -31,6 +31,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { Class } from '@/lib/class-management';
 import type { Student } from '@/lib/types';
+import { ScrollArea } from '@/components/ui/scroll-area';
   
   // Haversine formula to calculate distance between two lat/lon points
   function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -238,30 +239,32 @@ import type { Student } from '@/lib/types';
                     <Bell className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="space-y-4 max-h-48 overflow-y-auto">
-                    {notifications.length > 0 ? (
-                        notifications.map((notif) => (
-                        <div key={notif.id} className="flex items-start gap-4">
-                            <div className="flex-1">
-                                <p className={`text-sm ${notif.read ? 'text-muted-foreground' : 'font-semibold'}`}>
-                                    {notif.message}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                    {formatDistanceToNow(notif.createdAt, { addSuffix: true })}
-                                </p>
+                    <ScrollArea className="h-48">
+                        <div className="space-y-4">
+                        {notifications.length > 0 ? (
+                            notifications.map((notif) => (
+                            <div key={notif.id} className="flex items-start gap-4">
+                                <div className="flex-1">
+                                    <p className={`text-sm ${notif.read ? 'text-muted-foreground' : 'font-semibold'}`}>
+                                        {notif.message}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                        {formatDistanceToNow(notif.createdAt, { addSuffix: true })}
+                                    </p>
+                                </div>
+                                {!notif.read && (
+                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleMarkAsRead(notif.id)}>
+                                    <Check className="h-4 w-4" />
+                                    <span className="sr-only">Mark as read</span>
+                                </Button>
+                                )}
                             </div>
-                            {!notif.read && (
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleMarkAsRead(notif.id)}>
-                                <Check className="h-4 w-4" />
-                                <span className="sr-only">Mark as read</span>
-                            </Button>
-                            )}
+                            ))
+                        ) : (
+                            <p className="text-sm text-muted-foreground">No new notifications.</p>
+                        )}
                         </div>
-                        ))
-                    ) : (
-                        <p className="text-sm text-muted-foreground">No new notifications.</p>
-                    )}
-                    </div>
+                    </ScrollArea>
                 </CardContent>
             </Card>
         </div>

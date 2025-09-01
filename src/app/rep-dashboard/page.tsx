@@ -35,6 +35,7 @@ import type { AttendanceSession } from '@/lib/attendance-session';
 import { format, formatDistanceToNow } from 'date-fns';
 import type { Notification } from '@/lib/notifications';
 import type { Student } from '@/lib/types';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export default function RepDashboardPage() {
   const repId = 'REP001'; // Mock rep ID
@@ -205,30 +206,32 @@ export default function RepDashboardPage() {
                 <CardDescription>Recent system events and alerts.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="space-y-4">
-                    {notifications.length > 0 ? (
-                        notifications.map((notif) => (
-                        <div key={notif.id} className="flex items-start gap-4">
-                            <div className="flex-1">
-                                <p className={`text-sm ${notif.read ? 'text-muted-foreground' : 'font-semibold'}`}>
-                                    {notif.message}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                    {formatDistanceToNow(notif.createdAt, { addSuffix: true })}
-                                </p>
+                <ScrollArea className="h-72">
+                    <div className="space-y-4">
+                        {notifications.length > 0 ? (
+                            notifications.map((notif) => (
+                            <div key={notif.id} className="flex items-start gap-4">
+                                <div className="flex-1">
+                                    <p className={`text-sm ${notif.read ? 'text-muted-foreground' : 'font-semibold'}`}>
+                                        {notif.message}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                        {formatDistanceToNow(notif.createdAt, { addSuffix: true })}
+                                    </p>
+                                </div>
+                                {!notif.read && (
+                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleMarkAsRead(notif.id)}>
+                                    <Check className="h-4 w-4" />
+                                    <span className="sr-only">Mark as read</span>
+                                </Button>
+                                )}
                             </div>
-                            {!notif.read && (
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleMarkAsRead(notif.id)}>
-                                <Check className="h-4 w-4" />
-                                <span className="sr-only">Mark as read</span>
-                            </Button>
-                            )}
-                        </div>
-                        ))
-                    ) : (
-                        <p className="text-sm text-muted-foreground">No new notifications.</p>
-                    )}
-                </div>
+                            ))
+                        ) : (
+                            <p className="text-sm text-muted-foreground">No new notifications.</p>
+                        )}
+                    </div>
+                </ScrollArea>
             </CardContent>
         </Card>
       </div>
