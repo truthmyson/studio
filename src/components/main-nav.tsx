@@ -12,15 +12,16 @@ import {
   FileText,
   User,
   UserPlus,
+  BookOpenCheck,
 } from 'lucide-react';
 
 const links = [
   { href: '/', label: 'Home', icon: LayoutDashboard },
   { href: '/student-dashboard', label: 'Student Dashboard', icon: User },
   { href: '/rep-dashboard', label: 'Rep Dashboard', icon: LayoutDashboard },
+  { href: '/classes', label: 'My Classes', icon: BookOpenCheck },
   { href: '/students', label: 'Students', icon: Users },
   { href: '/attendance', label: 'Attendance AI', icon: FileText },
-  { href: '/rep-register', label: 'Rep Registration', icon: UserPlus },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -36,7 +37,7 @@ export function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElemen
         <Button
           key={href}
           asChild
-          variant={pathname === href ? 'secondary' : 'ghost'}
+          variant={pathname.startsWith(href) && href !== '/' || pathname === href ? 'secondary' : 'ghost'}
           className="w-full justify-start"
         >
           <Link href={href}>

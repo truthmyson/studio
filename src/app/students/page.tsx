@@ -5,7 +5,6 @@ import { PageHeader, PageHeaderHeading, PageHeaderDescription } from "@/componen
 import { StudentsTable } from "@/components/feature/students-table";
 import { studentData } from "@/lib/constants";
 import { Card, CardContent } from "@/components/ui/card";
-import { Student } from '@/lib/types';
 
 export default function StudentsPage() {
   return (

@@ -18,7 +18,7 @@ import {
   } from '@/components/ui/table';
   import { Badge } from '@/components/ui/badge';
   import { Button } from '@/components/ui/button';
-  import { ClipboardList, Loader2, UserCheck, Bell, Check } from 'lucide-react';
+  import { ClipboardList, Loader2, UserCheck, Bell, Check, PlusCircle } from 'lucide-react';
   import { recentAttendance } from '@/lib/constants';
   import { PageHeader, PageHeaderHeading, PageHeaderDescription } from '@/components/page-header';
   import { useEffect, useState, useCallback } from 'react';
@@ -26,6 +26,9 @@ import {
   import { getActiveSession, markStudentAttendance, getNotifications, markNotificationRead } from '@/lib/actions';
   import type { Notification } from '@/lib/notifications';
   import { formatDistanceToNow } from 'date-fns';
+  import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
   
   // Haversine formula to calculate distance between two lat/lon points
   function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -48,6 +51,8 @@ import {
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
     const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [isJoinClassOpen, setIsJoinClassOpen] = useState(false);
+    const [joinCode, setJoinCode] = useState('');
 
     const fetchNotifications = useCallback(async () => {
         const notifs = await getNotifications(studentId);
@@ -69,6 +74,17 @@ import {
         await markNotificationRead(notificationId);
         fetchNotifications();
     };
+
+    const handleJoinClass = () => {
+        if (!joinCode.trim()) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Join code cannot be empty.' });
+            return;
+        }
+        // In a real app, you'd call an action to validate the code and join the class.
+        toast({ title: 'Success!', description: `Successfully joined class with code: ${joinCode}` });
+        setJoinCode('');
+        setIsJoinClassOpen(false);
+    }
 
     const handleSignIn = () => {
         setIsLoading(true);
@@ -131,6 +147,10 @@ import {
                 <PageHeaderHeading>Student Dashboard</PageHeaderHeading>
                 <PageHeaderDescription>Welcome, John Doe!</PageHeaderDescription>
             </div>
+            <Button onClick={() => setIsJoinClassOpen(true)}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Join a Class
+            </Button>
         </PageHeader>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Card>
@@ -231,6 +251,31 @@ import {
             </Table>
           </CardContent>
         </Card>
+        <Dialog open={isJoinClassOpen} onOpenChange={setIsJoinClassOpen}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Join a New Class</DialogTitle>
+                    <DialogDescription>
+                        Enter the unique join code provided by your class representative.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="joinCode">Join Code</Label>
+                        <Input
+                            id="joinCode"
+                            value={joinCode}
+                            onChange={(e) => setJoinCode(e.target.value)}
+                            placeholder="e.g., SWE-Q-2024"
+                        />
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => setIsJoinClassOpen(false)}>Cancel</Button>
+                    <Button onClick={handleJoinClass}>Join Class</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
       </div>
     );
   }

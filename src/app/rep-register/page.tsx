@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PageHeader, PageHeaderHeading, PageHeaderDescription } from "@/components/page-header";
+import Link from "next/link";
 
 export default function RepRegisterPage() {
   return (
@@ -39,6 +40,10 @@ export default function RepRegisterPage() {
               <Input id="email" type="email" placeholder="name@university.edu" required />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input id="password" type="password" required />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="course">Course/Program</Label>
               <Input id="course" placeholder="B.Sc. Computer Science" required />
             </div>
@@ -51,6 +56,12 @@ export default function RepRegisterPage() {
               />
             </div>
             <Button type="submit" className="w-full">Submit Application</Button>
+             <p className="text-center text-sm text-muted-foreground">
+                Already have a rep account?{' '}
+                <Link href="/rep-login" className="underline hover:text-primary">
+                    Login
+                </Link>
+            </p>
           </form>
         </CardContent>
       </Card>

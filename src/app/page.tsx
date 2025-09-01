@@ -11,14 +11,22 @@ export default function HomePage() {
 
       <div className="flex gap-4">
         <Button asChild size="lg">
-          <Link href="/student-dashboard">Go to Student Dashboard</Link>
+          <Link href="/student-login">Student Login</Link>
         </Button>
         <Button asChild size="lg" variant="outline">
-          <Link href="/rep-dashboard">Go to Rep Dashboard</Link>
+          <Link href="/rep-login">Rep Login</Link>
         </Button>
-        <Button asChild size="lg" variant="secondary">
-            <Link href="/rep-register">Register as Rep</Link>
-        </Button>
+      </div>
+       <div className="text-center space-y-2">
+         <p className="text-sm text-muted-foreground">Don't have an account?</p>
+         <div className="flex gap-4">
+            <Button asChild variant="secondary">
+                <Link href="/student-register">Register as Student</Link>
+            </Button>
+            <Button asChild variant="secondary">
+                <Link href="/rep-register">Register as Rep</Link>
+            </Button>
+        </div>
       </div>
     </div>
   );
