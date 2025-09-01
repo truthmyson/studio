@@ -1,3 +1,6 @@
+
+'use client';
+
 import {
   Card,
   CardContent,
@@ -25,8 +28,12 @@ import {
 import { studentData, recentAttendance } from '@/lib/constants';
 import Link from 'next/link';
 import { PageHeader, PageHeaderHeading } from '@/components/page-header';
+import { GeofencingDialog } from '@/components/feature/geofencing-dialog';
+import { useState } from 'react';
 
 export default function RepDashboardPage() {
+  const [isGeofencingDialogOpen, setIsGeofencingDialogOpen] = useState(false);
+
   const totalStudents = studentData.length;
   const attendanceRate =
     recentAttendance.reduce((acc, record) => {
@@ -92,7 +99,7 @@ export default function RepDashboardPage() {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <Button size="sm">
+            <Button size="sm" onClick={() => setIsGeofencingDialogOpen(true)}>
               <UserCheck className="mr-2 h-4 w-4" /> Start Geo-fencing
             </Button>
             <p className="text-xs text-muted-foreground mt-2">
@@ -156,6 +163,10 @@ export default function RepDashboardPage() {
           </Table>
         </CardContent>
       </Card>
+      <GeofencingDialog
+        isOpen={isGeofencingDialogOpen}
+        onClose={() => setIsGeofencingDialogOpen(false)}
+      />
     </div>
   );
 }

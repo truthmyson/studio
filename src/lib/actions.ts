@@ -3,6 +3,7 @@
 
 import { generateAttendanceTable } from '@/ai/flows/attendance-table-generator';
 import { z } from 'zod';
+import { activeSession, startSession } from '@/lib/attendance-session';
 
 const studentDetailsSchema = z.array(
   z.object({
@@ -81,4 +82,23 @@ export async function generateAttendanceAction(
     console.error(error);
     return { status: 'error', message: 'An unexpected error occurred.' };
   }
+}
+
+
+export async function getActiveSession() {
+  return activeSession;
+}
+
+export async function startGeofencingAction(formData: FormData) {
+  const radius = parseFloat(formData.get('radius') as string);
+  const timeLimit = parseInt(formData.get('timeLimit') as string, 10);
+  const latitude = parseFloat(formData.get('latitude') as string);
+  const longitude = parseFloat(formData.get('longitude') as string);
+
+  if (isNaN(radius) || isNaN(timeLimit) || isNaN(latitude) || isNaN(longitude)) {
+    return { success: false, message: 'Invalid data provided.' };
+  }
+  
+  startSession({ latitude, longitude }, radius, timeLimit);
+  return { success: true, message: 'Geo-fencing session started!' };
 }
