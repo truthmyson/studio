@@ -19,7 +19,7 @@ import {
   import { Badge } from '@/components/ui/badge';
   import { Button } from '@/components/ui/button';
   import { ClipboardList, Loader2, UserCheck, Bell, Check, PlusCircle, LogOut, User as UserIcon } from 'lucide-react';
-  import { recentAttendance } from '@/lib/constants';
+  import { recentAttendance, studentData } from '@/lib/constants';
   import { PageHeader, PageHeaderHeading, PageHeaderDescription } from '@/components/page-header';
   import { useEffect, useState, useCallback } from 'react';
   import { useToast } from '@/hooks/use-toast';
@@ -30,6 +30,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { Class } from '@/lib/class-management';
+import type { Student } from '@/lib/types';
   
   // Haversine formula to calculate distance between two lat/lon points
   function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -49,6 +50,7 @@ import type { Class } from '@/lib/class-management';
   
   export default function StudentDashboardPage() {
     const studentId = '24275016'; // Mock student ID
+    const [currentUser, setCurrentUser] = useState<Student | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
     const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -57,13 +59,23 @@ import type { Class } from '@/lib/class-management';
     const [isJoining, setIsJoining] = useState(false);
     const [joinedClasses, setJoinedClasses] = useState<Class[]>([]);
 
+    useEffect(() => {
+        // In a real app, you'd fetch the current user. Here, we find them from mock data.
+        const user = studentData.find(s => s.id === studentId);
+        if(user) {
+            setCurrentUser(user);
+        }
+    }, [studentId]);
+
     const fetchStudentData = useCallback(async () => {
         const [notifs, classes] = await Promise.all([
             getNotifications(studentId),
             getStudentClassesAction(studentId)
         ]);
         setNotifications(notifs);
-        setJoinedClasses(classes);
+        if (classes.success) {
+            setJoinedClasses(classes.data);
+        }
     }, [studentId]);
 
     useEffect(() => {
@@ -177,13 +189,9 @@ import type { Class } from '@/lib/class-management';
         <PageHeader>
             <div>
                 <PageHeaderHeading>Student Dashboard</PageHeaderHeading>
-                <PageHeaderDescription>Welcome, Chris Mensah!</PageHeaderDescription>
+                <PageHeaderDescription>Welcome, {currentUser?.firstName || 'Student'}!</PageHeaderDescription>
             </div>
             <div className='flex gap-2'>
-                 <Button variant="outline">
-                    <UserIcon className="mr-2 h-4 w-4" />
-                    View Profile
-                </Button>
                 <Button onClick={() => setIsJoinClassOpen(true)}>
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Join a Class
@@ -361,7 +369,3 @@ import type { Class } from '@/lib/class-management';
       </div>
     );
   }
-
-    
-
-    

@@ -35,9 +35,13 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
   const { toast } = useToast();
 
   useEffect(() => {
-    if (isOpen) {
-        setClasses(getAllClasses());
+    async function fetchClasses() {
+        if (isOpen) {
+            const allClasses = await getAllClasses();
+            setClasses(allClasses);
+        }
     }
+    fetchClasses();
   }, [isOpen]);
 
   const handleStartSession = async () => {

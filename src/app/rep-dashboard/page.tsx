@@ -26,29 +26,32 @@ import {
   Bell,
   Check,
 } from 'lucide-react';
-import { studentData } from '@/lib/constants';
 import Link from 'next/link';
-import { PageHeader, PageHeaderHeading } from '@/components/page-header';
+import { PageHeader, PageHeaderHeading, PageHeaderDescription } from '@/components/page-header';
 import { GeofencingDialog } from '@/components/feature/geofencing-dialog';
 import { useEffect, useState, useCallback } from 'react';
-import { getAllSessions, getNotifications, markNotificationRead } from '@/lib/actions';
+import { getAllSessions, getNotifications, markNotificationRead, getAllStudentsAction } from '@/lib/actions';
 import type { AttendanceSession } from '@/lib/attendance-session';
 import { format, formatDistanceToNow } from 'date-fns';
 import type { Notification } from '@/lib/notifications';
+import type { Student } from '@/lib/types';
 
 export default function RepDashboardPage() {
   const repId = 'REP001'; // Mock rep ID
   const [isGeofencingDialogOpen, setIsGeofencingDialogOpen] = useState(false);
   const [sessions, setSessions] = useState<AttendanceSession[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
 
   const fetchDashboardData = useCallback(async () => {
-    const [allSessions, repNotifications] = await Promise.all([
+    const [allSessions, repNotifications, allStudents] = await Promise.all([
         getAllSessions(),
-        getNotifications(repId)
+        getNotifications(repId),
+        getAllStudentsAction()
     ]);
     setSessions(allSessions);
     setNotifications(repNotifications);
+    setStudents(allStudents);
   }, [repId]);
 
 
@@ -65,7 +68,7 @@ export default function RepDashboardPage() {
     fetchDashboardData(); // Refresh notifications
   };
 
-  const totalStudents = studentData.length;
+  const totalStudents = students.length;
   const overallAttendanceRate = sessions.length > 0 ? sessions.reduce((acc, session) => {
     const presentCount = session.students.filter(s => s.signedInAt).length;
     return acc + (presentCount / (session.students.length || 1));
@@ -75,6 +78,7 @@ export default function RepDashboardPage() {
     <div className="flex-1 space-y-4">
       <PageHeader>
         <PageHeaderHeading>Rep Dashboard</PageHeaderHeading>
+        <PageHeaderDescription>Manage classes, attendance, and students.</PageHeaderDescription>
       </PageHeader>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -183,7 +187,7 @@ export default function RepDashboardPage() {
                         {absentCount}
                         </TableCell>
                         <TableCell>
-                        <Badge variant={isSessionActive ? "default" : "outline"}>{isSessionActive ? "Active" : "Completed"}</Badge>
+                        <Badge variant={isSessionActive ? 'default' : 'outline'}>{isSessionActive ? "Active" : "Completed"}</Badge>
                         </TableCell>
                     </TableRow>
                     );

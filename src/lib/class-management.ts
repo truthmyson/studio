@@ -2,7 +2,7 @@
 'use server';
 
 import type { Student } from "./types";
-import { studentData } from "./constants";
+import { studentData, getStudentById } from "./constants";
 
 // Mock class structure
 export interface Class {
@@ -41,7 +41,7 @@ export async function deleteClass(id: string): Promise<void> {
     classes = classes.filter(c => c.id !== id);
 }
 
-export async function getStudentsByClass(classId: string): Promise<Student[]> {
+export async function getStudentsByClassId(classId: string): Promise<Student[]> {
     const cls = await getClassById(classId);
     if (!cls) return [];
     return studentData.filter(student => cls.studentIds.includes(student.id));
@@ -86,13 +86,9 @@ export async function removeStudentFromClass(classId: string, studentId: string)
     const studentIndex = classToEdit.studentIds.indexOf(studentId);
     if (studentIndex > -1) {
         classToEdit.studentIds.splice(studentIndex, 1);
-        const student = studentData.find(s => s.id === studentId);
+        const student = await getStudentById(studentId);
         const studentName = student ? `${student.firstName} ${student.lastName}` : 'student';
         return { success: true, message: `Removed ${studentName} from the class.` };
     }
     return { success: false, message: "Student not found in this class." };
 }
-
-    
-
-    

@@ -1,14 +1,13 @@
 
-
 'use server';
 
 import { generateAttendanceTable } from '@/ai/flows/attendance-table-generator';
 import { z } from 'zod';
 import { activeSession, startSession, allSessions, signInStudent, getSessionById, getSessionsByClass } from '@/lib/attendance-session';
-import { studentData } from './constants';
+import { getStudentById, studentData } from './constants';
 import { createSessionNotifications, getStudentNotifications, markNotificationAsRead, createRepNotification } from './notifications';
 import { format } from 'date-fns';
-import { getClassById, enrollStudentInClass, getClassesByStudent, studentLeaveClass, removeStudentFromClass } from './class-management';
+import { getClassById, enrollStudentInClass, getClassesByStudent, studentLeaveClass, removeStudentFromClass, getStudentsByClassId } from './class-management';
 import { Student } from './types';
 
 const studentDetailsSchema = z.array(
@@ -108,6 +107,10 @@ export async function getAllSessions() {
   return allSessions;
 }
 
+export async function getAllStudentsAction(): Promise<Student[]> {
+    return studentData;
+}
+
 
 export async function startGeofencingAction(formData: FormData) {
   const radius = parseFloat(formData.get('radius') as string);
@@ -182,7 +185,7 @@ export async function exportAttendanceAction(classId: string): Promise<{ success
         return { success: false, message: "Class not found." };
     }
 
-    const classStudents = studentData.filter(s => selectedClass.studentIds.includes(s.id));
+    const classStudents = await getStudentsByClassId(classId);
     const classSessions = getSessionsByClass(classId);
     
     // Map student details for the AI flow
@@ -249,8 +252,9 @@ export async function joinClassAction(studentId: string, joinCode: string): Prom
     return { success: result.success, message: result.message };
 }
 
-export async function getStudentClassesAction(studentId: string) {
-    return getClassesByStudent(studentId);
+export async function getStudentClassesAction(studentId: string): Promise<{ success: boolean, data: Class[] }> {
+    const classes = await getClassesByStudent(studentId);
+    return { success: true, data: classes };
 }
 
 export async function studentLeaveClassAction(classId: string, studentId: string) {
@@ -260,5 +264,3 @@ export async function studentLeaveClassAction(classId: string, studentId: string
 export async function removeStudentFromClassAction(classId: string, studentId: string) {
     return removeStudentFromClass(classId, studentId);
 }
-
-    

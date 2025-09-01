@@ -3,16 +3,20 @@ import type { Student } from './types';
 
 export const studentData: Student[] = [
   { id: '24275016', firstName: 'Chris', middleName: '', lastName: 'Mensah', major: 'Computer Science', email: 'chris.mensah@university.edu', courseName: 'Computer Science' },
-  { id: 'STU002', firstName: 'Jane', lastName: 'Smith', major: 'Computer Science', email: 'jane.smith@university.edu', courseName: 'Computer Science' },
-  { id: 'STU003', firstName: 'Peter', lastName: 'Jones', major: 'Software Engineering', email: 'peter.jones@university.edu', courseName: 'Software Engineering' },
-  { id: 'STU004', firstName: 'Mary', lastName: 'Johnson', major: 'Computer Science', email: 'mary.johnson@university.edu', courseName: 'Computer Science' },
-  { id: 'STU005', firstName: 'David', lastName: 'Williams', major: 'Information Technology', email: 'david.williams@university.edu', courseName: 'Information Technology' },
-  { id: 'STU006', firstName: 'Emily', lastName: 'Brown', major: 'Computer Science', email: 'emily.brown@university.edu', courseName: 'Computer Science' },
-  { id: 'STU007', firstName: 'Michael', lastName: 'Davis', major: 'Software Engineering', email: 'michael.davis@university.edu', courseName: 'Software Engineering' },
-  { id: 'STU008', firstName: 'Sarah', lastName: 'Miller', major: 'Computer Science', email: 'sarah.miller@university.edu', courseName: 'Computer Science' },
-  { id: 'STU009', firstName: 'Chris', lastName: 'Wilson', major: 'Information Technology', email: 'chris.wilson@university.edu', courseName: 'Information Technology' },
-  { id: 'STU010', firstName: 'Jessica', lastName: 'Taylor', major: 'Computer Science', email: 'jessica.taylor@university.edu', courseName: 'Computer Science' },
+  { id: 'STU002', firstName: 'Jane', middleName: '', lastName: 'Smith', major: 'Computer Science', email: 'jane.smith@university.edu', courseName: 'Computer Science' },
+  { id: 'STU003', firstName: 'Peter', middleName: '', lastName: 'Jones', major: 'Software Engineering', email: 'peter.jones@university.edu', courseName: 'Software Engineering' },
+  { id: 'STU004', firstName: 'Mary', middleName: '', lastName: 'Johnson', major: 'Computer Science', email: 'mary.johnson@university.edu', courseName: 'Computer Science' },
+  { id: 'STU005', firstName: 'David', middleName: '', lastName: 'Williams', major: 'Information Technology', email: 'david.williams@university.edu', courseName: 'Information Technology' },
+  { id: 'STU006', firstName: 'Emily', middleName: '', lastName: 'Brown', major: 'Computer Science', email: 'emily.brown@university.edu', courseName: 'Computer Science' },
+  { id: 'STU007', firstName: 'Michael', middleName: '', lastName: 'Davis', major: 'Software Engineering', email: 'michael.davis@university.edu', courseName: 'Software Engineering' },
+  { id: 'STU008', firstName: 'Sarah', middleName: '', lastName: 'Miller', major: 'Computer Science', email: 'sarah.miller@university.edu', courseName: 'Computer Science' },
+  { id: 'STU009', firstName: 'Chris', middleName: '', lastName: 'Wilson', major: 'Information Technology', email: 'chris.wilson@university.edu', courseName: 'Information Technology' },
+  { id: 'STU010', firstName: 'Jessica', middleName: '', lastName: 'Taylor', major: 'Computer Science', email: 'jessica.taylor@university.edu', courseName: 'Computer Science' },
 ];
+
+export async function getStudentById(id: string): Promise<Student | undefined> {
+    return studentData.find(s => s.id === id);
+}
 
 export const recentAttendance = [
     {
@@ -54,9 +58,9 @@ export const recentAttendance = [
 
 export const studentDetailsJsonExample = JSON.stringify(
   [
-    { id: 'STU001', name: 'John Doe', major: 'Computer Science' },
-    { id: 'STU002', name: 'Jane Smith', major: 'Computer Science' },
-    { id: 'STU003', name: 'Peter Jones', major: 'Software Engineering' },
+    { id: 'STU001', "First Name": 'John', "Last Name": "Doe", "Course Name": 'Computer Science' },
+    { id: 'STU002', "First Name": 'Jane', "Last Name": "Smith", "Course Name": 'Computer Science' },
+    { id: 'STU003', "First Name": 'Peter', "Last Name": "Jones", "Course Name": 'Software Engineering' },
   ],
   null,
   2
@@ -71,7 +75,3 @@ export const attendanceRecordsJsonExample = JSON.stringify(
   null,
   2
 );
-
-    
-
-    
