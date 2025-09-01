@@ -16,6 +16,7 @@ import { usePathname } from 'next/navigation';
 import { studentData } from '@/lib/constants';
 import { useEffect, useState } from 'react';
 import type { Student } from '@/lib/types';
+import Link from 'next/link';
 
 
 export function UserNav() {
@@ -53,6 +54,10 @@ export function UserNav() {
   if (!user) {
     return null; // Or a loading skeleton
   }
+  
+  if (pathname === '/') {
+    return null;
+  }
 
   return (
     <DropdownMenu>
@@ -83,8 +88,8 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          Log out
+        <DropdownMenuItem asChild>
+          <Link href="/">Log out</Link>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

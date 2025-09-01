@@ -13,7 +13,7 @@ const ptSans = PT_Sans({
 
 export const metadata: Metadata = {
   title: 'UniAttend',
-  description: 'An attendance app for university students.',
+  description: 'A modern solution for university attendance.',
 };
 
 export default function RootLayout({

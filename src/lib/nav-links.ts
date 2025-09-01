@@ -9,13 +9,13 @@ import {
   } from 'lucide-react';
 
 export function getNavLinks(pathname: string) {
-    if (pathname.includes('student')) {
+    if (pathname.includes('student-dashboard')) {
         return [
           { href: '/student-dashboard', label: 'Dashboard', icon: LayoutDashboard },
           { href: '/settings', label: 'Settings', icon: Settings },
         ]
     }
-     if (pathname.includes('rep') || pathname.includes('classes') || pathname.includes('students') || pathname.includes('attendance')) {
+     if (pathname.includes('rep-dashboard') || pathname.includes('classes') || pathname.includes('students') || pathname.includes('attendance')) {
          return [
           { href: '/rep-dashboard', label: 'Dashboard', icon: LayoutDashboard },
           { href: '/classes', label: 'My Classes', icon: BookOpenCheck },
@@ -26,7 +26,7 @@ export function getNavLinks(pathname: string) {
      }
      // Fallback for home page etc.
      return [
-          { href: '/student-dashboard', label: 'Student View', icon: User },
-          { href: '/rep-dashboard', label: 'Rep View', icon: LayoutDashboard },
+          { href: '/student-dashboard', label: 'Student Dashboard', icon: User },
+          { href: '/rep-dashboard', label: 'Rep Dashboard', icon: LayoutDashboard },
      ]
 }
