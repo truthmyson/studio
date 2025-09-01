@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -15,17 +16,13 @@ import {
   BookOpenCheck,
 } from 'lucide-react';
 
-const links = [
-  { href: '/student-dashboard', label: 'Student Dashboard', icon: User },
-  { href: '/rep-dashboard', label: 'Rep Dashboard', icon: LayoutDashboard },
-  { href: '/classes', label: 'My Classes', icon: BookOpenCheck },
-  { href: '/students', label: 'Students', icon: Users },
-  { href: '/attendance', label: 'Attendance AI', icon: FileText },
-  { href: '/settings', label: 'Settings', icon: Settings },
-];
-
 export function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
   const pathname = usePathname();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // A little helper to manage which links to show based on a "role"
   // In a real app, this would come from an auth context.
@@ -54,6 +51,10 @@ export function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElemen
 
   const navLinks = getLinksForRole();
 
+  if (!isClient) {
+    // Render nothing on the server to avoid mismatch
+    return null;
+  }
 
   return (
     <nav
