@@ -2,7 +2,7 @@
 import type { Student } from './types';
 
 export const studentData: Student[] = [
-  { id: '24275016', firstName: 'Chris', middleName: '', lastName: 'Mensah', major: 'Computer Science', email: 'chris.mensah@university.edu', courseName: 'Computer Science' },
+  { id: '24275016', firstName: 'Chris', middleName: '', lastName: 'Mensah', major: 'Computer Science', email: 'chris.mensah@university.edu', courseName: 'Computer Science', isRep: true },
   { id: 'STU002', firstName: 'Jane', middleName: '', lastName: 'Smith', major: 'Computer Science', email: 'jane.smith@university.edu', courseName: 'Computer Science' },
   { id: 'STU003', firstName: 'Peter', middleName: '', lastName: 'Jones', major: 'Software Engineering', email: 'peter.jones@university.edu', courseName: 'Software Engineering' },
   { id: 'STU004', firstName: 'Mary', middleName: '', lastName: 'Johnson', major: 'Computer Science', email: 'mary.johnson@university.edu', courseName: 'Computer Science' },

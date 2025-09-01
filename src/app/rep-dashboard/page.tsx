@@ -38,7 +38,7 @@ import type { Student } from '@/lib/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 export default function RepDashboardPage() {
-  const repId = 'REP001'; // Mock rep ID
+  const repId = '24275016'; // Mock rep ID, now aligned with student data
   const [isGeofencingDialogOpen, setIsGeofencingDialogOpen] = useState(false);
   const [sessions, setSessions] = useState<AttendanceSession[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);

@@ -25,40 +25,44 @@ export function UserNav() {
 
   useEffect(() => {
     // In a real app, this would come from an auth context.
-    // We simulate it based on the URL.
-    if (pathname.includes('student')) {
-      const student = studentData.find(s => s.id === '24275016'); // Mock current user
-      if (student) {
-        setUser({
-          name: `${student.firstName} ${student.lastName}`,
-          email: student.email,
-          fallback: `${student.firstName.charAt(0)}${student.lastName.charAt(0)}`,
-        });
-      }
-    } else if (pathname.includes('rep')) {
-      setUser({
-        name: 'Chris Mensah',
-        email: 'chris.mensah@university.edu',
-        fallback: 'CM',
-      });
+    // We simulate it based on the URL path.
+    const isRepView = pathname.includes('rep');
+    const studentId = '24275016'; // Mock current user ID
+    
+    const currentUser = studentData.find(s => s.id === studentId);
+
+    if (currentUser) {
+        if (isRepView && currentUser.isRep) {
+             setUser({
+                name: `${currentUser.firstName} ${currentUser.lastName} (Rep)`,
+                email: currentUser.email,
+                fallback: `${currentUser.firstName.charAt(0)}${currentUser.lastName.charAt(0)}`,
+             });
+        } else {
+             setUser({
+                name: `${currentUser.firstName} ${currentUser.lastName}`,
+                email: currentUser.email,
+                fallback: `${currentUser.firstName.charAt(0)}${currentUser.lastName.charAt(0)}`,
+             });
+        }
+    } else if (pathname === '/') {
+        // No user needed on the home page
+        setUser(null);
     } else {
-        // Default user for other pages
+        // Default guest user for other pages like login/register
         setUser({
             name: 'Guest User',
             email: 'guest@university.edu',
             fallback: 'GU'
-        })
+        });
     }
+
   }, [pathname]);
 
-  if (!user) {
-    return null; // Or a loading skeleton
-  }
-  
-  if (pathname === '/') {
+  if (pathname === '/' || !user) {
     return null;
   }
-
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

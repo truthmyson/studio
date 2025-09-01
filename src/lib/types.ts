@@ -11,4 +11,5 @@ export interface Student {
     contact?: string;
     gender?: 'Male' | 'Female' | 'Other' | 'Prefer not to say';
     courseName: string;
+    isRep?: boolean;
 }
