@@ -10,12 +10,17 @@ import {
   Users,
   Settings,
   FileText,
+  User,
+  UserPlus,
 } from 'lucide-react';
 
 const links = [
-  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/', label: 'Home', icon: LayoutDashboard },
+  { href: '/student-dashboard', label: 'Student Dashboard', icon: User },
+  { href: '/rep-dashboard', label: 'Rep Dashboard', icon: LayoutDashboard },
   { href: '/students', label: 'Students', icon: Users },
   { href: '/attendance', label: 'Attendance AI', icon: FileText },
+  { href: '/rep-register', label: 'Rep Registration', icon: UserPlus },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
