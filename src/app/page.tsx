@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/accordion"
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { useRef } from 'react';
 
 
 function PlayStoreIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -48,6 +49,7 @@ const features = [
 ]
 
 export default function HomePage() {
+  const videoRef = useRef<HTMLVideoElement>(null);
   return (
     <div className="flex-1 w-full" id="top">
         {/* Header */}
@@ -168,19 +170,38 @@ export default function HomePage() {
         <section id="demo" className="container py-16 md:py-24 text-center">
             <h2 className="text-3xl font-bold md:text-4xl">Explore the App in Action</h2>
             <p className="text-muted-foreground md:text-lg max-w-2xl mx-auto mb-8">
-                Watch this short demo to see how VITOBU simplifies attendance for students and representatives.
+                Watch this short demo to see how VITOBU simplifies attendance. Hover over the video to play.
             </p>
-            <div className="flex justify-center">
+            <div className="flex justify-center mb-8">
                 <div className="w-full max-w-4xl bg-black rounded-lg shadow-2xl overflow-hidden border">
                     <video
+                        ref={videoRef}
                         className="w-full h-full"
-                        controls
+                        loop
+                        muted
+                        playsInline
+                        onMouseEnter={() => videoRef.current?.play()}
+                        onMouseLeave={() => videoRef.current?.pause()}
                         poster="https://picsum.photos/1280/720"
                     >
                         {/* You can replace this with your actual video source */}
                         <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" />
                         Your browser does not support the video tag.
                     </video>
+                </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <div className="space-y-4">
+                    <h3 className="text-2xl font-bold">Representative Dashboard</h3>
+                    <div className="relative h-[400px] w-full group overflow-hidden rounded-xl">
+                        <Image src="https://picsum.photos/800/600" layout="fill" objectFit="cover" alt="Representative Dashboard Screenshot" className="rounded-xl shadow-lg transition-transform duration-500 group-hover:scale-105" data-ai-hint="dashboard analytics" />
+                    </div>
+                </div>
+                <div className="space-y-4">
+                    <h3 className="text-2xl font-bold">Student Mobile App</h3>
+                     <div className="relative h-[400px] w-full group overflow-hidden rounded-xl">
+                        <Image src="https://picsum.photos/800/600?grayscale" layout="fill" objectFit="cover" alt="Student App Screenshot" className="rounded-xl shadow-lg transition-transform duration-500 group-hover:scale-105" data-ai-hint="mobile app" />
+                    </div>
                 </div>
             </div>
         </section>
@@ -242,5 +263,3 @@ export default function HomePage() {
     </div>
   );
 }
-
-    
