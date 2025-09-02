@@ -92,6 +92,9 @@ export default function HomePage() {
                             <DropdownMenuItem asChild>
                                 <a href="#contact">Contact</a>
                             </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <a href="mailto:support@vitobu.app">Feedback</a>
+                            </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
