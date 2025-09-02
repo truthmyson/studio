@@ -72,6 +72,9 @@ export default function HomePage() {
                         <a href="#features">Features</a>
                     </Button>
                     <Button variant="ghost" asChild>
+                        <a href="#screenshots">Screenshots</a>
+                    </Button>
+                    <Button variant="ghost" asChild>
                         <a href="#faq">FAQ</a>
                     </Button>
                     <Button asChild>
