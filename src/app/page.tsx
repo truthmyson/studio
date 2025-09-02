@@ -20,6 +20,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
 
 
 function PlayStoreIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -67,9 +68,11 @@ export default function HomePage() {
                     <Button variant="ghost">How it Works</Button>
                     <Button variant="ghost">Features</Button>
                     <Button variant="ghost">FAQ</Button>
-                    <Button>
-                        Download App
-                        <ArrowRight className="ml-2 h-5 w-5" />
+                    <Button asChild>
+                        <Link href="/rep-login">
+                            Representative Portal
+                            <ArrowRight className="ml-2 h-5 w-5" />
+                        </Link>
                     </Button>
                 </div>
             </div>
