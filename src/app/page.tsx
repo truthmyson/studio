@@ -21,13 +21,6 @@ import {
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useRef } from 'react';
-import {
-    Carousel,
-    CarouselContent,
-    CarouselItem,
-    CarouselNext,
-    CarouselPrevious,
-} from "@/components/ui/carousel"
 
 function PlayStoreIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
@@ -318,3 +311,5 @@ export default function HomePage() {
     </div>
   );
 }
+
+    
