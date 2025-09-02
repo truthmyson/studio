@@ -3,7 +3,7 @@
 
 import { Button } from '@/components/ui/button';
 import { VITOBULogo } from '@/components/icons';
-import { Apple, ArrowRight, Bot, Feather, FileCheck, Users } from 'lucide-react';
+import { Apple, ArrowRight, Bot, ChevronDown, Feather, FileCheck, Mail, Users } from 'lucide-react';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -12,6 +12,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useRef } from 'react';
@@ -72,12 +78,22 @@ export default function HomePage() {
                     <Button variant="ghost" asChild>
                         <a href="#faq">FAQ</a>
                     </Button>
-                    <Button asChild>
-                        <Link href="/rep-login">
-                            Representative Portal
-                            <ArrowRight className="ml-2 h-5 w-5" />
-                        </Link>
-                    </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost">
+                            More
+                            <ChevronDown className="ml-2 h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem asChild>
+                                <Link href="/rep-login">Representative Portal</Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <a href="#contact">Contact</a>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </div>
         </header>
@@ -260,6 +276,23 @@ export default function HomePage() {
             </Accordion>
         </section>
 
+        {/* Contact Section */}
+        <section id="contact" className="bg-muted">
+            <div className="container py-16 text-center md:py-24">
+                <h2 className="text-3xl font-bold md:text-4xl">Contact Us</h2>
+                <p className="max-w-2xl mx-auto mt-4 text-lg text-muted-foreground">
+                    Have questions or need support? We're here to help.
+                </p>
+                <div className="mt-8">
+                    <Button asChild size="lg" className="transition-transform duration-300 hover:scale-105">
+                        <a href="mailto:support@vitobu.app">
+                            <Mail className="mr-2 h-5 w-5" />
+                            support@vitobu.app
+                        </a>
+                    </Button>
+                </div>
+            </div>
+        </section>
     </div>
   );
 }
