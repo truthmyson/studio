@@ -133,7 +133,7 @@ export default function HomePage() {
         <section id="how-it-works" className="bg-muted py-16 md:py-24">
              <div className="container grid gap-12 md:grid-cols-2 items-center">
                 <div className="space-y-4">
-                    <Badge variant="secondary">How It Works</Badge>
+                    <Badge variant="secondary" className="px-4 py-2 text-sm">How It Works</Badge>
                      <h2 className="text-3xl font-bold md:text-4xl">Simple Steps for Reps & Students</h2>
                      <p className="text-muted-foreground md:text-lg">
                         A straightforward process ensures everyone can get started in minutes.
