@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { UniAttendLogo } from '@/components/icons';
+import { VITOBULogo } from '@/components/icons';
 import Link from 'next/link';
 
 export default function HomePage() {
@@ -7,12 +7,12 @@ export default function HomePage() {
     <div className="flex flex-col items-center justify-center flex-1 text-center">
       <div className="flex flex-col items-center space-y-6">
         <div className="flex items-center gap-4">
-            <UniAttendLogo className="h-16 w-16 text-primary" />
-            <h1 className="text-5xl font-bold tracking-tight text-primary">UniAttend</h1>
+            <VITOBULogo className="h-16 w-16 text-primary" />
+            <h1 className="text-5xl font-bold tracking-tight text-primary">VITOBU</h1>
         </div>
         <p className="max-w-2xl text-lg text-muted-foreground">
           The seamless, modern, and intelligent solution for managing university attendance. 
-          UniAttend leverages geo-fencing for accurate check-ins, provides real-time data for representatives, and offers a simple interface for students.
+          VITOBU leverages geo-fencing for accurate check-ins, provides real-time data for representatives, and offers a simple interface for students.
         </p>
       </div>
 

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { UniAttendLogo } from '@/components/icons';
+import { VITOBULogo } from '@/components/icons';
 import { MainNav } from '@/components/main-nav';
 import { UserNav } from '@/components/user-nav';
 import { Button } from './ui/button';
@@ -38,8 +38,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                  {/* Simplified header for SSR */}
                 <div className="flex w-full items-center justify-between gap-4">
                     <Link href={homeLink} className="flex items-center gap-2 text-lg font-semibold">
-                      <UniAttendLogo className="h-6 w-6 text-primary" />
-                      <span className="sr-only">UniAttend</span>
+                      <VITOBULogo className="h-6 w-6 text-primary" />
+                      <span className="sr-only">VITOBU</span>
                     </Link>
                     <UserNav />
                 </div>
@@ -59,8 +59,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               href={homeLink}
               className="flex items-center gap-2 text-lg font-semibold md:text-base"
             >
-              <UniAttendLogo className="h-6 w-6 text-primary" />
-              <span className="sr-only">UniAttend</span>
+              <VITOBULogo className="h-6 w-6 text-primary" />
+              <span className="sr-only">VITOBU</span>
             </Link>
             <MainNav />
         </nav>
@@ -79,8 +79,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <SheetContent side="left">
             <nav className="grid gap-6 text-lg font-medium">
               <Link href={homeLink} className="flex items-center gap-2 text-lg font-semibold mb-4">
-                <UniAttendLogo className="h-6 w-6 text-primary" />
-                <span className="">UniAttend</span>
+                <VITOBULogo className="h-6 w-6 text-primary" />
+                <span className="">VITOBU</span>
               </Link>
               <MainNav />
             </nav>

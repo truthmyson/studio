@@ -12,7 +12,7 @@ const ptSans = PT_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'UniAttend',
+  title: 'VITOBU',
   description: 'A modern solution for university attendance.',
 };
 
