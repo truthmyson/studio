@@ -56,14 +56,14 @@ const features = [
 
 export default function HomePage() {
   return (
-    <div className="flex-1 w-full">
+    <div className="flex-1 w-full" id="top">
         {/* Header */}
         <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container flex h-16 max-w-screen-2xl items-center justify-between">
-                 <div className="flex items-center gap-2">
+                 <a href="/#top" className="flex items-center gap-2">
                     <VITOBULogo className="h-8 w-8 text-primary" />
                     <span className="font-bold text-lg">VITOBU</span>
-                </div>
+                </a>
                 <div className="flex items-center gap-4">
                     <Button variant="ghost">How it Works</Button>
                     <Button variant="ghost">Features</Button>
