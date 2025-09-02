@@ -23,7 +23,7 @@ function GithubIcon(props: React.SVGProps<SVGSVGElement>) {
 
 export function SiteFooter() {
     return (
-        <footer className="border-t">
+        <footer className="border-t bg-muted">
             <div className="container py-12">
                 <div className="grid grid-cols-2 gap-8 md:grid-cols-5">
                     <div className="col-span-2 md:col-span-2">
