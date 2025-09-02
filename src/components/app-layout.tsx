@@ -36,7 +36,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="flex min-h-screen w-full flex-col">
             <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-card px-4 md:px-6">
                  {/* Simplified header for SSR */}
-                <div className="flex w-full items-center justify-end gap-4">
+                <div className="flex w-full items-center justify-between gap-4">
+                    <Link href={homeLink} className="flex items-center gap-2 text-lg font-semibold">
+                      <UniAttendLogo className="h-6 w-6 text-primary" />
+                      <span className="sr-only">UniAttend</span>
+                    </Link>
                     <UserNav />
                 </div>
             </header>
@@ -50,27 +54,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen w-full flex-col">
       <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-card px-4 md:px-6">
-        <div className="hidden md:flex md:flex-row md:items-center md:gap-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="p-2 h-auto">
-                <div className="flex items-center gap-2">
-                  <UniAttendLogo className="h-6 w-6 text-primary" />
-                  <h1 className="text-xl font-bold text-primary">UniAttend</h1>
-                  <ChevronDown className="h-4 w-4 text-primary" />
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              {navLinks.map(({ href, label }) => (
-                <DropdownMenuItem key={href} asChild>
-                  <Link href={href}>{label}</Link>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
+        <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
+            <Link
+              href={homeLink}
+              className="flex items-center gap-2 text-lg font-semibold md:text-base"
+            >
+              <UniAttendLogo className="h-6 w-6 text-primary" />
+              <span className="sr-only">UniAttend</span>
+            </Link>
+            <MainNav />
+        </nav>
+        
         <Sheet>
           <SheetTrigger asChild>
             <Button
@@ -97,14 +91,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <UserNav />
         </div>
       </header>
-      <div className="flex flex-1">
-        <aside className="hidden w-64 flex-col border-r bg-card p-4 md:flex">
-          <MainNav />
-        </aside>
-        <main className="flex-1 p-4 md:p-6 lg:p-8">
-          {children}
-        </main>
-      </div>
+      <main className="flex flex-1 flex-col p-4 md:p-6 lg:p-8">
+        {children}
+      </main>
     </div>
   );
 }

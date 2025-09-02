@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import { getNavLinks } from '@/lib/nav-links';
 
 
@@ -27,21 +26,20 @@ export function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElemen
 
   return (
     <nav
-      className={cn('flex flex-col items-start gap-2', className)}
+      className={cn('flex flex-col items-start gap-4 md:flex-row md:items-center md:gap-6', className)}
       {...props}
     >
-      {navLinks.map(({ href, label, icon: Icon }) => (
-        <Button
+      {navLinks.map(({ href, label }) => (
+        <Link
           key={href}
-          asChild
-          variant={pathname === href ? 'secondary' : 'ghost'}
-          className="w-full justify-start"
+          href={href}
+          className={cn(
+            'transition-colors hover:text-foreground',
+            pathname === href ? 'text-foreground font-semibold' : 'text-muted-foreground'
+          )}
         >
-          <Link href={href}>
-            <Icon className="mr-2 h-4 w-4" />
-            {label}
-          </Link>
-        </Button>
+          {label}
+        </Link>
       ))}
     </nav>
   );
