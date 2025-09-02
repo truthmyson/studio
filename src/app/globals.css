@@ -109,4 +109,19 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-headline;
   }
+  section:target {
+    animation: highlight-fade 2s ease-in-out;
+  }
+}
+
+@keyframes highlight-fade {
+  0% {
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.5);
+  }
+  25% {
+    box-shadow: 0 0 0 8px hsl(var(--primary) / 0.1);
+  }
+  100% {
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0);
+  }
 }
