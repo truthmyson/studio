@@ -17,6 +17,7 @@ export const FontContext = createContext<FontContextType | undefined>(undefined)
 
 export function FontProvider({ children }: { children: React.ReactNode }) {
   const [font, setFont] = useState("inter")
+  const [headlineFont, setHeadlineFont] = useState("pt-sans")
 
   useEffect(() => {
     const storedFont = localStorage.getItem("ui-font")
@@ -27,8 +28,9 @@ export function FontProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     document.documentElement.style.setProperty("--font-sans", `var(--font-${font})`)
+    document.documentElement.style.setProperty("--font-headline", `var(--font-${headlineFont})`)
     localStorage.setItem("ui-font", font)
-  }, [font])
+  }, [font, headlineFont])
 
   return (
     <FontContext.Provider value={{ font, setFont }}>
