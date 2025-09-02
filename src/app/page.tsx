@@ -3,16 +3,9 @@
 
 import { Button } from '@/components/ui/button';
 import { VITOBULogo } from '@/components/icons';
-import { Apple, ArrowRight, Bot, ChevronDown, Feather, FileCheck, Users } from 'lucide-react';
+import { Apple, ArrowRight, Bot, Feather, FileCheck, Users } from 'lucide-react';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import {
   Accordion,
   AccordionContent,
@@ -101,7 +94,7 @@ export default function HomePage() {
                         <Apple className="mr-2 h-6 w-6" />
                         Download for iOS
                     </Button>
-                    <Button size="lg" variant="secondary" className="transition-transform duration-300 hover:scale-105">
+                    <Button size="lg" variant="outline" className="transition-transform duration-300 hover:scale-105">
                         <PlayStoreIcon className="mr-2 h-5 w-5"/>
                         Download for Android
                     </Button>
@@ -171,34 +164,25 @@ export default function HomePage() {
              </div>
         </section>
 
-         {/* Demo Carousel */}
+        {/* Demo Video Section */}
         <section id="demo" className="container py-16 md:py-24 text-center">
-            <h2 className="text-3xl font-bold md:text-4xl">Explore the App</h2>
-            <p className="text-muted-foreground md:text-lg max-w-2xl mx-auto">
-                Clean, intuitive, and powerful dashboards for both students and representatives.
+            <h2 className="text-3xl font-bold md:text-4xl">Explore the App in Action</h2>
+            <p className="text-muted-foreground md:text-lg max-w-2xl mx-auto mb-8">
+                Watch this short demo to see how VITOBU simplifies attendance for students and representatives.
             </p>
-             <Carousel className="w-full max-w-4xl mx-auto mt-8"
-                opts={{
-                    align: "start",
-                    loop: true,
-                }}
-             >
-                <CarouselContent>
-                    {Array.from({ length: 5 }).map((_, index) => (
-                    <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
-                        <div className="p-1">
-                        <Card className="overflow-hidden group">
-                            <CardContent className="flex aspect-[9/16] items-center justify-center p-0">
-                               <Image src={`https://picsum.photos/seed/${index+1}/450/800`} width={450} height={800} alt={`App Screenshot ${index + 1}`} data-ai-hint="app screenshot" className="transition-transform duration-500 group-hover:scale-105" />
-                            </CardContent>
-                        </Card>
-                        </div>
-                    </CarouselItem>
-                    ))}
-                </CarouselContent>
-                <CarouselPrevious className="transition-transform hover:scale-110" />
-                <CarouselNext className="transition-transform hover:scale-110" />
-            </Carousel>
+            <div className="flex justify-center">
+                <div className="w-full max-w-4xl bg-black rounded-lg shadow-2xl overflow-hidden border">
+                    <video
+                        className="w-full h-full"
+                        controls
+                        poster="https://picsum.photos/1280/720"
+                    >
+                        {/* You can replace this with your actual video source */}
+                        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" />
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
         </section>
 
         {/* CTA Section */}
@@ -258,3 +242,5 @@ export default function HomePage() {
     </div>
   );
 }
+
+    
