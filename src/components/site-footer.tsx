@@ -55,7 +55,7 @@ export function SiteFooter() {
                     <div className="col-span-2 md:col-span-1">
                         <h3 className="font-semibold text-foreground">Stay Updated</h3>
                         <p className="text-muted-foreground mt-4 text-sm">Join our newsletter to get the latest updates.</p>
-                        <form className="flex w-full max-w-sm items-center space-x-2 mt-4">
+                        <form className="flex flex-col w-full max-w-sm space-y-2 mt-4">
                             <Input type="email" placeholder="Email" className="py-5" />
                             <Button type="submit">Subscribe</Button>
                         </form>
