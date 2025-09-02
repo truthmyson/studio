@@ -116,15 +116,20 @@ export default function HomePage() {
                 <p className="max-w-3xl text-lg text-muted-foreground md:text-xl">
                     VITOBU leverages geo-fencing for accurate check-ins, provides real-time data for representatives, and offers a simple, intuitive interface for students.
                 </p>
-                <div className="flex gap-4">
-                    <Button size="lg" className="transition-transform duration-300 hover:scale-105">
-                        <Apple className="mr-2 h-6 w-6" />
-                        Download for iOS
-                    </Button>
-                    <Button size="lg" variant="outline" className="transition-transform duration-300 hover:scale-105">
-                        <PlayStoreIcon className="mr-2 h-5 w-5"/>
-                        Download for Android
-                    </Button>
+                <div className="flex flex-col items-center gap-4">
+                    <div className="flex gap-4">
+                        <Button size="lg" className="transition-transform duration-300 hover:scale-105">
+                            <Apple className="mr-2 h-6 w-6" />
+                            Download for iOS
+                        </Button>
+                        <Button size="lg" variant="outline" className="transition-transform duration-300 hover:scale-105">
+                            <PlayStoreIcon className="mr-2 h-5 w-5"/>
+                            Download for Android
+                        </Button>
+                    </div>
+                    <a href="#newsletter" className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+                        Subscribe to our newsletter <ArrowRight className="w-4 h-4" />
+                    </a>
                 </div>
             </div>
         </section>

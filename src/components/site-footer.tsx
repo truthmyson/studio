@@ -52,7 +52,7 @@ export function SiteFooter() {
                             <li><a href="#" className="text-muted-foreground hover:text-foreground">Terms of Service</a></li>
                         </ul>
                     </div>
-                    <div className="col-span-2 md:col-span-1">
+                    <div className="col-span-2 md:col-span-1" id="newsletter">
                         <h3 className="font-semibold text-foreground">Stay Updated</h3>
                         <p className="text-muted-foreground mt-4 text-sm">Join our newsletter to get the latest updates.</p>
                         <form className="flex flex-col w-full max-w-sm space-y-2 mt-4">
