@@ -21,7 +21,13 @@ import {
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useRef } from 'react';
-
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from "@/components/ui/carousel"
 
 function PlayStoreIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
@@ -124,30 +130,32 @@ export default function HomePage() {
         </section>
 
         {/* Features Section */}
-        <section id="features" className="container py-12 space-y-8">
-            <div className="text-center">
-                <h2 className="text-3xl font-bold md:text-4xl">Why VITOBU?</h2>
-                <p className="text-muted-foreground md:text-lg">Everything you need to streamline attendance management.</p>
-            </div>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-                {features.map((feature, i) => (
-                    <Card key={i} className="group transform-gpu transition-all duration-300 hover:-translate-y-2 hover:shadow-lg">
-                        <CardHeader>
-                            <div className="p-3 bg-primary/10 rounded-lg w-fit transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
-                                {feature.icon}
-                            </div>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                             <h3 className="text-xl font-bold">{feature.title}</h3>
-                            <p className="text-muted-foreground">{feature.description}</p>
-                        </CardContent>
-                    </Card>
-                ))}
+        <section id="features" className="bg-muted py-16 md:py-24">
+            <div className="container space-y-8">
+                <div className="text-center">
+                    <h2 className="text-3xl font-bold md:text-4xl">Why VITOBU?</h2>
+                    <p className="text-muted-foreground md:text-lg">Everything you need to streamline attendance management.</p>
+                </div>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                    {features.map((feature, i) => (
+                        <Card key={i} className="group transform-gpu transition-all duration-300 hover:-translate-y-2 hover:shadow-lg">
+                            <CardHeader>
+                                <div className="p-3 bg-primary/10 rounded-lg w-fit transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
+                                    {feature.icon}
+                                </div>
+                            </CardHeader>
+                            <CardContent className="space-y-2">
+                                <h3 className="text-xl font-bold">{feature.title}</h3>
+                                <p className="text-muted-foreground">{feature.description}</p>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
             </div>
         </section>
 
         {/* How it Works Section */}
-        <section id="how-it-works" className="bg-muted py-16 md:py-24">
+        <section id="how-it-works" className="py-16 md:py-24">
              <div className="container grid gap-12 md:grid-cols-2 items-center">
                 <div className="space-y-4">
                     <Badge variant="secondary" className="px-4 py-2 text-sm">How It Works</Badge>
@@ -186,40 +194,42 @@ export default function HomePage() {
         </section>
 
         {/* Demo Video Section */}
-        <section id="demo" className="container py-16 md:py-24 text-center">
-            <h2 className="text-3xl font-bold md:text-4xl">Explore the App in Action</h2>
-            <p className="text-muted-foreground md:text-lg max-w-2xl mx-auto mb-8">
-                Watch this short demo to see how VITOBU simplifies attendance. Hover over the video to play.
-            </p>
-            <div className="flex justify-center mb-8">
-                <div className="w-full max-w-4xl bg-black rounded-lg shadow-2xl overflow-hidden border">
-                    <video
-                        ref={videoRef}
-                        className="w-full h-full"
-                        loop
-                        muted
-                        playsInline
-                        onMouseEnter={() => videoRef.current?.play()}
-                        onMouseLeave={() => videoRef.current?.pause()}
-                        poster="https://picsum.photos/1280/720"
-                    >
-                        {/* You can replace this with your actual video source */}
-                        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" />
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                <div className="space-y-4">
-                    <h3 className="text-2xl font-bold">Representative Dashboard</h3>
-                    <div className="relative h-[400px] w-full group overflow-hidden rounded-xl">
-                        <Image src="https://picsum.photos/800/600" layout="fill" objectFit="cover" alt="Representative Dashboard Screenshot" className="rounded-xl shadow-lg transition-transform duration-500 group-hover:scale-105" data-ai-hint="dashboard analytics" />
+        <section id="demo" className="bg-muted py-16 md:py-24 text-center">
+            <div className="container">
+                <h2 className="text-3xl font-bold md:text-4xl">Explore the App in Action</h2>
+                <p className="text-muted-foreground md:text-lg max-w-2xl mx-auto mb-8">
+                    Watch this short demo to see how VITOBU simplifies attendance. Hover over the video to play.
+                </p>
+                <div className="flex justify-center mb-8">
+                    <div className="w-full max-w-4xl bg-black rounded-lg shadow-2xl overflow-hidden border">
+                        <video
+                            ref={videoRef}
+                            className="w-full h-full"
+                            loop
+                            muted
+                            playsInline
+                            onMouseEnter={() => videoRef.current?.play()}
+                            onMouseLeave={() => videoRef.current?.pause()}
+                            poster="https://picsum.photos/1280/720"
+                        >
+                            {/* You can replace this with your actual video source */}
+                            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" />
+                            Your browser does not support the video tag.
+                        </video>
                     </div>
                 </div>
-                <div className="space-y-4">
-                    <h3 className="text-2xl font-bold">Student Mobile App</h3>
-                     <div className="relative h-[400px] w-full group overflow-hidden rounded-xl">
-                        <Image src="https://picsum.photos/800/600?grayscale" layout="fill" objectFit="cover" alt="Student App Screenshot" className="rounded-xl shadow-lg transition-transform duration-500 group-hover:scale-105" data-ai-hint="mobile app" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                    <div className="space-y-4">
+                        <h3 className="text-2xl font-bold">Representative Dashboard</h3>
+                        <div className="relative h-[400px] w-full group overflow-hidden rounded-xl">
+                            <Image src="https://picsum.photos/800/600" layout="fill" objectFit="cover" alt="Representative Dashboard Screenshot" className="rounded-xl shadow-lg transition-transform duration-500 group-hover:scale-105" data-ai-hint="dashboard analytics" />
+                        </div>
+                    </div>
+                    <div className="space-y-4">
+                        <h3 className="text-2xl font-bold">Student Mobile App</h3>
+                        <div className="relative h-[400px] w-full group overflow-hidden rounded-xl">
+                            <Image src="https://picsum.photos/800/600?grayscale" layout="fill" objectFit="cover" alt="Student App Screenshot" className="rounded-xl shadow-lg transition-transform duration-500 group-hover:scale-105" data-ai-hint="mobile app" />
+                        </div>
                     </div>
                 </div>
             </div>
