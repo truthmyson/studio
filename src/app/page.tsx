@@ -156,8 +156,8 @@ export default function HomePage() {
                         </div>
                     </div>
                 </div>
-                 <div className="relative h-[500px] w-full">
-                     <Image src="https://picsum.photos/800/1000" layout="fill" objectFit="contain" alt="App interface showing the student dashboard" className="rounded-xl shadow-2xl" data-ai-hint="app interface" />
+                 <div className="relative h-[500px] w-full group overflow-hidden rounded-xl">
+                     <Image src="https://picsum.photos/800/1000" layout="fill" objectFit="cover" alt="App interface showing the student dashboard" className="rounded-xl shadow-2xl transition-transform duration-500 group-hover:scale-105" data-ai-hint="app interface" />
                  </div>
              </div>
         </section>
@@ -178,9 +178,9 @@ export default function HomePage() {
                     {Array.from({ length: 5 }).map((_, index) => (
                     <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
                         <div className="p-1">
-                        <Card className="overflow-hidden">
+                        <Card className="overflow-hidden group">
                             <CardContent className="flex aspect-[9/16] items-center justify-center p-0">
-                               <Image src={`https://picsum.photos/seed/${index+1}/450/800`} width={450} height={800} alt={`App Screenshot ${index + 1}`} data-ai-hint="app screenshot" />
+                               <Image src={`https://picsum.photos/seed/${index+1}/450/800`} width={450} height={800} alt={`App Screenshot ${index + 1}`} data-ai-hint="app screenshot" className="transition-transform duration-500 group-hover:scale-105" />
                             </CardContent>
                         </Card>
                         </div>
