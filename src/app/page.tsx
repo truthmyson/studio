@@ -88,7 +88,7 @@ export default function HomePage() {
                     VITOBU leverages geo-fencing for accurate check-ins, provides real-time data for representatives, and offers a simple, intuitive interface for students.
                 </p>
                 <div className="flex gap-4">
-                    <Button size="lg" variant="outline" className="transition-transform duration-300 hover:scale-105">
+                    <Button size="lg" className="transition-transform duration-300 hover:scale-105">
                         <Apple className="mr-2 h-6 w-6" />
                         Download for iOS
                     </Button>
