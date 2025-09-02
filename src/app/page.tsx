@@ -201,7 +201,7 @@ export default function HomePage() {
                     It's free to get started.
                 </p>
                 <div className="flex justify-center gap-4 mt-8">
-                     <Button size="lg" variant="outline" className="text-primary-foreground border-primary-foreground hover:bg-primary-foreground hover:text-primary transition-transform duration-300 hover:scale-105">
+                     <Button size="lg" variant="secondary" className="transition-transform duration-300 hover:scale-105">
                         <Apple className="mr-2 h-6 w-6" />
                         Download for iOS
                     </Button>
