@@ -65,9 +65,15 @@ export default function HomePage() {
                     <span className="font-bold text-lg">VITOBU</span>
                 </a>
                 <div className="flex items-center gap-4">
-                    <Button variant="ghost">How it Works</Button>
-                    <Button variant="ghost">Features</Button>
-                    <Button variant="ghost">FAQ</Button>
+                    <Button variant="ghost" asChild>
+                        <a href="#how-it-works">How it Works</a>
+                    </Button>
+                    <Button variant="ghost" asChild>
+                        <a href="#features">Features</a>
+                    </Button>
+                    <Button variant="ghost" asChild>
+                        <a href="#faq">FAQ</a>
+                    </Button>
                     <Button asChild>
                         <Link href="/rep-login">
                             Representative Portal
