@@ -16,7 +16,7 @@ type FontContextType = {
 export const FontContext = createContext<FontContextType | undefined>(undefined)
 
 export function FontProvider({ children }: { children: React.ReactNode }) {
-  const [font, setFont] = useState("pt-sans")
+  const [font, setFont] = useState("inter")
 
   useEffect(() => {
     const storedFont = localStorage.getItem("ui-font")
