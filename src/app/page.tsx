@@ -127,7 +127,7 @@ export default function HomePage() {
                             Download for Android
                         </Button>
                     </div>
-                    <a href="#newsletter" className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+                    <a href="#newsletter" className="text-base text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
                         Subscribe to our newsletter <ArrowRight className="w-4 h-4" />
                     </a>
                 </div>
