@@ -9,14 +9,8 @@ import { VITOBULogo } from '@/components/icons';
 import { MainNav } from '@/components/main-nav';
 import { UserNav } from '@/components/user-nav';
 import { Button } from './ui/button';
-import { Menu, ChevronDown } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { getNavLinks } from '@/lib/nav-links';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -50,6 +44,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
     );
   }
+
+  // Hide nav/login/register on the homepage
+  if (pathname === '/') {
+    return (
+      <div className="flex min-h-screen w-full flex-col">
+        <main className="flex flex-1 flex-col p-4 md:p-6 lg:p-8">
+            {children}
+        </main>
+      </div>
+    );
+  }
+
 
   return (
     <div className="flex min-h-screen w-full flex-col">

@@ -17,6 +17,7 @@ import { studentData } from '@/lib/constants';
 import { useEffect, useState } from 'react';
 import type { Student } from '@/lib/types';
 import Link from 'next/link';
+import { ModeToggle } from './mode-toggle';
 
 
 export function UserNav() {
@@ -60,10 +61,16 @@ export function UserNav() {
   }, [pathname]);
 
   if (pathname === '/' || !user) {
-    return null;
+    return (
+        <div className="flex w-full items-center justify-end gap-4">
+          <ModeToggle />
+        </div>
+    );
   }
   
   return (
+    <div className="flex items-center gap-2">
+    <ModeToggle />
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -97,5 +104,6 @@ export function UserNav() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+    </div>
   );
 }
