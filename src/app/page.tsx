@@ -287,27 +287,6 @@ export default function HomePage() {
             </Accordion>
         </section>
 
-        {/* Contact Section */}
-        <section id="contact" className="bg-muted">
-            <div className="container py-16 text-center md:py-24">
-                <h2 className="text-3xl font-bold md:text-4xl">Contact Us</h2>
-                <p className="max-w-2xl mx-auto mt-4 text-lg text-muted-foreground">
-                    Have questions or need support? We're here to help.
-                </p>
-                <div className="mt-8">
-                    <Button asChild size="lg" className="transition-transform duration-300 hover:scale-105">
-                        <a href="mailto:support@vitobu.app">
-                            <Mail className="mr-2 h-5 w-5" />
-                            support@vitobu.app
-                        </a>
-                    </Button>
-                </div>
-                <div className="mt-8 text-muted-foreground space-y-2">
-                    <p>123 University Avenue, Knowledge City, 12345</p>
-                    <p>+1 (234) 567-890</p>
-                </div>
-            </div>
-        </section>
     </div>
   );
 }

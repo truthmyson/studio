@@ -4,6 +4,7 @@
 import { VITOBULogo } from "./icons";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { Mail } from "lucide-react";
 
 function TwitterIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
@@ -25,7 +26,25 @@ export function SiteFooter() {
     return (
         <footer className="border-t bg-muted">
             <div className="container py-12">
-                <div className="grid grid-cols-2 gap-8 md:grid-cols-5">
+                 <div id="contact" className="text-center mb-12">
+                    <h2 className="text-3xl font-bold md:text-4xl">Contact Us</h2>
+                    <p className="max-w-2xl mx-auto mt-4 text-lg text-muted-foreground">
+                        Have questions or need support? We're here to help.
+                    </p>
+                    <div className="mt-8">
+                        <Button asChild size="lg" className="transition-transform duration-300 hover:scale-105">
+                            <a href="mailto:support@vitobu.app">
+                                <Mail className="mr-2 h-5 w-5" />
+                                support@vitobu.app
+                            </a>
+                        </Button>
+                    </div>
+                    <div className="mt-8 text-muted-foreground space-y-2">
+                        <p>123 University Avenue, Knowledge City, 12345</p>
+                        <p>+1 (234) 567-890</p>
+                    </div>
+                </div>
+                <div className="grid grid-cols-2 gap-8 md:grid-cols-5 border-t pt-12">
                     <div className="col-span-2 md:col-span-2">
                         <div className="flex items-center gap-2 mb-4">
                             <VITOBULogo className="h-8 w-8 text-primary" />
@@ -47,7 +66,7 @@ export function SiteFooter() {
                         <h3 className="font-semibold text-foreground">Company</h3>
                         <ul className="mt-4 space-y-2">
                             <li><a href="#" className="text-muted-foreground hover:text-foreground">About Us</a></li>
-                            <li><a href="#" className="text-muted-foreground hover:text-foreground">Contact</a></li>
+                            <li><a href="#contact" className="text-muted-foreground hover:text-foreground">Contact</a></li>
                             <li><a href="#" className="text-muted-foreground hover:text-foreground">Privacy Policy</a></li>
                             <li><a href="#" className="text-muted-foreground hover:text-foreground">Terms of Service</a></li>
                         </ul>
