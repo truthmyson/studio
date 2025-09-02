@@ -33,22 +33,22 @@ function PlayStoreIcon(props: React.SVGProps<SVGSVGElement>) {
 
 const features = [
     {
-        icon: <Users className="w-8 h-8 text-primary" />,
+        icon: <Users className="w-8 h-8 text-primary transition-colors group-hover:text-primary-foreground" />,
         title: "Geo-Fenced Attendance",
         description: "Detect student presence within a specified radius of the lecture hall to automatically register attendance.",
     },
     {
-        icon: <Feather className="w-8 h-8 text-primary" />,
+        icon: <Feather className="w-8 h-8 text-primary transition-colors group-hover:text-primary-foreground" />,
         title: "Live Notifications",
         description: "Send real-time notifications to registered students regarding lecture updates and attendance status.",
     },
     {
-        icon: <FileCheck className="w-8 h-8 text-primary" />,
+        icon: <FileCheck className="w-8 h-8 text-primary transition-colors group-hover:text-primary-foreground" />,
         title: "Attendance Summary",
         description: "Get detailed attendance summaries for each student, downloadable in CSV format for easy record-keeping.",
     },
     {
-        icon: <Bot className="w-8 h-8 text-primary" />,
+        icon: <Bot className="w-8 h-8 text-primary transition-colors group-hover:text-primary-foreground" />,
         title: "AI-Powered Reports",
         description: "Leverage AI to generate insightful attendance reports and identify patterns effortlessly.",
     }
