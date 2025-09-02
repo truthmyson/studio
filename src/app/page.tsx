@@ -71,7 +71,7 @@ export default function HomePage() {
                     <VITOBULogo className="h-8 w-8 text-primary" />
                     <span className="font-bold text-lg">VITOBU</span>
                 </a>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                     <Button variant="ghost" asChild>
                         <a href="#how-it-works">How it Works</a>
                     </Button>
