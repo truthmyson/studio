@@ -91,11 +91,11 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem asChild>
-            <Link href="/student-dashboard">Profile</Link>
+          <DropdownMenuItem>
+            Profile
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/settings">Settings</Link>
+          <DropdownMenuItem>
+            Settings
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />

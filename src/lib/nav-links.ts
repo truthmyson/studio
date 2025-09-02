@@ -12,6 +12,7 @@ export function getNavLinks(pathname: string) {
     if (pathname.includes('student-dashboard') || pathname.includes('settings')) {
         return [
           { href: '/student-dashboard', label: 'Dashboard', icon: LayoutDashboard },
+          { href: '/settings', label: 'Settings', icon: Settings },
         ]
     }
      if (pathname.includes('rep-dashboard') || pathname.includes('classes') || pathname.includes('students') || pathname.includes('attendance') || pathname.includes('all-students')) {
@@ -20,6 +21,7 @@ export function getNavLinks(pathname: string) {
           { href: '/classes', label: 'My Classes', icon: BookOpenCheck },
           { href: '/all-students', label: 'All Students', icon: Users },
           { href: '/attendance', label: 'Attendance AI', icon: FileText },
+          { href: '/settings', label: 'Settings', icon: Settings },
          ]
      }
      // Fallback for home page etc.
