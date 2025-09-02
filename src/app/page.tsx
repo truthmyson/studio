@@ -72,7 +72,7 @@ export default function HomePage() {
                         <a href="#features">Features</a>
                     </Button>
                     <Button variant="ghost" asChild>
-                        <a href="#screenshots">Screenshots</a>
+                        <a href="#demo">Demo</a>
                     </Button>
                     <Button variant="ghost" asChild>
                         <a href="#faq">FAQ</a>
@@ -171,8 +171,8 @@ export default function HomePage() {
              </div>
         </section>
 
-         {/* Screenshots Carousel */}
-        <section id="screenshots" className="container py-16 md:py-24 text-center">
+         {/* Demo Carousel */}
+        <section id="demo" className="container py-16 md:py-24 text-center">
             <h2 className="text-3xl font-bold md:text-4xl">Explore the App</h2>
             <p className="text-muted-foreground md:text-lg max-w-2xl mx-auto">
                 Clean, intuitive, and powerful dashboards for both students and representatives.
