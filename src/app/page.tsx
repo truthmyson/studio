@@ -309,6 +309,10 @@ export default function HomePage() {
                         </a>
                     </Button>
                 </div>
+                <div className="mt-8 text-muted-foreground space-y-2">
+                    <p>123 University Avenue, Knowledge City, 12345</p>
+                    <p>+1 (234) 567-890</p>
+                </div>
             </div>
         </section>
     </div>
