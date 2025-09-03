@@ -58,13 +58,8 @@ export default function RepRegisterPage() {
         description: state.message,
       });
     } else if (state.status === 'success') {
-      toast({
-        title: 'Registration Successful!',
-        description: "Redirecting you to the dashboard...",
-      });
-      setTimeout(() => {
-        router.push('/rep-dashboard');
-      }, 1500);
+      const successUrl = `/auth-success?redirectTo=/rep-dashboard&message=Registration Successful!&description=Your account has been created. Redirecting...`;
+      router.push(successUrl);
     }
   }, [state, toast, router]);
 

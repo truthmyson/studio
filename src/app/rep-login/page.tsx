@@ -31,13 +31,8 @@ export default function RepLoginPage() {
         // In a real app, you'd also check the password.
         // For this demo, we'll just check if the user exists and is a rep.
         if (user && user.isRep) {
-            toast({
-                title: "Login Successful",
-                description: "Redirecting to your dashboard...",
-            });
-            setTimeout(() => {
-                router.push('/rep-dashboard');
-            }, 1500);
+            const successUrl = `/auth-success?redirectTo=/rep-dashboard&message=Login Successful&description=Redirecting to your dashboard...`;
+            router.push(successUrl);
         } else if (user && !user.isRep) {
             toast({
                 variant: "destructive",
