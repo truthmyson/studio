@@ -15,6 +15,7 @@ import {
   studentDetailsJsonExample,
 } from '@/lib/constants';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { ScrollArea } from '../ui/scroll-area';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -97,66 +98,68 @@ export function AttendanceGeneratorForm() {
 
 
   return (
-    <form ref={formRef} action={formAction} className="space-y-6">
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="studentDetails">Student Details (JSON)</Label>
-          <Textarea
-            id="studentDetails"
-            name="studentDetails"
-            rows={10}
-            placeholder={studentDetailsJsonExample}
-            required
-            className="font-mono text-sm"
-            value={studentDetails}
-            onChange={(e) => setStudentDetails(e.target.value)}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="attendanceRecords">Attendance Records (JSON)</Label>
-          <Textarea
-            id="attendanceRecords"
-            name="attendanceRecords"
-            rows={10}
-            placeholder={attendanceRecordsJsonExample}
-            required
-            className="font-mono text-sm"
-            value={attendanceRecords}
-            onChange={(e) => setAttendanceRecords(e.target.value)}
-          />
-        </div>
-      </div>
-      
-      {state.status === 'error' && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Generation Failed</AlertTitle>
-          <AlertDescription>
-            {state.message} Please check your JSON format and try again.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {state.csvData && state.status === 'success' && (
-        <div className="space-y-4">
-            <Label htmlFor="csvOutput">Generated CSV Output</Label>
+    <ScrollArea className="h-[75vh]">
+        <form ref={formRef} action={formAction} className="space-y-6 pr-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+            <Label htmlFor="studentDetails">Student Details (JSON)</Label>
             <Textarea
-                id="csvOutput"
-                readOnly
-                value={state.csvData}
+                id="studentDetails"
+                name="studentDetails"
                 rows={10}
-                className="font-mono text-sm bg-secondary"
+                placeholder={studentDetailsJsonExample}
+                required
+                className="font-mono text-sm"
+                value={studentDetails}
+                onChange={(e) => setStudentDetails(e.target.value)}
             />
-             <Button type="button" onClick={handleDownload}>
-                <Download className="mr-2 h-4 w-4" />
-                Download CSV
-            </Button>
+            </div>
+            <div className="space-y-2">
+            <Label htmlFor="attendanceRecords">Attendance Records (JSON)</Label>
+            <Textarea
+                id="attendanceRecords"
+                name="attendanceRecords"
+                rows={10}
+                placeholder={attendanceRecordsJsonExample}
+                required
+                className="font-mono text-sm"
+                value={attendanceRecords}
+                onChange={(e) => setAttendanceRecords(e.target.value)}
+            />
+            </div>
         </div>
-      )}
+        
+        {state.status === 'error' && (
+            <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Generation Failed</AlertTitle>
+            <AlertDescription>
+                {state.message} Please check your JSON format and try again.
+            </AlertDescription>
+            </Alert>
+        )}
 
-      <div className="flex justify-end pt-4">
-        <SubmitButton />
-      </div>
-    </form>
+        {state.csvData && state.status === 'success' && (
+            <div className="space-y-4">
+                <Label htmlFor="csvOutput">Generated CSV Output</Label>
+                <Textarea
+                    id="csvOutput"
+                    readOnly
+                    value={state.csvData}
+                    rows={10}
+                    className="font-mono text-sm bg-secondary"
+                />
+                <Button type="button" onClick={handleDownload}>
+                    <Download className="mr-2 h-4 w-4" />
+                    Download CSV
+                </Button>
+            </div>
+        )}
+
+        <div className="flex justify-end pt-4 pb-6">
+            <SubmitButton />
+        </div>
+        </form>
+    </ScrollArea>
   );
 }
