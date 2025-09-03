@@ -270,7 +270,7 @@ export default function RepDashboardPage() {
                              <Button variant="ghost" size="icon" onClick={() => handleToggleSession(session.id, session.active)}>
                                 {session.active ? <PowerOff className="h-4 w-4" /> : <Power className="h-4 w-4"/>}
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={() => handleExport(session.classId, 'ClassName')}>
+                            <Button variant="ghost" size="icon" onClick={() => handleExport(session.classId, session.topic)}>
                                 <Download className="h-4 w-4" />
                             </Button>
                             <Button variant="ghost" size="icon" onClick={() => {
