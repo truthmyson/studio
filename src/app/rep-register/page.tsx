@@ -28,7 +28,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -66,7 +65,7 @@ export default function RepRegisterPage() {
 
   return (
     <div className="flex justify-center bg-background py-12 px-4">
-      <Card className="w-full max-w-md flex flex-col">
+      <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center items-center gap-2 mb-4">
             <VITOBULogo className="h-10 w-10 text-primary" />
@@ -76,9 +75,8 @@ export default function RepRegisterPage() {
             Fill out the form below to get started.
           </CardDescription>
         </CardHeader>
-        <form action={formAction} className="flex-1 flex flex-col overflow-hidden">
-          <ScrollArea className="flex-1">
-            <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-6 pb-2">
+        <form action={formAction}>
+            <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="firstName">First Name</Label>
                 <Input id="firstName" name="firstName" placeholder="John" required />
@@ -124,16 +122,15 @@ export default function RepRegisterPage() {
                 <Input id="password" name="password" type="password" required />
               </div>
             </CardContent>
-          </ScrollArea>
-          <CardFooter className="flex flex-col gap-4 pt-6">
-            <SubmitButton />
-            <div className="text-center text-sm">
-              Already have an account?{' '}
-              <Link href="/rep-login" className="underline">
-                Sign In
-              </Link>
-            </div>
-          </CardFooter>
+            <CardFooter className="flex flex-col gap-4">
+                <SubmitButton />
+                <div className="text-center text-sm">
+                Already have an account?{' '}
+                <Link href="/rep-login" className="underline">
+                    Sign In
+                </Link>
+                </div>
+            </CardFooter>
         </form>
       </Card>
     </div>

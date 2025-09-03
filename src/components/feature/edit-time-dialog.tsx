@@ -17,7 +17,6 @@ import { useToast } from '@/hooks/use-toast';
 import { updateSessionTimeAction, type AttendanceSession } from '@/lib/actions';
 import { Loader2 } from 'lucide-react';
 import { formatDistanceToNowStrict } from 'date-fns';
-import { ScrollArea } from '../ui/scroll-area';
 
 interface EditTimeDialogProps {
   isOpen: boolean;
@@ -91,22 +90,20 @@ export function EditTimeDialog({ isOpen, onClose, session, onTimeUpdated }: Edit
             </span>
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea>
-          <div className="space-y-4 py-4 pr-6">
-            <div className="space-y-2">
-              <Label htmlFor="timeLimit">New Total Duration (in minutes)</Label>
-              <Input
-                id="timeLimit"
-                type="number"
-                value={newTime}
-                onChange={(e) => setNewTime(e.target.value)}
-                placeholder="e.g., 25"
-                disabled={isLoading}
-              />
-            </div>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="timeLimit">New Total Duration (in minutes)</Label>
+            <Input
+              id="timeLimit"
+              type="number"
+              value={newTime}
+              onChange={(e) => setNewTime(e.target.value)}
+              placeholder="e.g., 25"
+              disabled={isLoading}
+            />
           </div>
-        </ScrollArea>
-        <DialogFooter className="sm:justify-start pt-4">
+        </div>
+        <DialogFooter className="sm:justify-start">
           <Button onClick={handleUpdateTime} disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Update Time
