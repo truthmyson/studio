@@ -12,6 +12,7 @@ import { Student } from './types';
 import { sendMessage, getMessagesForSession, Message, getDirectMessages } from './messaging';
 import * as xlsx from 'xlsx';
 import { convertArrayToCsv } from '@/services/csv-converter';
+import { SavedReport, createReport, getReports, deleteReportById } from './report-management';
 
 
 export type { AttendanceSession };
@@ -246,7 +247,7 @@ function generateReportData(classStudents: Student[], classSessions: AttendanceS
 }
 
 
-export async function exportAttendanceAction(classId: string): Promise<{ success: boolean; message: string; csvData?: string; xlsxData?: string }> {
+export async function createTableReportAction(classId: string, reportName: string): Promise<{ success: boolean; message: string; report?: SavedReport }> {
     const selectedClass = await getClassById(classId);
     if (!selectedClass) {
         return { success: false, message: "Class not found." };
@@ -255,7 +256,6 @@ export async function exportAttendanceAction(classId: string): Promise<{ success
     const classStudents = await getStudentsByClassId(classId);
     const classSessions = getSessionsByClass(classId);
     
-    // If there are no students, there's nothing to report.
     if (classStudents.length === 0) {
         return { success: false, message: 'No students are enrolled in this class to generate a report for.' };
     }
@@ -263,10 +263,6 @@ export async function exportAttendanceAction(classId: string): Promise<{ success
     const dataArray = generateReportData(classStudents, classSessions);
 
     try {
-        // Generate CSV
-        const csvData = convertArrayToCsv(dataArray);
-
-        // Generate XLSX
         const workbook = xlsx.utils.book_new();
         const worksheet = xlsx.utils.aoa_to_sheet(dataArray);
         xlsx.utils.book_append_sheet(workbook, worksheet, 'Attendance');
@@ -274,14 +270,15 @@ export async function exportAttendanceAction(classId: string): Promise<{ success
         const xlsxData = Buffer.from(xlsxBuffer).toString('base64');
         
         const message = classSessions.length > 0 
-            ? 'Attendance report generated successfully.' 
-            : 'No sessions found for this class. Exporting student roster.';
+            ? 'Attendance report generated and saved successfully.' 
+            : 'No session data found. Saved student roster.';
+
+        const report = await createReport(reportName, classId, selectedClass.name, dataArray, xlsxData);
 
         return {
             success: true,
             message,
-            csvData: csvData,
-            xlsxData: xlsxData
+            report
         };
     } catch (error) {
         console.error("Error during file generation:", error);
@@ -476,4 +473,17 @@ export async function deleteClassAction(classId: string): Promise<{ success: boo
 export async function updateSessionTimeAction(sessionId: string, newTimeLimit: number): Promise<{ success: boolean, message: string }> {
     const result = await updateSessionTimeLimit(sessionId, newTimeLimit);
     return result;
+}
+
+export async function getSavedReportsAction(): Promise<SavedReport[]> {
+    return getReports();
+}
+
+export async function deleteReportAction(reportId: string): Promise<{ success: boolean, message: string }> {
+    try {
+        await deleteReportById(reportId);
+        return { success: true, message: 'Report deleted successfully.' };
+    } catch (error) {
+        return { success: false, message: 'Failed to delete report.' };
+    }
 }
