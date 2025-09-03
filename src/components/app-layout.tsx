@@ -9,9 +9,9 @@ import Link from 'next/link';
 import { VITOBULogo } from './icons';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
-import { Menu, MoreVertical } from 'lucide-react';
+import { Menu, Settings, LogIn } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from './ui/dropdown-menu';
 
 const NO_NAV_ROUTES = ['/rep-login', '/rep-register', '/student-login'];
 
@@ -56,11 +56,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
-                                <MoreVertical className="h-5 w-5" />
-                                <span className="sr-only">More options</span>
+                                <Settings className="h-5 w-5" />
+                                <span className="sr-only">Settings</span>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                            <DropdownMenuItem onSelect={() => router.push('/rep-login')}>
+                                <LogIn className="mr-2" />
+                                <span>Rep Login</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
                             <DropdownMenuItem>
                                 <ModeToggle />
                                 <span className="ml-2">Toggle Theme</span>
@@ -89,8 +94,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                                     </Link>
                                 ))}
                             </nav>
-                             <div className="mt-6 pt-6 border-t flex items-center justify-between">
-                                <ModeToggle />
+                             <div className="mt-6 pt-6 border-t flex flex-col gap-4">
+                                <Button variant="outline" onClick={() => router.push('/rep-login')}>
+                                    <LogIn className="mr-2"/>
+                                    Rep Login
+                                </Button>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-muted-foreground">Toggle Theme</span>
+                                    <ModeToggle />
+                                </div>
                             </div>
                         </SheetContent>
                     </Sheet>
