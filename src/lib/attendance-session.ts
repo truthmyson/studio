@@ -8,7 +8,7 @@ export interface AttendanceSession {
     id: string;
     classId: string;
     repId: string; // The ID of the user who created the session
-    location: Location;
+    location: Location | null; // Can be null for online sessions
     radius: number; // in meters
     startTime: number; // Unix timestamp
     timeLimit: number; // in minutes
@@ -26,7 +26,7 @@ function cleanupOldSessions() {
     allSessions = allSessions.filter(session => session.startTime >= fourteenDaysAgo);
 }
 
-export function startSession(location: Location, radius: number, timeLimit: number, topic: string, studentIds: string[], classId: string, repId: string, includeRep = false) {
+export function startSession(location: Location | null, radius: number, timeLimit: number, topic: string, studentIds: string[], classId: string, repId: string, includeRep = false) {
     // Deactivate any other active session before starting a new one
     if (activeSession) {
         const currentActive = allSessions.find(s => s.id === activeSession?.id);

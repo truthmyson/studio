@@ -122,6 +122,7 @@ export async function getAllClassesAction(): Promise<Class[]> {
 }
 
 export async function startGeofencingAction(formData: FormData) {
+  const sessionType = formData.get('sessionType') as 'physical' | 'online';
   const radius = parseFloat(formData.get('radius') as string);
   const timeLimit = parseInt(formData.get('timeLimit') as string, 10);
   const latitude = parseFloat(formData.get('latitude') as string);
@@ -133,18 +134,24 @@ export async function startGeofencingAction(formData: FormData) {
   const includeRep = formData.get('includeRep') === 'true';
 
 
-  if (isNaN(radius) || isNaN(timeLimit) || isNaN(latitude) || isNaN(longitude) || !topic || !classId || !studentIdsRaw || !repId) {
+  if (isNaN(timeLimit) || !topic || !classId || !studentIdsRaw || !repId || !sessionType) {
     return { success: false, message: 'Invalid data provided.' };
   }
   
+  if (sessionType === 'physical' && (isNaN(radius) || isNaN(latitude) || isNaN(longitude))) {
+    return { success: false, message: 'Invalid location data for face-to-face session.'}
+  }
+
   let studentIds: string[];
   try {
     studentIds = JSON.parse(studentIdsRaw);
   } catch (error) {
     return { success: false, message: 'Invalid student ID format.' };
   }
+  
+  const location = sessionType === 'physical' ? { latitude, longitude } : null;
 
-  const session = startSession({ latitude, longitude }, radius, timeLimit, topic, studentIds, classId, repId, includeRep);
+  const session = startSession(location, radius, timeLimit, topic, studentIds, classId, repId, includeRep);
 
   // Create notifications for all students in the selected class
   createSessionNotifications(session.id, session.topic, studentIds);
