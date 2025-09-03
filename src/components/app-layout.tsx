@@ -9,15 +9,19 @@ import Link from 'next/link';
 import { VITOBULogo } from './icons';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
-import { Menu, LogIn, MoreVertical, Settings, ArrowLeft } from 'lucide-react';
+import { Menu, LogIn, MoreVertical, Settings, ArrowLeft, LogOut } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from './ui/dropdown-menu';
 
-const NO_NAV_ROUTES = ['/rep-login', '/rep-register', '/student-login'];
+const NO_NAV_ROUTES = ['/rep-login', '/rep-register', '/student-login', '/auth-success'];
+const REP_AUTHED_ROUTES = ['/rep-dashboard', '/classes', '/students', '/attendance'];
+
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+
+  const isRepAuthed = REP_AUTHED_ROUTES.some(route => pathname.startsWith(route));
 
   const homeLinks = [
     { href: '#features', label: 'Features' },
@@ -31,12 +35,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const links = pathname === '/' ? homeLinks : otherLinks;
 
   const showNav = !NO_NAV_ROUTES.includes(pathname);
+  const showBackArrow = showNav && pathname !== '/';
 
   return (
     <div className="flex-col md:flex">
       <div className="border-b sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex h-16 items-center px-4 container max-w-screen-2xl">
-          {pathname !== '/' && (
+          {showBackArrow && (
               <Button variant="ghost" size="icon" className="mr-2" onClick={() => router.back()}>
                   <ArrowLeft className="h-5 w-5" />
                   <span className="sr-only">Go Back</span>
@@ -66,10 +71,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem onSelect={() => router.push('/rep-login')}>
-                                <LogIn className="mr-2 h-4 w-4" />
-                                <span>Rep Login</span>
-                            </DropdownMenuItem>
+                            {isRepAuthed ? (
+                                <DropdownMenuItem onSelect={() => router.push('/')}>
+                                    <LogOut className="mr-2 h-4 w-4" />
+                                    <span>Log Out</span>
+                                </DropdownMenuItem>
+                            ) : (
+                                <DropdownMenuItem onSelect={() => router.push('/rep-login')}>
+                                    <LogIn className="mr-2 h-4 w-4" />
+                                    <span>Rep Login</span>
+                                </DropdownMenuItem>
+                            )}
                             <DropdownMenuSeparator />
                             <div className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
                                 <ModeToggle />
@@ -100,10 +112,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                                 ))}
                             </nav>
                              <div className="mt-6 pt-6 border-t flex flex-col gap-4">
-                                <Button variant="outline" onClick={() => router.push('/rep-login')}>
-                                    <LogIn className="mr-2"/>
-                                    Rep Login
-                                </Button>
+                                {isRepAuthed ? (
+                                    <Button variant="outline" onClick={() => router.push('/')}>
+                                        <LogOut className="mr-2"/>
+                                        Log Out
+                                    </Button>
+                                ) : (
+                                    <Button variant="outline" onClick={() => router.push('/rep-login')}>
+                                        <LogIn className="mr-2"/>
+                                        Rep Login
+                                    </Button>
+                                )}
                                 <div className="flex items-center justify-between">
                                     <span className="text-muted-foreground">Toggle Theme</span>
                                     <ModeToggle />
