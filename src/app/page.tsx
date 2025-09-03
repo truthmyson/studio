@@ -89,7 +89,7 @@ export default function HomePage() {
                                 <Link href="/rep-login">Representative Portal</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <a href="#contact">Contact</a>
+                                <Link href="#contact">Contact</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                                 <a href="mailto:support@vitobu.app">Feedback</a>
