@@ -9,7 +9,6 @@ import { getNavLinks } from '@/lib/nav-links';
 import Link from 'next/link';
 import { VITOBULogo } from './icons';
 import { cn } from '@/lib/utils';
-import { FontSettings } from './feature/font-settings';
 import { Button } from './ui/button';
 import { ArrowLeft, Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
@@ -60,7 +59,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 )}
                 
                 <div className="hidden md:flex items-center space-x-2">
-                    <FontSettings />
                     <ModeToggle />
                     <UserNav />
                 </div>
@@ -86,7 +84,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                                 ))}
                             </nav>
                              <div className="mt-6 pt-6 border-t flex items-center justify-between">
-                                <FontSettings />
                                 <ModeToggle />
                                 <UserNav />
                             </div>
