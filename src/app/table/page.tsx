@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getClassesByRepAction, exportAttendanceAction, type ClassWithStudentCount } from "@/lib/actions";
 import { downloadFile } from "@/lib/client-utils";
+import { Input } from "@/components/ui/input";
 
 const REP_ID = '24275016'; // Hardcoded for now
 
@@ -21,6 +22,7 @@ export default function TablePage() {
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
     const [classes, setClasses] = useState<ClassWithStudentCount[]>([]);
     const [selectedClassId, setSelectedClassId] = useState('');
+    const [reportName, setReportName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [generatedData, setGeneratedData] = useState<{ csv: string; xlsx: string; className: string; preview: string; } | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -29,6 +31,8 @@ export default function TablePage() {
     const handleOpenDialog = async () => {
         setIsLoading(true);
         setError(null);
+        setReportName('');
+        setSelectedClassId('');
         const repClasses = await getClassesByRepAction(REP_ID);
         setClasses(repClasses);
         setIsLoading(false);
@@ -44,6 +48,15 @@ export default function TablePage() {
             });
             return;
         }
+        if (!reportName.trim()) {
+            toast({
+                variant: 'destructive',
+                title: 'Error',
+                description: 'Please enter a name for the report.',
+            });
+            return;
+        }
+
 
         setIsLoading(true);
         setError(null);
@@ -52,11 +65,10 @@ export default function TablePage() {
         const result = await exportAttendanceAction(selectedClassId);
 
         if (result.success && result.csvData && result.xlsxData) {
-            const selectedClass = classes.find(c => c.id === selectedClassId);
             setGeneratedData({
                 csv: result.csvData,
                 xlsx: result.xlsxData,
-                className: selectedClass?.name || 'Report',
+                className: reportName, // Use the custom report name
                 preview: result.csvData, // Use CSV for the text preview
             });
             toast({
@@ -154,10 +166,20 @@ export default function TablePage() {
                     <DialogHeader>
                         <DialogTitle>Create New Attendance Table</DialogTitle>
                         <DialogDescription>
-                            Select a class to generate a complete attendance table including all past sessions.
+                            Select a class and name your report. A complete attendance table will be generated.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="report-name">Report Name</Label>
+                            <Input
+                                id="report-name"
+                                value={reportName}
+                                onChange={(e) => setReportName(e.target.value)}
+                                placeholder="e.g., Mid-Semester Attendance"
+                                disabled={isLoading}
+                            />
+                        </div>
                         <div className="space-y-2">
                             <Label htmlFor="class-select">Primary Class Database</Label>
                             <Select onValueChange={setSelectedClassId} value={selectedClassId} disabled={isLoading}>
@@ -182,7 +204,7 @@ export default function TablePage() {
                         <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} disabled={isLoading}>
                             Cancel
                         </Button>
-                        <Button onClick={handleCreateTable} disabled={isLoading || !selectedClassId}>
+                        <Button onClick={handleCreateTable} disabled={isLoading || !selectedClassId || !reportName.trim()}>
                             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Create Table
                         </Button>
