@@ -31,6 +31,7 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
   const [sessionType, setSessionType] = useState<'physical' | 'online'>('physical');
   const [radius, setRadius] = useState('100'); // Default radius in meters
   const [timeLimit, setTimeLimit] = useState('15'); // Default time limit in minutes
+  const [noTimeLimit, setNoTimeLimit] = useState(false);
   const [topic, setTopic] = useState(''); // Lecture topic
   const [selectedClassId, setSelectedClassId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
@@ -62,7 +63,7 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
 
     const formData = new FormData();
     formData.append('sessionType', sessionType);
-    formData.append('timeLimit', timeLimit);
+    formData.append('timeLimit', noTimeLimit ? 'Infinity' : timeLimit);
     formData.append('topic', topic);
     formData.append('classId', selectedClassId);
     const selectedClass = classes.find(c => c.id === selectedClassId);
@@ -118,6 +119,7 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
       setTopic('');
       setSelectedClassId('');
       setIncludeSelf(false);
+      setNoTimeLimit(false);
       onClose();
     } else {
       toast({
@@ -197,18 +199,31 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
               />
             </div>
           )}
-
+          
           <div className="space-y-2">
-            <Label htmlFor="timeLimit">Time Limit (in minutes)</Label>
-            <Input
-              id="timeLimit"
-              type="number"
-              value={timeLimit}
-              onChange={(e) => setTimeLimit(e.target.value)}
-              placeholder="e.g., 15"
-              disabled={isLoading}
-            />
+             <div className="flex items-center space-x-2">
+                <Checkbox id="no-time-limit" checked={noTimeLimit} onCheckedChange={(checked) => setNoTimeLimit(checked as boolean)} disabled={isLoading}/>
+                <Label htmlFor="no-time-limit" className="text-sm font-normal">
+                  No time limit
+                </Label>
+              </div>
           </div>
+
+
+          {!noTimeLimit && (
+            <div className="space-y-2">
+              <Label htmlFor="timeLimit">Time Limit (in minutes)</Label>
+              <Input
+                id="timeLimit"
+                type="number"
+                value={timeLimit}
+                onChange={(e) => setTimeLimit(e.target.value)}
+                placeholder="e.g., 15"
+                disabled={isLoading}
+              />
+            </div>
+          )}
+
            <div className="flex items-center space-x-2">
             <Checkbox id="include-self" checked={includeSelf} onCheckedChange={(checked) => setIncludeSelf(checked as boolean)} disabled={isLoading}/>
             <Label htmlFor="include-self" className="text-sm font-normal">

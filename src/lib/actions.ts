@@ -99,8 +99,11 @@ export async function generateAttendanceAction(
 
 
 export async function getActiveSession() {
-  // The active session is always the first one if it's currently active.
   if (activeSession && activeSession.active) {
+    // For sessions with no time limit, timeLimit will be Infinity
+    if (activeSession.timeLimit === Infinity) {
+        return activeSession;
+    }
     const timeSinceStart = (Date.now() - activeSession.startTime); // in ms
     if (timeSinceStart <= activeSession.timeLimit * 60 * 1000) {
       return activeSession;
@@ -124,7 +127,9 @@ export async function getAllClassesAction(): Promise<Class[]> {
 export async function startGeofencingAction(formData: FormData) {
   const sessionType = formData.get('sessionType') as 'physical' | 'online';
   const radius = parseFloat(formData.get('radius') as string);
-  const timeLimit = parseInt(formData.get('timeLimit') as string, 10);
+  const timeLimitRaw = formData.get('timeLimit') as string;
+  const timeLimit = timeLimitRaw === 'Infinity' ? Infinity : parseFloat(timeLimitRaw);
+
   const latitude = parseFloat(formData.get('latitude') as string);
   const longitude = parseFloat(formData.get('longitude') as string);
   const topic = formData.get('topic') as string;

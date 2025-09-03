@@ -11,7 +11,7 @@ export interface AttendanceSession {
     location: Location | null; // Can be null for online sessions
     radius: number; // in meters
     startTime: number; // Unix timestamp
-    timeLimit: number; // in minutes
+    timeLimit: number; // in minutes, or Infinity for no limit
     active: boolean;
     topic: string;
     students: { studentId: string; signedInAt: number | null }[];
