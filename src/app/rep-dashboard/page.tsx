@@ -29,7 +29,6 @@ import {
 import {
   getAllSessions,
   toggleSessionStatusAction,
-  exportAttendanceAction,
   getActiveSession,
   getStudentsForClassAction,
   type AttendanceSession,
@@ -144,24 +143,6 @@ export default function RepDashboardPage() {
         title: 'Error',
         description: result.message,
       });
-    }
-  };
-  
-  const handleExport = async (classId: string, className: string) => {
-    const result = await exportAttendanceAction(classId);
-    if (result.success && result.csvData) {
-        const blob = new Blob([result.csvData], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', `attendance_report_${className.replace(/\s+/g, '_')}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        toast({ title: "Success", description: "Report downloaded."});
-    } else {
-        toast({ variant: 'destructive', title: "Error", description: result.message });
     }
   };
 
@@ -358,9 +339,6 @@ export default function RepDashboardPage() {
                             <Button variant="ghost" size="icon" onClick={() => openStatsDialog(session)} title="View Stats">
                                 <BarChart className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={() => handleExport(session.classId, session.topic)} title="Download Report">
-                                <Download className="h-4 w-4" />
-                            </Button>
                             <Button variant="ghost" size="icon" onClick={() => openMessagingDialog(session)} title="Open Chat">
                                 <MessageSquare className="h-4 w-4" />
                             </Button>
@@ -419,3 +397,5 @@ export default function RepDashboardPage() {
     </div>
   );
 }
+
+    

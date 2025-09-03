@@ -37,6 +37,18 @@ export async function getReportById(id: string): Promise<SavedReport | undefined
     return savedReports.find(r => r.id === id);
 }
 
+export async function updateReport(reportId: string, newData: (string | number)[][], newXlsxData: string): Promise<SavedReport> {
+    const report = await getReportById(reportId);
+    if (!report) {
+        throw new Error("Report to update not found");
+    }
+    report.data = newData;
+    report.xlsxData = newXlsxData;
+    report.createdAt = Date.now(); // Update timestamp to reflect the update
+    return report;
+}
+
+
 export async function deleteReportById(id: string): Promise<void> {
     const index = savedReports.findIndex(r => r.id === id);
     if (index > -1) {

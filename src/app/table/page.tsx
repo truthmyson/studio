@@ -5,13 +5,13 @@ import { useState, useMemo, useEffect } from "react";
 import { PageHeader, PageHeaderDescription, PageHeaderHeading } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Loader2, Download, AlertCircle, FileSpreadsheet, Trash2, Eye } from "lucide-react";
+import { PlusCircle, Loader2, Download, AlertCircle, FileSpreadsheet, Trash2, Eye, RefreshCw } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { getClassesByRepAction, createTableReportAction, getSavedReportsAction, deleteReportAction, type ClassWithStudentCount } from "@/lib/actions";
+import { getClassesByRepAction, createTableReportAction, getSavedReportsAction, deleteReportAction, updateTableReportAction, type ClassWithStudentCount } from "@/lib/actions";
 import { downloadFile } from "@/lib/client-utils";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -19,6 +19,8 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import type { SavedReport } from "@/lib/report-management";
 import { format } from "date-fns";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
 
 const REP_ID = '24275016'; // Hardcoded for now
 
@@ -77,6 +79,7 @@ export default function TablePage() {
     const [selectedClassId, setSelectedClassId] = useState('');
     const [reportName, setReportName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isUpdating, setIsUpdating] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const { toast } = useToast();
 
@@ -121,7 +124,7 @@ export default function TablePage() {
 
         if (result.success && result.report) {
             toast({ title: 'Success!', description: result.message });
-            fetchSavedReports(); // Refresh the list
+            await fetchSavedReports(); // Refresh the list
             setSelectedReport(result.report); // Show the new report immediately
         } else {
             setError(result.message || 'An unexpected error occurred.');
@@ -130,6 +133,22 @@ export default function TablePage() {
         
         setIsLoading(false);
         setIsCreateDialogOpen(false);
+    };
+
+    const handleUpdateReport = async (reportId: string) => {
+        setIsUpdating(reportId);
+        const result = await updateTableReportAction(reportId);
+        if (result.success && result.report) {
+            toast({ title: 'Report Updated', description: result.message });
+            await fetchSavedReports();
+            // If the updated report is being viewed, refresh its data
+            if (selectedReport?.id === reportId) {
+                setSelectedReport(result.report);
+            }
+        } else {
+            toast({ variant: 'destructive', title: 'Error', description: result.message });
+        }
+        setIsUpdating(null);
     };
 
     const handleDeleteReport = async (reportId: string) => {
@@ -160,48 +179,64 @@ export default function TablePage() {
                 </Button>
             </PageHeader>
             
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                 {savedReports.map(report => (
-                    <Card key={report.id}>
-                        <CardHeader>
-                            <CardTitle>{report.name}</CardTitle>
-                            <CardDescription>
-                                Created on {format(new Date(report.createdAt), 'PPP')} for class {report.className}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-sm text-muted-foreground">
-                                This report contains {report.data.length - 1} student records.
-                            </p>
-                        </CardContent>
-                        <CardFooter className="flex justify-end gap-2">
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <Button variant="destructive" size="icon">
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            This will permanently delete the report "{report.name}". This action cannot be undone.
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={() => handleDeleteReport(report.id)}>Delete</AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                            <Button variant="outline" onClick={() => setSelectedReport(report)}>
-                                <Eye className="mr-2 h-4 w-4" />
-                                View
-                            </Button>
-                        </CardFooter>
-                    </Card>
-                ))}
-            </div>
+            <TooltipProvider>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {savedReports.map(report => (
+                        <Card key={report.id}>
+                            <CardHeader>
+                                <CardTitle>{report.name}</CardTitle>
+                                <CardDescription>
+                                    Created on {format(new Date(report.createdAt), 'PPP')} for class {report.className}
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-sm text-muted-foreground">
+                                    This report contains {report.data.length - 1} student records.
+                                </p>
+                            </CardContent>
+                            <CardFooter className="flex justify-end gap-2">
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button variant="ghost" size="icon" onClick={() => handleUpdateReport(report.id)} disabled={isUpdating === report.id}>
+                                            {isUpdating === report.id ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                <RefreshCw className="h-4 w-4" />
+                                            )}
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Update Report</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button variant="destructive" size="icon">
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                This will permanently delete the report "{report.name}". This action cannot be undone.
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction onClick={() => handleDeleteReport(report.id)}>Delete</AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                                <Button variant="outline" onClick={() => setSelectedReport(report)}>
+                                    <Eye className="mr-2 h-4 w-4" />
+                                    View
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    ))}
+                </div>
+            </TooltipProvider>
 
             {savedReports.length === 0 && (
                  <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 p-12 text-center h-80">

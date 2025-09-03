@@ -12,7 +12,7 @@ import { Student } from './types';
 import { sendMessage, getMessagesForSession, Message, getDirectMessages } from './messaging';
 import * as xlsx from 'xlsx';
 import { convertArrayToCsv } from '@/services/csv-converter';
-import { SavedReport, createReport, getReports, deleteReportById } from './report-management';
+import { SavedReport, createReport, getReports, deleteReportById, updateReport, getReportById } from './report-management';
 
 
 export type { AttendanceSession };
@@ -283,6 +283,44 @@ export async function createTableReportAction(classId: string, reportName: strin
     } catch (error) {
         console.error("Error during file generation:", error);
         return { success: false, message: 'An unexpected error occurred while generating the report file.' };
+    }
+}
+
+
+export async function updateTableReportAction(reportId: string): Promise<{ success: boolean; message: string; report?: SavedReport }> {
+    const existingReport = await getReportById(reportId);
+    if (!existingReport) {
+        return { success: false, message: "Report not found." };
+    }
+    
+    const { classId } = existingReport;
+
+    const classStudents = await getStudentsByClassId(classId);
+    const classSessions = getSessionsByClass(classId);
+
+    if (classStudents.length === 0) {
+        return { success: false, message: 'The associated class has no students.' };
+    }
+    
+    const dataArray = generateReportData(classStudents, classSessions);
+
+    try {
+        const workbook = xlsx.utils.book_new();
+        const worksheet = xlsx.utils.aoa_to_sheet(dataArray);
+        xlsx.utils.book_append_sheet(workbook, worksheet, 'Attendance');
+        const xlsxBuffer = xlsx.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+        const xlsxData = Buffer.from(xlsxBuffer).toString('base64');
+        
+        const updatedReport = await updateReport(reportId, dataArray, xlsxData);
+
+        return {
+            success: true,
+            message: 'Report updated successfully with the latest data.',
+            report: updatedReport,
+        };
+    } catch (error) {
+        console.error("Error during report update:", error);
+        return { success: false, message: 'An unexpected error occurred while updating the report.' };
     }
 }
 
