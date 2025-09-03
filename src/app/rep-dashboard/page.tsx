@@ -203,15 +203,15 @@ export default function RepDashboardPage() {
                 </CardDescription>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => openEditTimeDialog(activeSessionDetails.session)} disabled={activeSessionDetails.session.timeLimit === Infinity}>
+                <Button variant="outline" size="icon" onClick={() => openEditTimeDialog(activeSessionDetails.session)} disabled={activeSessionDetails.session.timeLimit === Infinity}>
                     <Clock className="h-4 w-4"/>
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => openMessagingDialog(activeSessionDetails.session)}>
+                <Button variant="outline" size="icon" onClick={() => openMessagingDialog(activeSessionDetails.session)}>
                     <MessageSquare className="h-4 w-4"/>
                 </Button>
                 <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <Button variant="destructive" size="sm">
+                        <Button variant="destructive" size="icon">
                             <PowerOff className="h-4 w-4" />
                         </Button>
                     </AlertDialogTrigger>
@@ -280,12 +280,13 @@ export default function RepDashboardPage() {
           <ScrollArea className="h-[500px]">
              {sortedSessions.length > 0 ? sortedSessions.map((session, index) => (
                 <div key={session.id}>
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 space-y-2 md:space-y-0">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 gap-y-4">
                         <div className="space-y-1">
                             <p className="font-semibold">{session.topic}</p>
-                            <p className="text-sm text-muted-foreground">
-                                {format(new Date(session.startTime), 'PPP p')}
-                            </p>
+                            <div className="flex items-center gap-x-4 gap-y-1 text-sm text-muted-foreground flex-wrap">
+                              <span>{session.classId}</span>
+                              <span>{format(new Date(session.startTime), 'PPP p')}</span>
+                            </div>
                         </div>
                         <div className="flex items-center gap-2 flex-wrap">
                              <Badge variant={session.active ? 'default' : 'secondary'}>

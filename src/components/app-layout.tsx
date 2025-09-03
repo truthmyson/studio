@@ -24,17 +24,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const isRepAuthed = REP_AUTHED_ROUTES.some(route => pathname.startsWith(route));
 
   const homeLinks = [
-    { href: '#features', label: 'Features' },
-    { href: '#how-it-works', label: 'How It Works' },
-    { href: '#demo', label: 'Demo' },
-    { href: '#faq', label: 'FAQ' },
-    { href: '#contact', label: 'Contact' },
+    { href: '/#features', label: 'Features' },
+    { href: '/#how-it-works', label: 'How It Works' },
+    { href: '/#demo', label: 'Demo' },
+    { href: '/#faq', label: 'FAQ' },
+    { href: '/#contact', label: 'Contact' },
   ];
 
   const otherLinks = getNavLinks(pathname);
   const links = pathname === '/' ? homeLinks : otherLinks;
 
-  const showNav = !NO_NAV_ROUTES.includes(pathname);
+  const showNav = !NO_NAV_ROUTES.some(path => pathname.startsWith(path));
   const showBackArrow = showNav && pathname !== '/';
 
   return (
@@ -42,7 +42,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="border-b sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex h-16 items-center px-4 container max-w-screen-2xl">
           {showBackArrow && (
-              <Button variant="ghost" size="icon" className="mr-2" onClick={() => router.back()}>
+              <Button variant="ghost" size="icon" className="mr-2 md:hidden" onClick={() => router.back()}>
                   <ArrowLeft className="h-5 w-5" />
                   <span className="sr-only">Go Back</span>
               </Button>

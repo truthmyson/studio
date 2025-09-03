@@ -56,7 +56,7 @@ export default function HomePage() {
                     VITOBU leverages geo-fencing for accurate check-ins, provides real-time data for representatives, and offers a simple, intuitive interface for students.
                 </p>
                 <div className="flex flex-col items-center gap-4">
-                    <div className="flex gap-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
                         <Button size="lg" className="transition-transform duration-300 hover:scale-105">
                             <Apple className="mr-2 h-6 w-6" />
                             Download for iOS
@@ -80,7 +80,7 @@ export default function HomePage() {
                     <h2 className="text-3xl font-bold md:text-4xl">Why VITOBU?</h2>
                     <p className="text-muted-foreground md:text-lg">Everything you need to streamline attendance management.</p>
                 </div>
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                     {features.map((feature, i) => (
                         <Card key={i} className="group transform-gpu transition-all duration-300 hover:-translate-y-2 hover:shadow-lg">
                             <CardHeader>
@@ -100,7 +100,7 @@ export default function HomePage() {
 
         {/* How it Works Section */}
         <section id="how-it-works" className="py-16 md:py-24">
-             <div className="container grid gap-12 md:grid-cols-2 items-center">
+             <div className="container grid gap-12 lg:grid-cols-2 items-center">
                 <div className="space-y-4">
                     <Badge variant="secondary" className="px-4 py-2 text-base">How It Works</Badge>
                      <h2 className="text-3xl font-bold md:text-4xl">Simple Steps for Reps & Students</h2>
@@ -109,21 +109,21 @@ export default function HomePage() {
                     </p>
                     <div className="space-y-4">
                         <div className="flex items-start gap-4">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">1</div>
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold shrink-0">1</div>
                             <div className="flex-1">
                                 <h4 className="font-bold">Rep Creates a Session</h4>
                                 <p className="text-muted-foreground">The class representative starts a geo-fenced attendance session from their dashboard, setting a location and time limit.</p>
                             </div>
                         </div>
                         <div className="flex items-start gap-4">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">2</div>
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold shrink-0">2</div>
                             <div className="flex-1">
                                 <h4 className="font-bold">Students Get Notified</h4>
                                 <p className="text-muted-foreground">All students enrolled in the class receive an instant notification that the session has started.</p>
                             </div>
                         </div>
                         <div className="flex items-start gap-4">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">3</div>
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold shrink-0">3</div>
                             <div className="flex-1">
                                 <h4 className="font-bold">Students Sign In</h4>
                                 <p className="text-muted-foreground">Students within the designated area can sign in with a single tap on their phone. Presence is verified instantly.</p>
@@ -187,7 +187,7 @@ export default function HomePage() {
                     Download the app and revolutionize how your institution handles attendance.
                     It's free to get started.
                 </p>
-                <div className="flex justify-center gap-4 mt-8">
+                <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8">
                      <Button size="lg" variant="secondary" className="transition-transform duration-300 hover:scale-105">
                         <Apple className="mr-2 h-6 w-6" />
                         Download for iOS

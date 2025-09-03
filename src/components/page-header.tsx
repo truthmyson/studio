@@ -8,7 +8,7 @@ function PageHeader({
   return (
     <section
       className={cn(
-        "flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0",
+        "flex flex-col items-start gap-y-4 md:flex-row md:items-center md:justify-between",
         className
       )}
       {...props}
@@ -40,7 +40,7 @@ function PageHeaderDescription({
   return (
     <p
       className={cn(
-        "text-base text-muted-foreground md:text-lg",
+        "text-base text-muted-foreground",
         className
       )}
       {...props}

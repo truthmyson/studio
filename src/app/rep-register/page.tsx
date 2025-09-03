@@ -76,7 +76,7 @@ export default function RepRegisterPage() {
           </CardDescription>
         </CardHeader>
         <form action={formAction}>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label htmlFor="firstName">First Name</Label>
               <Input id="firstName" name="firstName" placeholder="John" required />
@@ -85,23 +85,23 @@ export default function RepRegisterPage() {
               <Label htmlFor="lastName">Last Name</Label>
               <Input id="lastName" name="lastName" placeholder="Doe" required />
             </div>
-             <div className="grid gap-2 col-span-1 md:col-span-2">
+             <div className="grid gap-2 col-span-1 sm:col-span-2">
               <Label htmlFor="middleName">Middle Name (Optional)</Label>
               <Input id="middleName" name="middleName" placeholder="Kofi" />
             </div>
-            <div className="grid gap-2 col-span-1 md:col-span-2">
+            <div className="grid gap-2 col-span-1 sm:col-span-2">
               <Label htmlFor="studentId">School ID</Label>
               <Input id="studentId" name="studentId" placeholder="10-digit ID" required />
             </div>
-            <div className="grid gap-2 col-span-1 md:col-span-2">
+            <div className="grid gap-2 col-span-1 sm:col-span-2">
               <Label htmlFor="email">Email</Label>
               <Input id="email" name="email" type="email" placeholder="m@example.com" required />
             </div>
-             <div className="grid gap-2 col-span-1 md:col-span-2">
+             <div className="grid gap-2 col-span-1 sm:col-span-2">
               <Label htmlFor="contact">Contact Number</Label>
               <Input id="contact" name="contact" placeholder="0551234567" required />
             </div>
-             <div className="grid gap-2 col-span-1 md:col-span-2">
+             <div className="grid gap-2 col-span-1 sm:col-span-2">
                 <Label htmlFor="gender">Gender</Label>
                 <Select name="gender">
                     <SelectTrigger id="gender">
@@ -113,11 +113,11 @@ export default function RepRegisterPage() {
                     </SelectContent>
                 </Select>
              </div>
-             <div className="grid gap-2 col-span-1 md:col-span-2">
+             <div className="grid gap-2 col-span-1 sm:col-span-2">
                 <Label htmlFor="courseName">Course/Department</Label>
                 <Input id="courseName" name="courseName" placeholder="e.g., Computer Science" required />
              </div>
-            <div className="grid gap-2 col-span-1 md:col-span-2">
+            <div className="grid gap-2 col-span-1 sm:col-span-2">
               <Label htmlFor="password">Password</Label>
               <Input id="password" name="password" type="password" required />
             </div>

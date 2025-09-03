@@ -26,7 +26,7 @@ interface EditTimeDialogProps {
 }
 
 export function EditTimeDialog({ isOpen, onClose, session, onTimeUpdated }: EditTimeDialogProps) {
-  const [newTime, setNewTime] = useState(session.timeLimit.toString());
+  const [newTime, setNewTime] = useState(session.timeLimit === Infinity ? '' : session.timeLimit.toString());
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   
@@ -77,9 +77,9 @@ export function EditTimeDialog({ isOpen, onClose, session, onTimeUpdated }: Edit
     <Dialog open={isOpen} onOpenChange={(open) => {
         if (!open) onClose();
         // Reset time to current session time limit on open
-        setNewTime(session.timeLimit.toString());
+        setNewTime(session.timeLimit === Infinity ? '' : session.timeLimit.toString());
     }}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Edit Session Duration</DialogTitle>
           <DialogDescription>
@@ -103,13 +103,13 @@ export function EditTimeDialog({ isOpen, onClose, session, onTimeUpdated }: Edit
             />
           </div>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isLoading}>
-            Cancel
-          </Button>
+        <DialogFooter className="sm:justify-start">
           <Button onClick={handleUpdateTime} disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Update Time
+          </Button>
+           <Button variant="outline" onClick={onClose} disabled={isLoading}>
+            Cancel
           </Button>
         </DialogFooter>
       </DialogContent>
