@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -64,8 +65,8 @@ export default function RepRegisterPage() {
   }, [state, toast, router]);
 
   return (
-    <div className="flex justify-center min-h-screen bg-background py-12 px-4">
-      <Card className="w-full max-w-md">
+    <div className="flex justify-center bg-background py-12 px-4 min-h-screen">
+      <Card className="w-full max-w-md flex flex-col">
         <CardHeader className="text-center">
           <div className="flex justify-center items-center gap-2 mb-4">
             <VITOBULogo className="h-10 w-10 text-primary" />
@@ -75,54 +76,56 @@ export default function RepRegisterPage() {
             Fill out the form below to get started.
           </CardDescription>
         </CardHeader>
-        <form action={formAction}>
-          <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="firstName">First Name</Label>
-              <Input id="firstName" name="firstName" placeholder="John" required />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input id="lastName" name="lastName" placeholder="Doe" required />
-            </div>
-             <div className="grid gap-2 col-span-1 sm:col-span-2">
-              <Label htmlFor="middleName">Middle Name (Optional)</Label>
-              <Input id="middleName" name="middleName" placeholder="Kofi" />
-            </div>
-            <div className="grid gap-2 col-span-1 sm:col-span-2">
-              <Label htmlFor="studentId">School ID</Label>
-              <Input id="studentId" name="studentId" placeholder="10-digit ID" required />
-            </div>
-            <div className="grid gap-2 col-span-1 sm:col-span-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" placeholder="m@example.com" required />
-            </div>
-             <div className="grid gap-2 col-span-1 sm:col-span-2">
-              <Label htmlFor="contact">Contact Number</Label>
-              <Input id="contact" name="contact" placeholder="0551234567" required />
-            </div>
-             <div className="grid gap-2 col-span-1 sm:col-span-2">
-                <Label htmlFor="gender">Gender</Label>
-                <Select name="gender">
-                    <SelectTrigger id="gender">
-                        <SelectValue placeholder="Select gender" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="male">Male</SelectItem>
-                        <SelectItem value="female">Female</SelectItem>
-                    </SelectContent>
-                </Select>
-             </div>
-             <div className="grid gap-2 col-span-1 sm:col-span-2">
-                <Label htmlFor="courseName">Course/Department</Label>
-                <Input id="courseName" name="courseName" placeholder="e.g., Computer Science" required />
-             </div>
-            <div className="grid gap-2 col-span-1 sm:col-span-2">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" name="password" type="password" required />
-            </div>
-          </CardContent>
-          <CardFooter className="flex flex-col gap-4">
+        <form action={formAction} className="flex-1 flex flex-col overflow-hidden">
+          <ScrollArea className="flex-1">
+            <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-6">
+              <div className="grid gap-2">
+                <Label htmlFor="firstName">First Name</Label>
+                <Input id="firstName" name="firstName" placeholder="John" required />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input id="lastName" name="lastName" placeholder="Doe" required />
+              </div>
+              <div className="grid gap-2 col-span-1 sm:col-span-2">
+                <Label htmlFor="middleName">Middle Name (Optional)</Label>
+                <Input id="middleName" name="middleName" placeholder="Kofi" />
+              </div>
+              <div className="grid gap-2 col-span-1 sm:col-span-2">
+                <Label htmlFor="studentId">School ID</Label>
+                <Input id="studentId" name="studentId" placeholder="10-digit ID" required />
+              </div>
+              <div className="grid gap-2 col-span-1 sm:col-span-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" name="email" type="email" placeholder="m@example.com" required />
+              </div>
+              <div className="grid gap-2 col-span-1 sm:col-span-2">
+                <Label htmlFor="contact">Contact Number</Label>
+                <Input id="contact" name="contact" placeholder="0551234567" required />
+              </div>
+              <div className="grid gap-2 col-span-1 sm:col-span-2">
+                  <Label htmlFor="gender">Gender</Label>
+                  <Select name="gender">
+                      <SelectTrigger id="gender">
+                          <SelectValue placeholder="Select gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                          <SelectItem value="male">Male</SelectItem>
+                          <SelectItem value="female">Female</SelectItem>
+                      </SelectContent>
+                  </Select>
+              </div>
+              <div className="grid gap-2 col-span-1 sm:col-span-2">
+                  <Label htmlFor="courseName">Course/Department</Label>
+                  <Input id="courseName" name="courseName" placeholder="e.g., Computer Science" required />
+              </div>
+              <div className="grid gap-2 col-span-1 sm:col-span-2">
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" name="password" type="password" required />
+              </div>
+            </CardContent>
+          </ScrollArea>
+          <CardFooter className="flex flex-col gap-4 pt-6">
             <SubmitButton />
             <div className="text-center text-sm">
               Already have an account?{' '}
@@ -136,5 +139,3 @@ export default function RepRegisterPage() {
     </div>
   );
 }
-
-    

@@ -17,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { createClassAction } from '@/lib/actions';
 import { Loader2 } from 'lucide-react';
+import { ScrollArea } from '../ui/scroll-area';
 
 interface CreateClassDialogProps {
   isOpen: boolean;
@@ -77,28 +78,31 @@ export function CreateClassDialog({ isOpen, onClose, repId, onClassCreated }: Cr
             Fill in the details below. A unique join code will be generated automatically.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Class Name</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Advanced Web Development"
-              disabled={isLoading}
-            />
+        <ScrollArea className="max-h-[60vh]">
+          <div className="space-y-4 py-4 pr-6">
+            <div className="space-y-2">
+              <Label htmlFor="name">Class Name</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g., Advanced Web Development"
+                disabled={isLoading}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Description (Optional)</Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="e.g., A course covering modern frontend and backend technologies."
+                disabled={isLoading}
+                rows={5}
+              />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="description">Description (Optional)</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="e.g., A course covering modern frontend and backend technologies."
-              disabled={isLoading}
-            />
-          </div>
-        </div>
+        </ScrollArea>
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={isLoading}>
             Cancel
