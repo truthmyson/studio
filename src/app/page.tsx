@@ -42,6 +42,15 @@ const features = [
 
 export default function HomePage() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  
+  const handleMouseEnter = () => {
+    videoRef.current?.play();
+  };
+
+  const handleMouseLeave = () => {
+    videoRef.current?.pause();
+  };
+
   return (
     <div className="flex-1 w-full" id="top">
         {/* Header content is now handled by AppLayout */}
@@ -142,15 +151,19 @@ export default function HomePage() {
             <div className="container">
                 <h2 className="text-3xl font-bold md:text-4xl">Explore the App in Action</h2>
                 <p className="text-muted-foreground md:text-lg max-w-2xl mx-auto mb-8">
-                    Watch this short demo to see how VITOBU simplifies attendance. Click the video to play.
+                    Watch this short demo to see how VITOBU simplifies attendance. Hover over the video to play.
                 </p>
-                <div className="flex justify-center mb-8">
+                <div 
+                    className="flex justify-center mb-8"
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                >
                     <div className="w-full max-w-4xl bg-black rounded-lg shadow-2xl overflow-hidden border">
                         <video
                             ref={videoRef}
                             className="w-full h-full"
                             loop
-                            controls
+                            muted
                             playsInline
                             poster="https://picsum.photos/1280/720"
                         >
