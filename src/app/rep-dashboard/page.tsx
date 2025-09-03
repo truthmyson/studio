@@ -22,6 +22,7 @@ import {
   Trash2,
   BarChart,
   Clock,
+  MapPin,
 } from 'lucide-react';
 import {
   getAllSessions,
@@ -198,8 +199,14 @@ export default function RepDashboardPage() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
                 <CardTitle className="text-2xl text-primary">Live Session: {activeSessionDetails.session.topic}</CardTitle>
-                <CardDescription>
-                  Session ends {activeSessionDetails.timeLeft}.
+                <CardDescription className="flex flex-col sm:flex-row sm:items-center gap-x-4 gap-y-1 mt-1">
+                    <span>Session ends {activeSessionDetails.timeLeft}.</span>
+                    {activeSessionDetails.session.venue && (
+                        <span className="flex items-center gap-1">
+                            <MapPin className="h-4 w-4"/>
+                            {activeSessionDetails.session.venue}
+                        </span>
+                    )}
                 </CardDescription>
               </div>
               <div className="flex items-center gap-2">
@@ -286,6 +293,7 @@ export default function RepDashboardPage() {
                             <div className="flex items-center gap-x-4 gap-y-1 text-sm text-muted-foreground flex-wrap">
                               <span>{session.classId}</span>
                               <span>{format(new Date(session.startTime), 'PPP p')}</span>
+                              {session.venue && <span className="flex items-center gap-1"><MapPin className="h-4 w-4"/> {session.venue}</span>}
                             </div>
                         </div>
                         <div className="flex items-center gap-2 flex-wrap">

@@ -14,6 +14,7 @@ export interface AttendanceSession {
     timeLimit: number; // in minutes, or Infinity for no limit
     active: boolean;
     topic: string;
+    venue?: string; // New: human-readable location
     students: { studentId: string; signedInAt: number | null }[];
 }
   
@@ -26,7 +27,7 @@ function cleanupOldSessions() {
     allSessions = allSessions.filter(session => session.startTime >= fourteenDaysAgo);
 }
 
-export function startSession(location: Location | null, radius: number, timeLimit: number, topic: string, studentIds: string[], classId: string, repId: string, includeRep = false) {
+export function startSession(location: Location | null, radius: number, timeLimit: number, topic: string, studentIds: string[], classId: string, repId: string, venue?: string, includeRep = false) {
     // Deactivate any other active session before starting a new one
     if (activeSession) {
         const currentActive = allSessions.find(s => s.id === activeSession?.id);
@@ -60,6 +61,7 @@ export function startSession(location: Location | null, radius: number, timeLimi
         timeLimit,
         active: true,
         topic,
+        venue,
         students: initialStudents,
     };
     

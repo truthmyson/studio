@@ -33,6 +33,7 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
   const [timeLimit, setTimeLimit] = useState('15'); // Default time limit in minutes
   const [noTimeLimit, setNoTimeLimit] = useState(false);
   const [topic, setTopic] = useState(''); // Lecture topic
+  const [venue, setVenue] = useState(''); // New field for location/classroom
   const [selectedClassId, setSelectedClassId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [classes, setClasses] = useState<Class[]>([]);
@@ -65,6 +66,7 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
     formData.append('sessionType', sessionType);
     formData.append('timeLimit', noTimeLimit ? 'Infinity' : timeLimit);
     formData.append('topic', topic);
+    formData.append('venue', venue);
     formData.append('classId', selectedClassId);
     const selectedClass = classes.find(c => c.id === selectedClassId);
     if (!selectedClass) {
@@ -117,6 +119,7 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
     if (result.success) {
       // No toast for success, the notification on the dashboard is enough
       setTopic('');
+      setVenue('');
       setSelectedClassId('');
       setIncludeSelf(false);
       setNoTimeLimit(false);
@@ -184,6 +187,17 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
                 <Label htmlFor="online">Online</Label>
               </div>
             </RadioGroup>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="venue">Venue / Classroom (Optional)</Label>
+            <Input
+              id="venue"
+              value={venue}
+              onChange={(e) => setVenue(e.target.value)}
+              placeholder="e.g., Room 101, Auditorium B"
+              disabled={isLoading}
+            />
           </div>
 
           {sessionType === 'physical' && (

@@ -135,6 +135,7 @@ export async function startGeofencingAction(formData: FormData) {
   const latitude = parseFloat(formData.get('latitude') as string);
   const longitude = parseFloat(formData.get('longitude') as string);
   const topic = formData.get('topic') as string;
+  const venue = formData.get('venue') as string | undefined;
   const classId = formData.get('classId') as string;
   const studentIdsRaw = formData.get('studentIds') as string;
   const repId = formData.get('repId') as string;
@@ -158,7 +159,7 @@ export async function startGeofencingAction(formData: FormData) {
   
   const location = sessionType === 'physical' ? { latitude, longitude } : null;
 
-  const session = startSession(location, radius, timeLimit, topic, studentIds, classId, repId, includeRep);
+  const session = startSession(location, radius, timeLimit, topic, studentIds, classId, repId, venue, includeRep);
 
   // Create notifications for all students in the selected class
   createSessionNotifications(session.id, session.topic, studentIds);
