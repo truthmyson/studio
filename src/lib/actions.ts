@@ -10,6 +10,9 @@ import { format } from 'date-fns';
 import { getClassById, enrollStudentInClass, getClassesByStudent, studentLeaveClass, removeStudentFromClass, getStudentsByClassId, getAllClasses, Class, createClass, getClassesByRep, deleteClass } from './class-management';
 import { Student } from './types';
 import { sendMessage, getMessagesForSession, Message, getDirectMessages } from './messaging';
+import * as xlsx from 'xlsx';
+import { convertArrayToCsv } from '@/services/csv-converter';
+
 
 export type { AttendanceSession };
 
@@ -203,8 +206,47 @@ export async function markNotificationRead(notificationId: string) {
     return { success: true };
 }
 
+function generateReportData(classStudents: Student[], classSessions: AttendanceSession[]) {
+    // Sort dates chronologically
+    const sortedDates = classSessions
+        .map(session => format(new Date(session.startTime), 'yyyy-MM-dd'))
+        .filter((date, index, self) => self.indexOf(date) === index) // Unique dates
+        .sort();
 
-export async function exportAttendanceAction(classId: string): Promise<{ success: boolean, message: string, csvData?: string }> {
+    // Create the CSV header row
+    const header = ['Student ID', 'First Name', 'Middle Name', 'Last Name', 'Course Name', ...sortedDates];
+    
+    // Create map for quick lookup
+    const sessionMap: Record<string, AttendanceSession> = {};
+    classSessions.forEach(session => {
+        sessionMap[format(new Date(session.startTime), 'yyyy-MM-dd')] = session;
+    });
+
+    // Create the data rows
+    const dataRows = classStudents.map(student => {
+        const studentId = student.id;
+        const firstName = student.firstName || '';
+        const middleName = student.middleName || '';
+        const lastName = student.lastName || '';
+        const courseName = student.courseName || '';
+        
+        const attendanceValues = sortedDates.map(date => {
+            const session = sessionMap[date];
+            if (session) {
+                const studentAttendance = session.students.find(s => s.studentId === studentId);
+                return studentAttendance && studentAttendance.signedInAt ? 'Present' : 'Absent';
+            }
+            return 'N/A'; // Should not happen if logic is correct
+        });
+
+        return [studentId, firstName, middleName, lastName, courseName, ...attendanceValues];
+    });
+    
+    return [header, ...dataRows];
+}
+
+
+export async function exportAttendanceAction(classId: string): Promise<{ success: boolean; message: string; csvData?: string; xlsxData?: string }> {
     const selectedClass = await getClassById(classId);
     if (!selectedClass) {
         return { success: false, message: "Class not found." };
@@ -213,61 +255,40 @@ export async function exportAttendanceAction(classId: string): Promise<{ success
     const classStudents = await getStudentsByClassId(classId);
     const classSessions = getSessionsByClass(classId);
     
-    // Map student details for the AI flow
-    const studentDetailsForFlow = classStudents.map(s => ({
-        id: s.id,
-        'First Name': s.firstName,
-        'Middle Name': s.middleName || '',
-        'Last Name': s.lastName,
-        'Course Name': s.courseName,
-    }));
-    
-    // If there are no sessions, we can still export the student roster.
-    if (classSessions.length === 0) {
-        try {
-            const result = await generateAttendanceTable({
-                studentDetails: studentDetailsForFlow,
-                attendanceRecords: {}, // No records yet
-            });
-             return {
-                success: true,
-                message: 'No sessions found for this class. Exporting student roster.',
-                csvData: result.csvData,
-            };
-        } catch (error) {
-            console.error(error);
-            return { success: false, message: 'An unexpected error occurred while generating the roster.' };
-        }
+    // If there are no students, there's nothing to report.
+    if (classStudents.length === 0) {
+        return { success: false, message: 'No students are enrolled in this class to generate a report for.' };
     }
 
-    const attendanceRecords: Record<string, string[]> = {};
-    for (const session of classSessions) {
-        const date = format(new Date(session.startTime), "yyyy-MM-dd");
-        attendanceRecords[date] = session.students
-            .filter(s => s.signedInAt !== null)
-            .map(s => s.studentId);
-    }
-    
+    const dataArray = generateReportData(classStudents, classSessions);
+
     try {
-        const result = await generateAttendanceTable({
-            studentDetails: studentDetailsForFlow,
-            attendanceRecords: attendanceRecords,
-        });
+        // Generate CSV
+        const csvData = convertArrayToCsv(dataArray);
 
-        if (result.csvData) {
-            return {
-                success: true,
-                message: 'CSV file generated successfully.',
-                csvData: result.csvData,
-            };
-        } else {
-            return { success: false, message: 'Failed to generate CSV data.' };
-        }
+        // Generate XLSX
+        const workbook = xlsx.utils.book_new();
+        const worksheet = xlsx.utils.aoa_to_sheet(dataArray);
+        xlsx.utils.book_append_sheet(workbook, worksheet, 'Attendance');
+        const xlsxBuffer = xlsx.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+        const xlsxData = Buffer.from(xlsxBuffer).toString('base64');
+        
+        const message = classSessions.length > 0 
+            ? 'Attendance report generated successfully.' 
+            : 'No sessions found for this class. Exporting student roster.';
+
+        return {
+            success: true,
+            message,
+            csvData: csvData,
+            xlsxData: xlsxData
+        };
     } catch (error) {
-        console.error(error);
-        return { success: false, message: 'An unexpected error occurred while generating the report.' };
+        console.error("Error during file generation:", error);
+        return { success: false, message: 'An unexpected error occurred while generating the report file.' };
     }
 }
+
 
 export async function joinClassAction(studentId: string, joinCode: string): Promise<{ success: boolean, message: string, className?: string }> {
     const result = await enrollStudentInClass(studentId, joinCode);

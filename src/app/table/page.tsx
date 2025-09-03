@@ -5,7 +5,7 @@ import { useState } from "react";
 import { PageHeader, PageHeaderDescription, PageHeaderHeading } from "@/components/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Loader2, Download, AlertCircle } from "lucide-react";
+import { PlusCircle, Loader2, Download, AlertCircle, FileText, FileSpreadsheet } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getClassesByRepAction, exportAttendanceAction, type ClassWithStudentCount } from "@/lib/actions";
+import { downloadFile } from "@/lib/client-utils";
 
 const REP_ID = '24275016'; // Hardcoded for now
 
@@ -21,12 +22,13 @@ export default function TablePage() {
     const [classes, setClasses] = useState<ClassWithStudentCount[]>([]);
     const [selectedClassId, setSelectedClassId] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [generatedData, setGeneratedData] = useState<{ csv: string; className: string } | null>(null);
+    const [generatedData, setGeneratedData] = useState<{ csv: string; xlsx: string; className: string; preview: string; } | null>(null);
     const [error, setError] = useState<string | null>(null);
     const { toast } = useToast();
 
     const handleOpenDialog = async () => {
         setIsLoading(true);
+        setError(null);
         const repClasses = await getClassesByRepAction(REP_ID);
         setClasses(repClasses);
         setIsLoading(false);
@@ -49,11 +51,13 @@ export default function TablePage() {
 
         const result = await exportAttendanceAction(selectedClassId);
 
-        if (result.success && result.csvData) {
+        if (result.success && result.csvData && result.xlsxData) {
             const selectedClass = classes.find(c => c.id === selectedClassId);
             setGeneratedData({
                 csv: result.csvData,
-                className: selectedClass?.name || 'Report'
+                xlsx: result.xlsxData,
+                className: selectedClass?.name || 'Report',
+                preview: result.csvData, // Use CSV for the text preview
             });
             toast({
                 title: 'Success!',
@@ -72,19 +76,18 @@ export default function TablePage() {
         setIsCreateDialogOpen(false);
     };
 
-    const handleDownload = () => {
+    const handleDownload = (format: 'csv' | 'xlsx') => {
         if (!generatedData) return;
-    
-        const blob = new Blob([generatedData.csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', `attendance_report_${generatedData.className.replace(/\s+/g, '_')}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        toast({ title: "Success", description: "Report download started."});
+
+        const { csv, xlsx, className } = generatedData;
+        const filename = `attendance_report_${className.replace(/\s+/g, '_')}`;
+
+        if (format === 'csv') {
+            downloadFile(filename + '.csv', csv, 'text/csv');
+        } else {
+            downloadFile(filename + '.xlsx', xlsx, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        }
+        toast({ title: "Success", description: `Report download started as ${format.toUpperCase()}.`});
     };
 
     return (
@@ -105,18 +108,27 @@ export default function TablePage() {
                 <CardContent className="pt-6">
                     {generatedData && (
                         <div className="space-y-4">
-                            <Label htmlFor="csvOutput">Generated Report for: {generatedData.className}</Label>
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <Label htmlFor="csvOutput" className="text-lg font-semibold">Generated Report for: {generatedData.className}</Label>
+                                <div className="flex gap-2">
+                                     <Button type="button" onClick={() => handleDownload('xlsx')} variant="secondary">
+                                        <FileSpreadsheet className="mr-2 h-4 w-4" />
+                                        Download Excel
+                                    </Button>
+                                    <Button type="button" onClick={() => handleDownload('csv')}>
+                                        <FileText className="mr-2 h-4 w-4" />
+                                        Download CSV
+                                    </Button>
+                                </div>
+                            </div>
                             <Textarea
                                 id="csvOutput"
                                 readOnly
-                                value={generatedData.csv}
+                                value={generatedData.preview}
                                 rows={20}
                                 className="font-mono text-sm bg-secondary"
+                                placeholder="Report preview..."
                             />
-                            <Button type="button" onClick={handleDownload}>
-                                <Download className="mr-2 h-4 w-4" />
-                                Download CSV
-                            </Button>
                         </div>
                     )}
                     {error && (
