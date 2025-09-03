@@ -37,7 +37,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <div className="flex-col md:flex">
       <div className="border-b sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex h-16 items-center px-4 container max-w-screen-2xl">
-          <Link href="/" className="flex items-center gap-2 mr-6">
+          <Link href="/#top" className="flex items-center gap-2 mr-6">
             <VITOBULogo className="h-6 w-6 text-primary" />
             <span className={cn("font-bold", "hidden md:inline-block")}>
               VITOBU
@@ -62,14 +62,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem onSelect={() => router.push('/rep-login')}>
-                                <LogIn className="mr-2" />
+                                <LogIn className="mr-2 h-4 w-4" />
                                 <span>Rep Login</span>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>
+                            <div className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
                                 <ModeToggle />
                                 <span className="ml-2">Toggle Theme</span>
-                            </DropdownMenuItem>
+                            </div>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
