@@ -3,14 +3,13 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { MainNav } from './main-nav';
-import { UserNav } from './user-nav';
 import { ModeToggle } from './mode-toggle';
 import { getNavLinks } from '@/lib/nav-links';
 import Link from 'next/link';
 import { VITOBULogo } from './icons';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
-import { ArrowLeft, Menu, MoreVertical } from 'lucide-react';
+import { Menu, MoreVertical } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 
@@ -68,7 +67,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
-                    <UserNav />
                 </div>
                 
                 <div className="md:hidden">
@@ -93,7 +91,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                             </nav>
                              <div className="mt-6 pt-6 border-t flex items-center justify-between">
                                 <ModeToggle />
-                                <UserNav />
                             </div>
                         </SheetContent>
                     </Sheet>
