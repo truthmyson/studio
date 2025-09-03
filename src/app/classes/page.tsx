@@ -20,14 +20,21 @@ export default function ClassesPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchClasses = async () => {
-    setIsLoading(true);
-    const repClasses = await getClassesByRepAction(REP_ID);
-    setClasses(repClasses);
-    setIsLoading(false);
+    // Only set loading true on the initial fetch
+    if (isLoading) {
+        const repClasses = await getClassesByRepAction(REP_ID);
+        setClasses(repClasses);
+        setIsLoading(false);
+    } else {
+        const repClasses = await getClassesByRepAction(REP_ID);
+        setClasses(repClasses);
+    }
   };
 
   useEffect(() => {
-    fetchClasses();
+    fetchClasses(); // Initial fetch
+    const interval = setInterval(fetchClasses, 3000); // Poll for updates every 3 seconds
+    return () => clearInterval(interval); // Cleanup on component unmount
   }, []);
 
   return (
