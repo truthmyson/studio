@@ -65,7 +65,7 @@ export default function RepRegisterPage() {
   }, [state, toast, router]);
 
   return (
-    <div className="flex justify-center bg-background py-12 px-4 min-h-screen">
+    <div className="flex justify-center bg-background py-12 px-4">
       <Card className="w-full max-w-md flex flex-col">
         <CardHeader className="text-center">
           <div className="flex justify-center items-center gap-2 mb-4">
@@ -78,7 +78,7 @@ export default function RepRegisterPage() {
         </CardHeader>
         <form action={formAction} className="flex-1 flex flex-col overflow-hidden">
           <ScrollArea className="flex-1">
-            <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-6">
+            <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-6 pb-2">
               <div className="grid gap-2">
                 <Label htmlFor="firstName">First Name</Label>
                 <Input id="firstName" name="firstName" placeholder="John" required />

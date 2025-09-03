@@ -103,7 +103,7 @@ export function CreateClassDialog({ isOpen, onClose, repId, onClassCreated }: Cr
             </div>
           </div>
         </ScrollArea>
-        <DialogFooter>
+        <DialogFooter className="pt-4">
           <Button variant="outline" onClick={onClose} disabled={isLoading}>
             Cancel
           </Button>

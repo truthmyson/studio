@@ -145,7 +145,7 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="max-h-[70vh]">
-            <div className="space-y-4 py-4 pr-6">
+            <div className="space-y-4 py-4 pr-6 pb-2">
                 <div className="space-y-2">
                     <Label htmlFor="class">Class</Label>
                     <Select onValueChange={setSelectedClassId} value={selectedClassId} disabled={isLoading}>

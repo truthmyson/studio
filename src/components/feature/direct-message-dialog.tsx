@@ -144,7 +144,7 @@ export function DirectMessageDialog({ isOpen, onClose, student, repId }: DirectM
                         />
                     </div>
                 </div>
-                <DialogFooter>
+                <DialogFooter className="pt-2">
                     <Button variant="outline" onClick={onClose} disabled={isSending}>
                         Cancel
                     </Button>
