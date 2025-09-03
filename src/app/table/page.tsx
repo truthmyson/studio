@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { PageHeader, PageHeaderDescription, PageHeaderHeading } from "@/components/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,11 +10,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getClassesByRepAction, exportAttendanceAction, type ClassWithStudentCount } from "@/lib/actions";
 import { downloadFile } from "@/lib/client-utils";
 import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 const REP_ID = '24275016'; // Hardcoded for now
 
@@ -97,6 +98,14 @@ export default function TablePage() {
         
         toast({ title: "Success", description: `Report download started.`});
     };
+    
+    const parsedPreview = useMemo(() => {
+        if (!generatedData?.preview) return { header: [], rows: [] };
+        const lines = generatedData.preview.split('\n');
+        const header = lines[0].split(',');
+        const rows = lines.slice(1).map(line => line.split(','));
+        return { header, rows };
+    }, [generatedData]);
 
     return (
         <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -125,14 +134,27 @@ export default function TablePage() {
                                     </Button>
                                 </div>
                             </div>
-                            <Textarea
-                                id="csvOutput"
-                                readOnly
-                                value={generatedData.preview}
-                                rows={20}
-                                className="font-mono text-sm bg-secondary"
-                                placeholder="Report preview..."
-                            />
+                             <ScrollArea className="h-96 w-full rounded-md border">
+                                <Table>
+                                    <TableHeader className="sticky top-0 bg-background">
+                                        <TableRow>
+                                            {parsedPreview.header.map((col, index) => (
+                                                <TableHead key={index}>{col}</TableHead>
+                                            ))}
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {parsedPreview.rows.map((row, rowIndex) => (
+                                            <TableRow key={rowIndex}>
+                                                {row.map((cell, cellIndex) => (
+                                                    <TableCell key={cellIndex}>{cell}</TableCell>
+                                                ))}
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                                <ScrollBar orientation="horizontal" />
+                             </ScrollArea>
                         </div>
                     ) : error ? (
                         <Alert variant="destructive">
