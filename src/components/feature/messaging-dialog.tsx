@@ -14,7 +14,8 @@ import type { AttendanceSession } from '@/lib/attendance-session';
 import type { Message } from '@/lib/messaging';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { studentData } from '@/lib/constants';
+import { getStudentById } from '@/lib/constants'; // Assuming this can be used on client
+import { Badge } from '../ui/badge';
 
 interface MessagingDialogProps {
   isOpen: boolean;
@@ -27,22 +28,39 @@ export function MessagingDialog({ isOpen, onClose, session, currentUserId }: Mes
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [isSending, setIsSending] = useState(false);
+    const [users, setUsers] = useState<Record<string, {name: string, email: string}>>({});
     const { toast } = useToast();
     const scrollAreaRef = useRef<HTMLDivElement>(null);
 
     const isRep = currentUserId === session.repId;
 
-    const fetchMessages = async () => {
+    const fetchMessagesAndUsers = async () => {
         if (!session) return;
         const fetchedMessages = await getMessagesForSessionAction(session.id);
         setMessages(fetchedMessages);
+
+        // Fetch user details for all participants
+        const userIds = new Set(fetchedMessages.map(m => m.senderId).concat(currentUserId));
+        const newUsers: Record<string, {name: string, email: string}> = {};
+        for (const userId of Array.from(userIds)) {
+            if (!users[userId]) {
+                const user = await getStudentById(userId);
+                if (user) {
+                    newUsers[userId] = { name: `${user.firstName} ${user.lastName}`, email: user.email };
+                }
+            }
+        }
+        if (Object.keys(newUsers).length > 0) {
+            setUsers(prev => ({...prev, ...newUsers}));
+        }
     };
+
 
     useEffect(() => {
         if (isOpen) {
-            fetchMessages();
+            fetchMessagesAndUsers();
             // Poll for new messages
-            const interval = setInterval(fetchMessages, 3000);
+            const interval = setInterval(fetchMessagesAndUsers, 3000);
             return () => clearInterval(interval);
         }
     }, [isOpen, session.id]);
@@ -58,22 +76,15 @@ export function MessagingDialog({ isOpen, onClose, session, currentUserId }: Mes
         if (!newMessage.trim()) return;
 
         setIsSending(true);
-        // If rep is sending, they reply to the last student who sent a message.
+        // If rep is sending, they broadcast to the session.
         // If student is sending, they send to the rep.
-        const lastStudentMessage = [...messages].reverse().find(m => m.senderId !== session.repId);
-        const receiverId = isRep ? (lastStudentMessage?.senderId || '') : session.repId;
-
-        if (!receiverId && isRep) {
-            toast({ variant: 'destructive', title: 'Cannot Reply', description: "No student has sent a message yet in this session." });
-            setIsSending(false);
-            return;
-        }
+        const receiverId = isRep ? `session-${session.id}` : session.repId;
 
         const result = await sendMessageAction(currentUserId, receiverId, session.id, newMessage);
 
         if (result.success) {
             setNewMessage('');
-            await fetchMessages(); // Re-fetch immediately after sending
+            await fetchMessagesAndUsers(); // Re-fetch immediately after sending
         } else {
             toast({
                 variant: 'destructive',
@@ -84,7 +95,7 @@ export function MessagingDialog({ isOpen, onClose, session, currentUserId }: Mes
         setIsSending(false);
     };
 
-    const getUser = (userId: string) => studentData.find(s => s.id === userId);
+    const getUser = (userId: string) => users[userId] || {name: 'Unknown User', email: ''};
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -92,7 +103,7 @@ export function MessagingDialog({ isOpen, onClose, session, currentUserId }: Mes
             <DialogHeader>
             <DialogTitle>Session Chat: {session.topic}</DialogTitle>
             <DialogDescription>
-                {isRep ? "Review messages from students for this session." : "Communicate with the session representative."}
+                {isRep ? "Send messages to all signed-in students for this session." : "Communicate with the session representative."}
             </DialogDescription>
             </DialogHeader>
             <div className="py-4 space-y-4">
@@ -101,24 +112,27 @@ export function MessagingDialog({ isOpen, onClose, session, currentUserId }: Mes
                         messages.map(msg => {
                             const user = getUser(msg.senderId);
                             const isMe = msg.senderId === currentUserId;
+                            const isBroadcast = isRep && msg.senderId === currentUserId;
                             return (
                                 <div key={msg.id} className={cn("flex items-end gap-2 mb-4", isMe ? "justify-end" : "justify-start")}>
                                      {!isMe && (
                                         <Avatar className="h-8 w-8">
                                             <AvatarImage src={`https://picsum.photos/seed/${user?.email}/32/32`} />
-                                            <AvatarFallback>{user?.firstName?.[0]}{user?.lastName?.[0]}</AvatarFallback>
+                                            <AvatarFallback>{user?.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                                         </Avatar>
                                      )}
                                     <div className={cn("max-w-xs rounded-lg p-3", isMe ? "bg-primary text-primary-foreground" : "bg-muted")}>
+                                        {!isMe && <p className="text-xs font-bold mb-1">{user.name}</p>}
                                         <p className="text-sm">{msg.content}</p>
                                         <p className="text-xs text-right mt-1 opacity-70" title={format(new Date(msg.timestamp), "PPP p")}>
                                             {formatDistanceToNow(new Date(msg.timestamp), { addSuffix: true })}
                                         </p>
+                                        {isBroadcast && <Badge variant="secondary" className="mt-2 w-full justify-center">Broadcast</Badge>}
                                     </div>
                                     {isMe && (
                                          <Avatar className="h-8 w-8">
                                             <AvatarImage src={`https://picsum.photos/seed/${user?.email}/32/32`} />
-                                            <AvatarFallback>{user?.firstName?.[0]}{user?.lastName?.[0]}</AvatarFallback>
+                                            <AvatarFallback>{user?.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                                         </Avatar>
                                      )}
                                 </div>
@@ -153,5 +167,3 @@ export function MessagingDialog({ isOpen, onClose, session, currentUserId }: Mes
         </Dialog>
     );
 }
-
-    

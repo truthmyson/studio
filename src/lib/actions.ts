@@ -290,11 +290,11 @@ export async function removeStudentFromClassAction(classId: string, studentId: s
     return removeStudentFromClass(classId, studentId);
 }
 
-export async function sendMessageAction(senderId: string, receiverId: string, sessionId: string | null, content: string): Promise<{ success: boolean, message?: string }> {
-    if (!senderId || !receiverId || !content.trim()) {
+export async function sendMessageAction(senderId: string, receiverIdOrTopic: string, sessionId: string | null, content: string): Promise<{ success: boolean, message?: string }> {
+    if (!senderId || !receiverIdOrTopic || !content.trim()) {
         return { success: false, message: "Missing required fields." };
     }
-    await sendMessage(senderId, receiverId, sessionId, content);
+    await sendMessage(senderId, receiverIdOrTopic, sessionId, content);
     return { success: true };
 }
 
@@ -456,5 +456,3 @@ export async function updateSessionTimeAction(sessionId: string, newTimeLimit: n
     const result = await updateSessionTimeLimit(sessionId, newTimeLimit);
     return result;
 }
-
-    
