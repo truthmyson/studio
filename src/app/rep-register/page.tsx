@@ -64,7 +64,7 @@ export default function RepRegisterPage() {
   }, [state, toast, router]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background py-12 px-4">
+    <div className="flex justify-center min-h-screen bg-background py-12 px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center items-center gap-2 mb-4">
