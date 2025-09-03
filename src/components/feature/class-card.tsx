@@ -16,6 +16,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useToast } from '@/hooks/use-toast';
 import QRCode from 'qrcode';
 import type { ClassWithStudentCount } from '@/lib/actions';
+import { Label } from '@/components/ui/label';
 
 interface ClassCardProps {
   classData: ClassWithStudentCount;
