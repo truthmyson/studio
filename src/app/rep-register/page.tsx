@@ -60,10 +60,10 @@ export default function RepRegisterPage() {
     } else if (state.status === 'success') {
       toast({
         title: 'Registration Successful!',
-        description: state.message,
+        description: "Redirecting you to the dashboard...",
       });
       setTimeout(() => {
-        router.push('/rep-login');
+        router.push('/rep-dashboard');
       }, 1500);
     }
   }, [state, toast, router]);
