@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { VITOBULogo } from './icons';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
-import { Menu, Settings, LogIn } from 'lucide-react';
+import { Menu, LogIn, MoreVertical } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from './ui/dropdown-menu';
 
@@ -19,7 +19,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  // For the homepage, we'll define specific links. For others, it's dynamic.
   const homeLinks = [
     { href: '#features', label: 'Features' },
     { href: '#how-it-works', label: 'How It Works' },
@@ -56,7 +55,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
-                                <Settings className="h-5 w-5" />
+                                <MoreVertical className="h-5 w-5" />
                                 <span className="sr-only">Settings</span>
                             </Button>
                         </DropdownMenuTrigger>
