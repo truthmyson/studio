@@ -312,7 +312,7 @@ export async function toggleSessionStatusAction(sessionId: string, newStatus: bo
         // If a session is reactivated, notify students
         createSessionNotifications(result.session.id, result.session.topic, result.session.students.map(s => s.studentId));
     }
-    return { success: result.success, message: `Session status updated.`, session: session };
+    return { success: result.success, message: `Session status updated.`, session: result.session };
 }
 
 const userSchema = z.object({
