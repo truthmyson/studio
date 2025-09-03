@@ -21,6 +21,7 @@ import {
   Download,
   Trash2,
   BarChart,
+  Clock,
 } from 'lucide-react';
 import {
   getAllSessions,
@@ -50,6 +51,7 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { SessionStatsDialog } from '@/components/feature/session-stats-dialog';
+import { EditTimeDialog } from '@/components/feature/edit-time-dialog';
 
 interface StudentDetails {
   id: string;
@@ -71,6 +73,7 @@ export default function RepDashboardPage() {
   const [isGeofencingDialogOpen, setIsGeofencingDialogOpen] = useState(false);
   const [isMessagingDialogOpen, setIsMessagingDialogOpen] = useState(false);
   const [isStatsDialogOpen, setIsStatsDialogOpen] = useState(false);
+  const [isEditTimeDialogOpen, setIsEditTimeDialogOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<AttendanceSession | null>(null);
 
   const { toast } = useToast();
@@ -98,8 +101,11 @@ export default function RepDashboardPage() {
       const totalStudents = studentDetails.length;
       const progress = totalStudents > 0 ? (signedInCount / totalStudents) * 100 : 0;
       
-      const endTime = activeSession.startTime + activeSession.timeLimit * 60 * 1000;
-      const timeLeft = formatDistanceToNow(endTime, { includeSeconds: true, addSuffix: true });
+      let timeLeft = "No time limit";
+      if (activeSession.timeLimit !== Infinity) {
+          const endTime = activeSession.startTime + activeSession.timeLimit * 60 * 1000;
+          timeLeft = formatDistanceToNow(endTime, { includeSeconds: true, addSuffix: true });
+      }
 
 
       setActiveSessionDetails({
@@ -168,6 +174,11 @@ export default function RepDashboardPage() {
     setSelectedSession(session);
     setIsMessagingDialogOpen(true);
   }
+  
+  const openEditTimeDialog = (session: AttendanceSession) => {
+    setSelectedSession(session);
+    setIsEditTimeDialogOpen(true);
+  }
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -192,6 +203,9 @@ export default function RepDashboardPage() {
                 </CardDescription>
               </div>
               <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => openEditTimeDialog(activeSessionDetails.session)} disabled={activeSessionDetails.session.timeLimit === Infinity}>
+                    <Clock className="h-4 w-4"/>
+                </Button>
                 <Button variant="outline" size="sm" onClick={() => openMessagingDialog(activeSessionDetails.session)}>
                     <MessageSquare className="h-4 w-4"/>
                 </Button>
@@ -329,6 +343,15 @@ export default function RepDashboardPage() {
                     setSelectedSession(null);
                 }}
                 session={selectedSession}
+            />
+            <EditTimeDialog
+                isOpen={isEditTimeDialogOpen}
+                onClose={() => {
+                    setIsEditTimeDialogOpen(false);
+                    setSelectedSession(null);
+                }}
+                session={selectedSession}
+                onTimeUpdated={fetchDashboardData}
             />
         </>
       )}

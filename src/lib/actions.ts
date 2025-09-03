@@ -3,13 +3,15 @@
 
 import { generateAttendanceTable } from '@/ai/flows/attendance-table-generator';
 import { z } from 'zod';
-import { activeSession, startSession, getSessions, signInStudent, getSessionById, getSessionsByClass, toggleSessionStatus } from '@/lib/attendance-session';
+import { activeSession, startSession, getSessions, signInStudent, getSessionById, getSessionsByClass, toggleSessionStatus, updateSessionTimeLimit, AttendanceSession } from '@/lib/attendance-session';
 import { getStudentById, studentData, addStudent } from './constants';
 import { createSessionNotifications, getStudentNotifications, markNotificationAsRead, createRepNotification } from './notifications';
 import { format } from 'date-fns';
 import { getClassById, enrollStudentInClass, getClassesByStudent, studentLeaveClass, removeStudentFromClass, getStudentsByClassId, getAllClasses, Class, createClass, getClassesByRep, deleteClass } from './class-management';
 import { Student } from './types';
 import { sendMessage, getMessagesForSession, Message } from './messaging';
+
+export type { AttendanceSession };
 
 const studentDetailsSchema = z.array(
   z.object({
@@ -442,4 +444,9 @@ export async function deleteClassAction(classId: string): Promise<{ success: boo
         }
         return { success: false, message: 'An unknown error occurred while deleting the class.' };
     }
+}
+
+export async function updateSessionTimeAction(sessionId: string, newTimeLimit: number): Promise<{ success: boolean, message: string }> {
+    const result = await updateSessionTimeLimit(sessionId, newTimeLimit);
+    return result;
 }

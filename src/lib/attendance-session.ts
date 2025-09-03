@@ -141,3 +141,26 @@ export function toggleSessionStatus(sessionId: string, newStatus: boolean): { su
     console.log(`Session ${sessionId} has been ${newStatus ? 'activated' : 'deactivated'}.`);
     return { success: true, message: `Session status updated.`, session: session };
 }
+
+export async function updateSessionTimeLimit(sessionId: string, newTimeLimit: number): Promise<{ success: boolean; message: string }> {
+    const session = getSessionById(sessionId);
+    if (!session) {
+        return { success: false, message: 'Session not found.' };
+    }
+    if (!session.active) {
+        return { success: false, message: 'Can only update time for active sessions.' };
+    }
+
+    // You might want to add validation, e.g., newTimeLimit should be greater than elapsed time.
+    const elapsedTimeMinutes = (Date.now() - session.startTime) / (60 * 1000);
+    if (newTimeLimit < elapsedTimeMinutes) {
+        return { success: false, message: 'New time limit cannot be less than the time already elapsed.' };
+    }
+
+    session.timeLimit = newTimeLimit;
+    if (activeSession?.id === sessionId) {
+        activeSession.timeLimit = newTimeLimit;
+    }
+    
+    return { success: true, message: 'Session time limit updated successfully.' };
+}
