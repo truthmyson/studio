@@ -16,7 +16,7 @@ let messages: Message[] = [];
 
 export async function sendMessage(senderId: string, receiverId: string, sessionId: string | null, content: string) {
     const newMessage: Message = {
-        id: `msg-${Date.now()}`,
+        id: `msg-${Date.now()}-${Math.random()}`,
         sessionId,
         senderId,
         receiverId,
@@ -40,4 +40,14 @@ export async function getMessagesForSession(sessionId: string): Promise<Message[
         .sort((a, b) => a.timestamp - b.timestamp);
 }
 
+export async function getDirectMessages(userId1: string, userId2: string): Promise<Message[]> {
+    return messages
+        .filter(m => 
+            m.sessionId === null &&
+            ((m.senderId === userId1 && m.receiverId === userId2) || 
+             (m.senderId === userId2 && m.receiverId === userId1))
+        )
+        .sort((a, b) => a.timestamp - b.timestamp);
+}
     
+

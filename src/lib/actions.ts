@@ -9,7 +9,7 @@ import { createSessionNotifications, getStudentNotifications, markNotificationAs
 import { format } from 'date-fns';
 import { getClassById, enrollStudentInClass, getClassesByStudent, studentLeaveClass, removeStudentFromClass, getStudentsByClassId, getAllClasses, Class, createClass, getClassesByRep, deleteClass } from './class-management';
 import { Student } from './types';
-import { sendMessage, getMessagesForSession, Message } from './messaging';
+import { sendMessage, getMessagesForSession, Message, getDirectMessages } from './messaging';
 
 export type { AttendanceSession };
 
@@ -301,13 +301,17 @@ export async function getMessagesForSessionAction(sessionId: string): Promise<Me
     return getMessagesForSession(sessionId);
 }
 
+export async function getDirectMessagesAction(userId1: string, userId2: string): Promise<Message[]> {
+    return getDirectMessages(userId1, userId2);
+}
+
 export async function toggleSessionStatusAction(sessionId: string, newStatus: boolean): Promise<{ success: boolean, message: string, session?: AttendanceSession }> {
     const result = toggleSessionStatus(sessionId, newStatus);
     if (result.success && result.session && newStatus === true) {
         // If a session is reactivated, notify students
         createSessionNotifications(result.session.id, result.session.topic, result.session.students.map(s => s.studentId));
     }
-    return { success: result.success, message: result.message };
+    return { success: result.success, message: `Session status updated.`, session: session };
 }
 
 const userSchema = z.object({
