@@ -10,8 +10,9 @@ import Link from 'next/link';
 import { VITOBULogo } from './icons';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
-import { ArrowLeft, Menu } from 'lucide-react';
+import { ArrowLeft, Menu, MoreVertical } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 
 const NO_NAV_ROUTES = ['/rep-login', '/rep-register', '/student-login'];
 
@@ -59,7 +60,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 )}
                 
                 <div className="hidden md:flex items-center space-x-2">
-                    <ModeToggle />
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                                <MoreVertical className="h-5 w-5" />
+                                <span className="sr-only">More options</span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem>
+                                <ModeToggle />
+                                <span className="ml-2">Toggle Theme</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                     <UserNav />
                 </div>
                 
