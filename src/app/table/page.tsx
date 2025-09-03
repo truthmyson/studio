@@ -3,10 +3,10 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { PageHeader, PageHeaderDescription, PageHeaderHeading } from "@/components/page-header";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Loader2, Download, AlertCircle, FileSpreadsheet, Trash2, Eye, RefreshCw } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter as DialogFooterComponent } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
@@ -18,7 +18,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import type { SavedReport } from "@/lib/report-management";
 import { format } from "date-fns";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter as AlertDialogFooterComponent, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 
@@ -222,10 +222,10 @@ export default function TablePage() {
                                                 This will permanently delete the report "{report.name}". This action cannot be undone.
                                             </AlertDialogDescription>
                                         </AlertDialogHeader>
-                                        <AlertDialogFooter>
+                                        <AlertDialogFooterComponent>
                                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                                             <AlertDialogAction onClick={() => handleDeleteReport(report.id)}>Delete</AlertDialogAction>
-                                        </AlertDialogFooter>
+                                        </AlertDialogFooterComponent>
                                     </AlertDialogContent>
                                 </AlertDialog>
                                 <Button variant="outline" onClick={() => setSelectedReport(report)}>
@@ -302,7 +302,7 @@ export default function TablePage() {
                             </Alert>
                         )}
                     </div>
-                    <DialogFooter>
+                    <DialogFooterComponent>
                         <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} disabled={isLoading}>
                             Cancel
                         </Button>
@@ -310,9 +310,11 @@ export default function TablePage() {
                             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Create Report
                         </Button>
-                    </DialogFooter>
+                    </DialogFooterComponent>
                 </DialogContent>
             </Dialog>
         </div>
     );
 }
+
+    
