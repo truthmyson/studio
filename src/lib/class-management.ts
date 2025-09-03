@@ -42,7 +42,7 @@ let classes: Class[] = [
         repId: '24275016',
         students: [
             { studentId: '24275016', joinedAt: '2024-05-01T10:00:00Z' },
-            { studentId: 'STU003', joinedAt: '2024-05-04T14:00:00Z' },
+            { studentId: 'STU003', joinedAt: '204-05-04T14:00:00Z' },
             { studentId: 'STU005', joinedAt: '2024-05-05T16:00:00Z' },
             { studentId: 'STU006', joinedAt: '2024-05-06T11:20:00Z' },
             { studentId: 'STU007', joinedAt: '2024-05-07T13:00:00Z' },
@@ -154,3 +154,5 @@ export async function removeStudentFromClass(classId: string, studentId: string)
     }
     return { success: false, message: "Student not found in this class." };
 }
+
+    

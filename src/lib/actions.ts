@@ -413,7 +413,8 @@ export async function createClassAction(formData: FormData): Promise<{ success: 
     }
 
     try {
-        await createClass(result.data.name, result.data.repId, result.data.description);
+        const newClass = await createClass(result.data.name, result.data.repId, result.data.description);
+        createRepNotification(result.data.repId, `Class "${newClass.name}" created successfully.`);
         return { success: true, message: 'Class created successfully.' };
     } catch (error) {
         return { success: false, message: 'An error occurred while creating the class.' };
@@ -450,3 +451,5 @@ export async function updateSessionTimeAction(sessionId: string, newTimeLimit: n
     const result = await updateSessionTimeLimit(sessionId, newTimeLimit);
     return result;
 }
+
+    

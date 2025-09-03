@@ -61,3 +61,5 @@ export function markNotificationAsRead(notificationId: string) {
         notification.read = true;
     }
 }
+
+    
