@@ -20,6 +20,7 @@ import {
   PowerOff,
   Download,
   Trash2,
+  BarChart,
 } from 'lucide-react';
 import {
   getAllSessions,
@@ -48,6 +49,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { SessionStatsDialog } from '@/components/feature/session-stats-dialog';
 
 interface StudentDetails {
   id: string;
@@ -68,7 +70,8 @@ export default function RepDashboardPage() {
 
   const [isGeofencingDialogOpen, setIsGeofencingDialogOpen] = useState(false);
   const [isMessagingDialogOpen, setIsMessagingDialogOpen] = useState(false);
-  const [selectedSessionForChat, setSelectedSessionForChat] = useState<AttendanceSession | null>(null);
+  const [isStatsDialogOpen, setIsStatsDialogOpen] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<AttendanceSession | null>(null);
 
   const { toast } = useToast();
 
@@ -156,6 +159,16 @@ export default function RepDashboardPage() {
     return sessions.sort((a, b) => b.startTime - a.startTime);
   }, [sessions]);
 
+  const openStatsDialog = (session: AttendanceSession) => {
+    setSelectedSession(session);
+    setIsStatsDialogOpen(true);
+  }
+
+  const openMessagingDialog = (session: AttendanceSession) => {
+    setSelectedSession(session);
+    setIsMessagingDialogOpen(true);
+  }
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
@@ -179,10 +192,7 @@ export default function RepDashboardPage() {
                 </CardDescription>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => {
-                    setSelectedSessionForChat(activeSessionDetails.session);
-                    setIsMessagingDialogOpen(true);
-                }}>
+                <Button variant="outline" size="sm" onClick={() => openMessagingDialog(activeSessionDetails.session)}>
                     <MessageSquare className="h-4 w-4"/>
                 </Button>
                 <AlertDialog>
@@ -270,13 +280,13 @@ export default function RepDashboardPage() {
                              <Button variant="ghost" size="icon" onClick={() => handleToggleSession(session.id, session.active)}>
                                 {session.active ? <PowerOff className="h-4 w-4" /> : <Power className="h-4 w-4"/>}
                             </Button>
+                            <Button variant="ghost" size="icon" onClick={() => openStatsDialog(session)}>
+                                <BarChart className="h-4 w-4" />
+                            </Button>
                             <Button variant="ghost" size="icon" onClick={() => handleExport(session.classId, session.topic)}>
                                 <Download className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={() => {
-                                setSelectedSessionForChat(session);
-                                setIsMessagingDialogOpen(true);
-                            }}>
+                            <Button variant="ghost" size="icon" onClick={() => openMessagingDialog(session)}>
                                 <MessageSquare className="h-4 w-4" />
                             </Button>
                              <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
@@ -301,13 +311,26 @@ export default function RepDashboardPage() {
         onClose={() => setIsGeofencingDialogOpen(false)}
         repId={REP_ID}
       />
-      {selectedSessionForChat && (
-        <MessagingDialog
-            isOpen={isMessagingDialogOpen}
-            onClose={() => setIsMessagingDialogOpen(false)}
-            session={selectedSessionForChat}
-            currentUserId={REP_ID}
-        />
+      {selectedSession && (
+        <>
+            <MessagingDialog
+                isOpen={isMessagingDialogOpen}
+                onClose={() => {
+                    setIsMessagingDialogOpen(false);
+                    setSelectedSession(null);
+                }}
+                session={selectedSession}
+                currentUserId={REP_ID}
+            />
+            <SessionStatsDialog
+                isOpen={isStatsDialogOpen}
+                onClose={() => {
+                    setIsStatsDialogOpen(false);
+                    setSelectedSession(null);
+                }}
+                session={selectedSession}
+            />
+        </>
       )}
     </div>
   );
