@@ -15,7 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { getStudentsForClassAction, removeStudentFromClassAction, type ClassWithStudentCount } from '@/lib/actions';
 import type { Student } from '@/lib/types';
 import { StudentsTable } from './students-table';
-import { Loader2, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog';
 
