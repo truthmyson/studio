@@ -13,10 +13,11 @@ import {
   import { Trash2 } from 'lucide-react';
   
   interface Action {
-      label: string;
-      onClick: (studentId: string) => void;
-      variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
-  }
+    label: string;
+    variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+    onClick?: (studentId: string) => void;
+    Component?: React.FC<{ student: Student }>;
+}
 
   interface StudentsTableProps {
     data: Student[];
@@ -51,18 +52,21 @@ import {
                   <TableCell>{student.courseName}</TableCell>
                   {actions.length > 0 && (
                     <TableCell className="text-right">
-                        {actions.map(action => (
-                            <Button 
-                                key={action.label} 
-                                variant={action.variant} 
-                                size="sm" 
-                                onClick={() => action.onClick(student.id)}
-                                className="ml-2"
-                            >
-                                <Trash2 className="mr-2 h-4 w-4"/>
-                                {action.label}
-                            </Button>
-                        ))}
+                        {actions.map((action) => 
+                            action.Component ? (
+                                <action.Component key={action.label} student={student} />
+                            ) : (
+                                <Button 
+                                    key={action.label} 
+                                    variant={action.variant || 'default'} 
+                                    size="sm" 
+                                    onClick={() => action.onClick?.(student.id)}
+                                    className="ml-2"
+                                >
+                                    {action.label}
+                                </Button>
+                            )
+                        )}
                     </TableCell>
                   )}
                 </TableRow>

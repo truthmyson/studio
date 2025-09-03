@@ -67,7 +67,7 @@ export default function ClassesPage() {
       ) : classes.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {classes.map((cls) => (
-                <ClassCard key={cls.id} classData={cls} />
+                <ClassCard key={cls.id} classData={cls} onClassDeleted={fetchClasses} onStudentsUpdated={fetchClasses}/>
             ))}
         </div>
       ) : (
