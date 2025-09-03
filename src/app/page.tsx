@@ -57,48 +57,7 @@ export default function HomePage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   return (
     <div className="flex-1 w-full" id="top">
-        {/* Header */}
-        <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="container flex h-16 max-w-screen-2xl items-center justify-between">
-                 <a href="/#top" className="flex items-center gap-2">
-                    <VITOBULogo className="h-8 w-8 text-primary" />
-                    <span className="font-bold text-lg">VITOBU</span>
-                </a>
-                <div className="flex items-center gap-2">
-                    <Button variant="ghost" asChild>
-                        <a href="#how-it-works">How it Works</a>
-                    </Button>
-                    <Button variant="ghost" asChild>
-                        <a href="#features">Features</a>
-                    </Button>
-                    <Button variant="ghost" asChild>
-                        <a href="#demo">Demo</a>
-                    </Button>
-                    <Button variant="ghost" asChild>
-                        <a href="#faq">FAQ</a>
-                    </Button>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost">
-                            More
-                            <ChevronDown className="ml-2 h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            <DropdownMenuItem asChild>
-                                <Link href="/rep-login">Representative Portal</Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href="#contact">Contact</Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <a href="mailto:support@vitobu.app">Feedback</a>
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
-            </div>
-        </header>
+        {/* Header content is now handled by AppLayout */}
 
         {/* Hero Section */}
         <section className="container grid items-center gap-6 pt-20 pb-16 md:pt-28 md:pb-24">
