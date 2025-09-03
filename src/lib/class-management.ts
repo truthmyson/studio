@@ -15,25 +15,48 @@ export interface ClassStudent {
 export interface Class {
   id: string;
   name: string;
+  description?: string;
+  repId: string;
   students: ClassStudent[];
   joinCode: string;
 }
 
 // In-memory store for classes
 let classes: Class[] = [
-    { id: 'CLS001', name: 'Software Engineering Q', students: [
-        { studentId: '24275016', joinedAt: '2024-05-01T10:00:00Z' },
-        { studentId: 'STU002', joinedAt: '2024-05-02T11:00:00Z' },
-        { studentId: 'STU004', joinedAt: '2024-05-03T09:30:00Z' },
-    ], joinCode: 'SWEQ2024' },
-    { id: 'CLS002', name: 'Intro to AI', students: [
-        { studentId: '24275016', joinedAt: '2024-05-01T10:00:00Z' },
-        { studentId: 'STU003', joinedAt: '2024-05-04T14:00:00Z' },
-        { studentId: 'STU005', joinedAt: '2024-05-05T16:00:00Z' },
-        { studentId: 'STU006', joinedAt: '2024-05-06T11:20:00Z' },
-        { studentId: 'STU007', joinedAt: '2024-05-07T13:00:00Z' },
-    ], joinCode: 'AINT2024' },
-    { id: 'CLS003', name: 'My Course', students: [{ studentId: '24275016', joinedAt: '2024-05-10T10:00:00Z' }], joinCode: 'MYCO5702' },
+    { 
+        id: 'CLS001', 
+        name: 'Software Engineering Q', 
+        description: 'A quantitative approach to software engineering principles and practices.',
+        repId: '24275016',
+        students: [
+            { studentId: '24275016', joinedAt: '2024-05-01T10:00:00Z' },
+            { studentId: 'STU002', joinedAt: '2024-05-02T11:00:00Z' },
+            { studentId: 'STU004', joinedAt: '2024-05-03T09:30:00Z' },
+        ], 
+        joinCode: 'SWEQ2024' 
+    },
+    { 
+        id: 'CLS002', 
+        name: 'Intro to AI', 
+        description: 'Fundamental concepts of Artificial Intelligence, including search, knowledge representation, and machine learning.',
+        repId: '24275016',
+        students: [
+            { studentId: '24275016', joinedAt: '2024-05-01T10:00:00Z' },
+            { studentId: 'STU003', joinedAt: '2024-05-04T14:00:00Z' },
+            { studentId: 'STU005', joinedAt: '2024-05-05T16:00:00Z' },
+            { studentId: 'STU006', joinedAt: '2024-05-06T11:20:00Z' },
+            { studentId: 'STU007', joinedAt: '2024-05-07T13:00:00Z' },
+        ], 
+        joinCode: 'AINT2024' 
+    },
+    { 
+        id: 'CLS003', 
+        name: 'My Course', 
+        description: 'A special course for demonstrating app features.',
+        repId: '24275016',
+        students: [{ studentId: '24275016', joinedAt: '2024-05-10T10:00:00Z' }], 
+        joinCode: 'MYCO5702' 
+    },
 ];
 
 export async function getAllClasses(): Promise<Class[]> {
@@ -44,11 +67,13 @@ export async function getClassById(id: string): Promise<Class | undefined> {
     return classes.find(c => c.id === id);
 }
 
-export async function createClass(name: string): Promise<Class> {
+export async function createClass(name: string, repId: string, description?: string): Promise<Class> {
     const newClass: Class = {
         id: `CLS${(classes.length + 1).toString().padStart(3, '0')}`,
-        name: name,
-        students: [],
+        name,
+        description,
+        repId,
+        students: [{ studentId: repId, joinedAt: new Date().toISOString() }], // Rep is auto-enrolled
         joinCode: `${name.replace(/[^a-zA-Z0-9]/g, '').slice(0, 4).toUpperCase()}${Math.floor(1000 + Math.random() * 9000)}`
     };
     classes.push(newClass);
@@ -96,6 +121,10 @@ export async function enrollStudentInClass(studentId: string, joinCode: string):
 
 export async function getClassesByStudent(studentId: string): Promise<Class[]> {
     return classes.filter(c => c.students.some(s => s.studentId === studentId));
+}
+
+export async function getClassesByRep(repId: string): Promise<Class[]> {
+    return classes.filter(c => c.repId === repId);
 }
 
 export async function studentLeaveClass(classId: string, studentId: string): Promise<{ success: boolean; message: string }> {

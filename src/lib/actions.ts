@@ -7,7 +7,7 @@ import { activeSession, startSession, getSessions, signInStudent, getSessionById
 import { getStudentById, studentData, addStudent } from './constants';
 import { createSessionNotifications, getStudentNotifications, markNotificationAsRead, createRepNotification } from './notifications';
 import { format } from 'date-fns';
-import { getClassById, enrollStudentInClass, getClassesByStudent, studentLeaveClass, removeStudentFromClass, getStudentsByClassId, getAllClasses, Class } from './class-management';
+import { getClassById, enrollStudentInClass, getClassesByStudent, studentLeaveClass, removeStudentFromClass, getStudentsByClassId, getAllClasses, Class, createClass, getClassesByRep } from './class-management';
 import { Student } from './types';
 import { sendMessage, getMessagesForSession, Message } from './messaging';
 
@@ -376,4 +376,42 @@ export async function registerRepAction(
     formData: FormData
   ): Promise<StudentFormState> {
     return handleUserRegistration(formData, true);
+}
+
+
+// Action to create a class
+const createClassSchema = z.object({
+    name: z.string().min(1, "Class name is required."),
+    description: z.string().optional(),
+    repId: z.string(),
+});
+
+export async function createClassAction(formData: FormData): Promise<{ success: boolean; message: string; }> {
+    const result = createClassSchema.safeParse({
+        name: formData.get('name'),
+        description: formData.get('description'),
+        repId: formData.get('repId'),
+    });
+
+    if (!result.success) {
+        const firstError = Object.values(result.error.flatten().fieldErrors)[0]?.[0];
+        return { success: false, message: firstError || 'Validation failed.' };
+    }
+
+    try {
+        await createClass(result.data.name, result.data.repId, result.data.description);
+        return { success: true, message: 'Class created successfully.' };
+    } catch (error) {
+        return { success: false, message: 'An error occurred while creating the class.' };
+    }
+}
+
+export type ClassWithStudentCount = Class & { studentCount: number };
+
+export async function getClassesByRepAction(repId: string): Promise<ClassWithStudentCount[]> {
+    const repClasses = await getClassesByRep(repId);
+    return repClasses.map(cls => ({
+        ...cls,
+        studentCount: cls.students.length,
+    }));
 }
