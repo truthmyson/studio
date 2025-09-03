@@ -22,7 +22,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 interface SessionStatsDialogProps {
   isOpen: boolean;
@@ -33,6 +33,11 @@ interface SessionStatsDialogProps {
 const LATE_THRESHOLD_MINUTES = 5;
 
 export function SessionStatsDialog({ isOpen, onClose, session }: SessionStatsDialogProps) {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const statsData = useMemo(() => {
     if (!session) return { data: [], total: 0 };
@@ -84,21 +89,23 @@ export function SessionStatsDialog({ isOpen, onClose, session }: SessionStatsDia
                     <CardTitle className="text-center">Session Summary ({statsData.total} Students)</CardTitle>
                 </CardHeader>
                 <CardContent className="h-80">
-                     <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={statsData.data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" />
-                            <YAxis allowDecimals={false} />
-                            <Tooltip
-                                contentStyle={{
-                                    backgroundColor: 'hsl(var(--background))',
-                                    borderColor: 'hsl(var(--border))',
-                                }}
-                            />
-                            <Legend />
-                            <Bar dataKey="students" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                        </BarChart>
-                    </ResponsiveContainer>
+                    {isClient && (
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={statsData.data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="name" />
+                                <YAxis allowDecimals={false} />
+                                <Tooltip
+                                    contentStyle={{
+                                        backgroundColor: 'hsl(var(--background))',
+                                        borderColor: 'hsl(var(--border))',
+                                    }}
+                                />
+                                <Legend />
+                                <Bar dataKey="students" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    )}
                 </CardContent>
             </Card>
         </div>
