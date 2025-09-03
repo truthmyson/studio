@@ -8,7 +8,7 @@ function PageHeader({
   return (
     <section
       className={cn(
-        "flex items-center justify-between space-y-2",
+        "flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0",
         className
       )}
       {...props}
@@ -40,7 +40,7 @@ function PageHeaderDescription({
   return (
     <p
       className={cn(
-        "text-lg text-muted-foreground",
+        "text-base text-muted-foreground md:text-lg",
         className
       )}
       {...props}
@@ -49,3 +49,5 @@ function PageHeaderDescription({
 }
 
 export { PageHeader, PageHeaderHeading, PageHeaderDescription };
+
+    

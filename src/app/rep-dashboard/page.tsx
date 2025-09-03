@@ -182,7 +182,7 @@ export default function RepDashboardPage() {
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between space-y-2 md:space-y-0">
         <h2 className="text-3xl font-bold tracking-tight">Representative Dashboard</h2>
         <div className="flex items-center space-x-2">
           <Button onClick={() => setIsGeofencingDialogOpen(true)}>
@@ -195,7 +195,7 @@ export default function RepDashboardPage() {
       {activeSessionDetails && (
         <Card className="bg-primary/5 border-primary/20 shadow-lg">
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
                 <CardTitle className="text-2xl text-primary">Live Session: {activeSessionDetails.session.topic}</CardTitle>
                 <CardDescription>
@@ -287,7 +287,7 @@ export default function RepDashboardPage() {
                                 {format(new Date(session.startTime), 'PPP p')}
                             </p>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                              <Badge variant={session.active ? 'default' : 'secondary'}>
                                 {session.active ? 'Live' : 'Ended'}
                             </Badge>
@@ -358,7 +358,5 @@ export default function RepDashboardPage() {
     </div>
   );
 }
-
-    
 
     

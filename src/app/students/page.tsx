@@ -27,7 +27,7 @@ export default function StudentsPage() {
   }, []);
 
   return (
-    <div className="flex-1 space-y-4">
+    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
        <PageHeader>
         <div>
             <PageHeaderHeading>Manage Students</PageHeaderHeading>
@@ -48,3 +48,5 @@ export default function StudentsPage() {
     </div>
   );
 }
+
+    
