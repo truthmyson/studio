@@ -35,7 +35,9 @@ export default function RepLoginPage() {
                 title: "Login Successful",
                 description: "Redirecting to your dashboard...",
             });
-            router.push('/rep-dashboard');
+            setTimeout(() => {
+                router.push('/rep-dashboard');
+            }, 1500);
         } else if (user && !user.isRep) {
             toast({
                 variant: "destructive",
@@ -68,7 +70,7 @@ export default function RepLoginPage() {
                     </div>
                     <div className="grid gap-2">
                         <Label htmlFor="password">Password</Label>
-                        <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                        <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleLogin()} />
                     </div>
                 </CardContent>
                 <CardFooter className="flex flex-col gap-4">
