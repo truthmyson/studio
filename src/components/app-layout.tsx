@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { VITOBULogo } from './icons';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
-import { Menu, LogIn, MoreVertical } from 'lucide-react';
+import { Menu, LogIn, MoreVertical, Settings, ArrowLeft } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from './ui/dropdown-menu';
 
@@ -36,6 +36,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <div className="flex-col md:flex">
       <div className="border-b sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex h-16 items-center px-4 container max-w-screen-2xl">
+          {pathname !== '/' && (
+              <Button variant="ghost" size="icon" className="mr-2" onClick={() => router.back()}>
+                  <ArrowLeft className="h-5 w-5" />
+                  <span className="sr-only">Go Back</span>
+              </Button>
+          )}
           <Link href="/#top" className="flex items-center gap-2 mr-6">
             <VITOBULogo className="h-6 w-6 text-primary" />
             <span className={cn("font-bold", "hidden md:inline-block")}>
