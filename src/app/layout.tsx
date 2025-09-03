@@ -7,6 +7,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { FontProvider } from '@/components/font-provider';
 import { SiteFooter } from '@/components/site-footer';
 import AppLayout from '@/components/app-layout';
+import { ScrollToTop } from '@/components/feature/scroll-to-top';
 
 export const metadata: Metadata = {
   title: 'VITOBU - Smart University Attendance',
@@ -58,6 +59,7 @@ export default function RootLayout({
             </AppLayout>
             <SiteFooter />
             <Toaster />
+            <ScrollToTop />
           </FontProvider>
         </ThemeProvider>
       </body>
