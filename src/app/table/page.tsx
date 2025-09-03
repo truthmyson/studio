@@ -118,10 +118,10 @@ export default function TablePage() {
             </PageHeader>
             <Card>
                 <CardContent className="pt-6">
-                    {generatedData && (
+                    {generatedData ? (
                         <div className="space-y-4">
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                <Label htmlFor="csvOutput" className="text-lg font-semibold">Generated Report for: {generatedData.className}</Label>
+                                <h3 className="text-lg font-semibold">Report Preview: {generatedData.className}</h3>
                                 <div className="flex gap-2">
                                      <Button type="button" onClick={() => handleDownload('xlsx')} variant="secondary">
                                         <FileSpreadsheet className="mr-2 h-4 w-4" />
@@ -142,15 +142,13 @@ export default function TablePage() {
                                 placeholder="Report preview..."
                             />
                         </div>
-                    )}
-                    {error && (
+                    ) : error ? (
                         <Alert variant="destructive">
                             <AlertCircle className="h-4 w-4" />
                             <AlertTitle>Generation Failed</AlertTitle>
                             <AlertDescription>{error}</AlertDescription>
                         </Alert>
-                    )}
-                    {!generatedData && !error && (
+                    ) : (
                         <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 p-12 text-center h-80">
                             <h3 className="text-xl font-semibold tracking-tight">No table generated yet</h3>
                             <p className="text-muted-foreground mt-2">
