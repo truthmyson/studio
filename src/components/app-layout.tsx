@@ -52,12 +52,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </div>
 
               <div className="ml-auto flex items-center space-x-2">
-                {pathname !== '/' && (
-                  <Button variant="ghost" size="sm" onClick={() => router.back()}>
-                    <ArrowLeft className="mr-2 h-4 w-4"/>
-                    Go Back
-                  </Button>
-                )}
                 
                 <div className="hidden md:flex items-center space-x-2">
                     <DropdownMenu>
