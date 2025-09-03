@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState, useFormStatus } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -47,7 +47,7 @@ export default function RepRegisterPage() {
     message: '',
   };
 
-  const [state, formAction] = useFormState(registerRepAction, initialState);
+  const [state, formAction] = useActionState(registerRepAction, initialState);
 
   useEffect(() => {
     if (state.status === 'error' && state.message) {
