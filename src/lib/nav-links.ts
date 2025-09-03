@@ -4,10 +4,12 @@ export interface NavLink {
   label: string;
 }
 
+const REP_AUTHED_ROUTES = ['/rep-dashboard', '/classes', '/students', '/attendance'];
+
 export function getNavLinks(pathname: string): NavLink[] {
-  const isRep = pathname.startsWith('/rep-');
+  const isRepAuthed = REP_AUTHED_ROUTES.some(route => pathname.startsWith(route));
   
-  if (isRep) {
+  if (isRepAuthed) {
     return [
       { href: '/rep-dashboard', label: 'Dashboard' },
       { href: '/classes', label: 'My Classes' },
