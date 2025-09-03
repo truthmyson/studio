@@ -9,6 +9,7 @@ import { CreateClassDialog } from '@/components/feature/create-class-dialog';
 import { getClassesByRepAction, type ClassWithStudentCount } from '@/lib/actions';
 import { ClassCard } from '@/components/feature/class-card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 // Hardcoded for now, in a real app this would come from the user's session
 const REP_ID = '24275016'; 
