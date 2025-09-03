@@ -1,5 +1,6 @@
 
 import type { Student } from './types';
+import type { AttendanceSession } from './attendance-session';
 
 export const studentData: Student[] = [
   { id: '24275016', firstName: 'Chris', middleName: '', lastName: 'Mensah', major: 'Computer Science', email: 'chris.mensah@university.edu', courseName: 'Computer Science', isRep: true },
@@ -14,6 +15,45 @@ export const studentData: Student[] = [
   { id: 'STU010', firstName: 'Jessica', middleName: '', lastName: 'Taylor', major: 'Computer Science', email: 'jessica.taylor@university.edu', courseName: 'Computer Science' },
 ];
 
+export const sessionData: AttendanceSession[] = [
+    {
+        id: 'session-1715853600000', // A fixed past date
+        classId: 'CLS001',
+        repId: '24275016',
+        location: null,
+        radius: 100,
+        startTime: new Date('2024-05-16T10:00:00Z').getTime(),
+        timeLimit: 60,
+        active: false,
+        topic: 'Advanced Networking',
+        venue: 'Online',
+        students: [
+            { studentId: '24275016', signedInAt: null },
+            { studentId: 'STU002', signedInAt: new Date('2024-05-16T10:01:00Z').getTime() },
+            { studentId: 'STU004', signedInAt: new Date('2024-05-16T10:02:30Z').getTime() },
+        ],
+    },
+    {
+        id: 'session-1715940000000', // A fixed past date
+        classId: 'CLS002',
+        repId: '24275016',
+        location: null,
+        radius: 100,
+        startTime: new Date('2024-05-17T12:00:00Z').getTime(),
+        timeLimit: 90,
+        active: false,
+        topic: 'Intro to AI - Ethics',
+        venue: 'Auditorium B',
+        students: [
+            { studentId: '24275016', signedInAt: new Date('2024-05-17T12:00:15Z').getTime() },
+            { studentId: 'STU003', signedInAt: new Date('2024-05-17T12:05:00Z').getTime() },
+            { studentId: 'STU005', signedInAt: new Date('2024-05-17T12:01:00Z').getTime() },
+            { studentId: 'STU006', signedInAt: new Date('2024-05-17T12:03:20Z').getTime() },
+            { studentId: 'STU007', signedInAt: null },
+        ],
+    }
+];
+
 export async function getStudentById(id: string): Promise<Student | undefined> {
     return studentData.find(s => s.id === id);
 }
@@ -21,44 +61,6 @@ export async function getStudentById(id: string): Promise<Student | undefined> {
 export function addStudent(student: Student) {
     studentData.push(student);
 }
-
-export const recentAttendance = [
-    {
-        topic: 'Introduction to Algorithms',
-        date: '2024-05-10',
-        status: {
-            '24275016': 'Present', 'STU002': 'Present', 'STU003': 'Absent', 'STU004': 'Present', 'STU005': 'Present', 'STU006': 'Present', 'STU007': 'Absent', 'STU008': 'Present', 'STU009': 'Present', 'STU010': 'Present'
-        }
-    },
-    {
-        topic: 'Data Structures',
-        date: '2024-05-12',
-        status: {
-            '24275016': 'Present', 'STU002': 'Present', 'STU003': 'Present', 'STU004': 'Present', 'STU005': 'Absent', 'STU006': 'Present', 'STU007': 'Present', 'STU008': 'Present', 'STU009': 'Present', 'STU010': 'Absent'
-        }
-    },
-    {
-        topic: 'Machine Learning Basics',
-        date: '2024-05-14',
-        status: {
-            '24275016': 'Present', 'STU002': 'Present', 'STU003': 'Present', 'STU004': 'Present', 'STU005': 'Present', 'STU006': 'Present', 'STU007': 'Present', 'STU008': 'Present', 'STU009': 'Present', 'STU010': 'Present'
-        }
-    },
-    {
-        topic: 'Advanced Networking',
-        date: '2024-05-16',
-        status: {
-            '24275016': 'Absent', 'STU002': 'Present', 'STU003': 'Absent', 'STU004': 'Present', 'STU005': 'Present', 'STU006': 'Absent', 'STU007': 'Present', 'STU008': 'Present', 'STU009': 'Absent', 'STU010': 'Present'
-        }
-    },
-    {
-        topic: 'Cybersecurity Fundamentals',
-        date: '2024-05-18',
-        status: {
-            '24275016': 'Present', 'STU002': 'Present', 'STU003': 'Present', 'STU004': 'Present', 'STU005': 'Present', 'STU006': 'Present', 'STU007': 'Present', 'STU008': 'Absent', 'STU009': 'Present', 'STU010': 'Present'
-        }
-    }
-]
 
 export const studentDetailsJsonExample = JSON.stringify(
   [

@@ -1,4 +1,6 @@
 
+import { sessionData } from "./constants";
+
 interface Location {
     latitude: number;
     longitude: number;
@@ -18,13 +20,21 @@ export interface AttendanceSession {
     students: { studentId: string; signedInAt: number | null }[];
 }
   
-export let activeSession: AttendanceSession | null = null;
-export let allSessions: AttendanceSession[] = [];
+export let allSessions: AttendanceSession[] = [...sessionData];
+export let activeSession: AttendanceSession | null = allSessions.find(s => s.active) || null;
 
 // Auto-delete sessions older than 14 days
 function cleanupOldSessions() {
     const fourteenDaysAgo = Date.now() - 14 * 24 * 60 * 60 * 1000;
-    allSessions = allSessions.filter(session => session.startTime >= fourteenDaysAgo);
+    // We won't filter the base sessionData, just any new sessions
+    const baseIds = new Set(sessionData.map(s => s.id));
+    const recentSessions = allSessions.filter(session => {
+        if (baseIds.has(session.id)) {
+            return true; // Always keep the base data
+        }
+        return session.startTime >= fourteenDaysAgo;
+    });
+    allSessions = recentSessions;
 }
 
 export function startSession(location: Location | null, radius: number, timeLimit: number, topic: string, studentIds: string[], classId: string, repId: string, venue?: string, includeRep = false) {
@@ -153,7 +163,7 @@ export async function updateSessionTimeLimit(sessionId: string, newTimeLimit: nu
         return { success: false, message: 'Can only update time for active sessions.' };
     }
 
-    // You might want to add validation, e.g., newTimeLimit should be greater than elapsed time.
+    // You might want to add to add validation, e.g., newTimeLimit should be greater than elapsed time.
     const elapsedTimeMinutes = (Date.now() - session.startTime) / (60 * 1000);
     if (newTimeLimit < elapsedTimeMinutes) {
         return { success: false, message: 'New time limit cannot be less than the time already elapsed.' };
