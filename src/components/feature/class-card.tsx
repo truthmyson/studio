@@ -1,6 +1,7 @@
 
 'use client';
 
+import { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -9,14 +10,22 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { QrCode, Users, Copy, Trash2, Download } from 'lucide-react';
+import { Users, Copy, Trash2, Download, Eye } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
 import QRCode from 'qrcode';
 import type { ClassWithStudentCount } from '@/lib/actions';
 import { Label } from '@/components/ui/label';
+import Image from 'next/image';
 
 interface ClassCardProps {
   classData: ClassWithStudentCount;
@@ -24,6 +33,7 @@ interface ClassCardProps {
 
 export function ClassCard({ classData }: ClassCardProps) {
   const { toast } = useToast();
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(classData.joinCode);
@@ -33,22 +43,15 @@ export function ClassCard({ classData }: ClassCardProps) {
     });
   };
 
-  const handleDownloadQR = async () => {
+  const generateQrCode = async () => {
     try {
       const dataUrl = await QRCode.toDataURL(classData.joinCode, {
         width: 512,
         margin: 2,
+        errorCorrectionLevel: 'H',
       });
-      const link = document.createElement('a');
-      link.href = dataUrl;
-      link.download = `qrcode_${classData.name.replace(/\s+/g, '_')}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      toast({
-        title: 'Success',
-        description: 'QR code download started.',
-      });
+      setQrCodeDataUrl(dataUrl);
+      return dataUrl;
     } catch (err) {
       console.error(err);
       toast({
@@ -56,7 +59,24 @@ export function ClassCard({ classData }: ClassCardProps) {
         title: 'Error',
         description: 'Failed to generate QR code.',
       });
+      return '';
     }
+  };
+
+  const handleDownloadQR = async () => {
+    const dataUrl = qrCodeDataUrl || (await generateQrCode());
+    if (!dataUrl) return;
+
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = `qrcode_${classData.name.replace(/\s+/g, '_')}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast({
+      title: 'Success',
+      description: 'QR code download started.',
+    });
   };
 
   return (
@@ -95,10 +115,30 @@ export function ClassCard({ classData }: ClassCardProps) {
                  </div>
             </div>
             <div className="flex w-full justify-between items-center gap-2">
-                <Button onClick={handleDownloadQR}>
-                    <Download className="mr-2 h-4 w-4" />
-                    Download QR
-                </Button>
+                <div className="flex gap-2">
+                    <Dialog onOpenChange={(open) => { if (open) generateQrCode(); }}>
+                        <DialogTrigger asChild>
+                            <Button variant="outline">
+                                <Eye className="mr-2 h-4 w-4" />
+                                Preview QR
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-xs">
+                            <DialogHeader>
+                                <DialogTitle>QR Code for {classData.name}</DialogTitle>
+                            </DialogHeader>
+                            {qrCodeDataUrl && (
+                                <div className="flex justify-center p-4">
+                                    <Image src={qrCodeDataUrl} alt={`QR Code for ${classData.name}`} width={256} height={256} />
+                                </div>
+                            )}
+                        </DialogContent>
+                    </Dialog>
+                    <Button onClick={handleDownloadQR}>
+                        <Download className="mr-2 h-4 w-4" />
+                        Download QR
+                    </Button>
+                </div>
                 <Tooltip>
                     <TooltipTrigger asChild>
                          <Button variant="destructive" size="icon">
