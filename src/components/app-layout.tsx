@@ -11,15 +11,27 @@ import { VITOBULogo } from './icons';
 import { cn } from '@/lib/utils';
 import { FontSettings } from './feature/font-settings';
 import { Button } from './ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Menu } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 
-const NO_NAV_ROUTES = ['/rep-login', '/rep-register', '/student-login', '/'];
+const NO_NAV_ROUTES = ['/rep-login', '/rep-register', '/student-login'];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const links = getNavLinks(pathname);
+  // For the homepage, we'll define specific links. For others, it's dynamic.
+  const homeLinks = [
+    { href: '#features', label: 'Features' },
+    { href: '#how-it-works', label: 'How It Works' },
+    { href: '#demo', label: 'Demo' },
+    { href: '#faq', label: 'FAQ' },
+    { href: '#contact', label: 'Contact' },
+  ];
+
+  const otherLinks = getNavLinks(pathname);
+  const links = pathname === '/' ? homeLinks : otherLinks;
+
   const showNav = !NO_NAV_ROUTES.includes(pathname);
 
   return (
@@ -33,23 +45,58 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </span>
           </Link>
 
-          {showNav && <MainNav links={links} />}
-          
-          <div className="ml-auto flex items-center space-x-2">
-            {pathname !== '/' && (
-              <Button variant="ghost" size="sm" onClick={() => router.back()}>
-                <ArrowLeft className="mr-2 h-4 w-4"/>
-                Go Back
-              </Button>
-            )}
-            {showNav && (
-                <>
+          {showNav && (
+            <>
+              <div className="hidden md:flex flex-1">
+                <MainNav links={links} />
+              </div>
+
+              <div className="ml-auto flex items-center space-x-2">
+                {pathname !== '/' && (
+                  <Button variant="ghost" size="sm" onClick={() => router.back()}>
+                    <ArrowLeft className="mr-2 h-4 w-4"/>
+                    Go Back
+                  </Button>
+                )}
+                
+                <div className="hidden md:flex items-center space-x-2">
                     <FontSettings />
                     <ModeToggle />
                     <UserNav />
-                </>
-            )}
-          </div>
+                </div>
+                
+                <div className="md:hidden">
+                    <Sheet>
+                        <SheetTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                                <Menu className="h-6 w-6"/>
+                                <span className="sr-only">Open menu</span>
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent side="right">
+                            <Link href="/" className="flex items-center gap-2 mb-6">
+                               <VITOBULogo className="h-6 w-6 text-primary" />
+                               <span className="font-bold">VITOBU</span>
+                            </Link>
+                            <nav className="flex flex-col gap-4">
+                                {links.map(link => (
+                                    <Link key={link.href} href={link.href} className="text-lg font-medium text-muted-foreground hover:text-foreground">
+                                        {link.label}
+                                    </Link>
+                                ))}
+                            </nav>
+                             <div className="mt-6 pt-6 border-t flex items-center justify-between">
+                                <FontSettings />
+                                <ModeToggle />
+                                <UserNav />
+                            </div>
+                        </SheetContent>
+                    </Sheet>
+                </div>
+
+              </div>
+            </>
+          )}
         </div>
       </div>
       <main>{children}</main>

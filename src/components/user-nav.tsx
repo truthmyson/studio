@@ -17,12 +17,26 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export function UserNav() {
+  const pathname = usePathname();
+
   // In a real app, you'd get the user's name and email from session/context
   const userName = 'Chris Mensah';
   const userEmail = 'chris.mensah@university.edu';
   const userInitials = 'CM';
+
+  const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+     if (pathname === '/') {
+        e.preventDefault();
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+            history.pushState(null, '', `#${id}`);
+        }
+     }
+  };
 
   return (
     <DropdownMenu>
@@ -46,15 +60,18 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-             <Link href="/settings">Profile</Link>
+             <Link href="/rep-dashboard">Dashboard</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+             <Link href="#contact" onClick={(e) => handleScrollTo(e, 'contact')}>Contact</Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/settings">Settings</Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Link href="/">Log out</Link>
+        <DropdownMenuItem asChild>
+            <Link href="/rep-login">Log out</Link>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
