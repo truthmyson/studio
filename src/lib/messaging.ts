@@ -4,7 +4,7 @@ import { getStudentById } from "./constants";
 
 export interface Message {
     id: string;
-    sessionId: string;
+    sessionId: string | null; // Can be null for direct messages
     senderId: string;
     receiverId: string;
     content: string;
@@ -14,7 +14,7 @@ export interface Message {
 // In-memory store for messages
 let messages: Message[] = [];
 
-export async function sendMessage(senderId: string, receiverId: string, sessionId: string, content: string) {
+export async function sendMessage(senderId: string, receiverId: string, sessionId: string | null, content: string) {
     const newMessage: Message = {
         id: `msg-${Date.now()}`,
         sessionId,
@@ -30,7 +30,7 @@ export async function sendMessage(senderId: string, receiverId: string, sessionI
     const senderName = sender ? `${sender.firstName} ${sender.lastName}` : "A user";
     createRepNotification(receiverId, `New message from ${senderName}: "${content.substring(0, 30)}..."`);
     
-    console.log(`Message sent from ${senderId} to ${receiverId} in session ${sessionId}`);
+    console.log(`Message sent from ${senderId} to ${receiverId}`);
     return newMessage;
 }
 

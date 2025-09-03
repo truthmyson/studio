@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import type { Student } from '@/lib/types';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { Search } from 'lucide-react';
+import { MessageSquare, Search } from 'lucide-react';
   
   interface Action {
     label: string;
@@ -26,9 +26,10 @@ import { Search } from 'lucide-react';
   interface StudentsTableProps {
     data: Student[];
     actions?: Action[];
+    onMessageStudent?: (student: Student) => void;
   }
   
-  export function StudentsTable({ data, actions = [] }: StudentsTableProps) {
+  export function StudentsTable({ data, actions = [], onMessageStudent }: StudentsTableProps) {
     const [searchTerm, setSearchTerm] = React.useState('');
 
     const getFullName = (student: Student) => {
@@ -45,6 +46,17 @@ import { Search } from 'lucide-react';
         });
     }, [searchTerm, data]);
 
+    const allActions = [...actions];
+    if (onMessageStudent) {
+        allActions.unshift({
+            label: 'Message',
+            variant: 'outline',
+            onClick: (studentId) => {
+                const student = data.find(s => s.id === studentId);
+                if(student) onMessageStudent(student);
+            }
+        });
+    }
 
     return (
       <div className="space-y-4">
@@ -64,7 +76,7 @@ import { Search } from 'lucide-react';
                 <TableHead>Student ID</TableHead>
                 <TableHead>Full Name</TableHead>
                 <TableHead>Course</TableHead>
-                {actions.length > 0 && <TableHead className="text-right">Actions</TableHead>}
+                {(allActions.length > 0) && <TableHead className="text-right">Actions</TableHead>}
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -76,8 +88,18 @@ import { Search } from 'lucide-react';
                     </TableCell>
                     <TableCell className="font-medium">{getFullName(student)}</TableCell>
                     <TableCell>{student.courseName}</TableCell>
-                    {actions.length > 0 && (
+                    {(allActions.length > 0) && (
                         <TableCell className="text-right">
+                            {onMessageStudent && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => onMessageStudent(student)}
+                                  className="mr-2"
+                                >
+                                  <MessageSquare className="h-4 w-4" />
+                                </Button>
+                            )}
                             {actions.map((action) => 
                                 action.Component ? (
                                     <action.Component key={action.label} student={student} />
@@ -99,7 +121,7 @@ import { Search } from 'lucide-react';
                 ))
                 ) : (
                 <TableRow>
-                    <TableCell colSpan={actions.length > 0 ? 4 : 3} className="h-24 text-center">
+                    <TableCell colSpan={allActions.length > 0 ? 4 : 3} className="h-24 text-center">
                     No students found.
                     </TableCell>
                 </TableRow>
