@@ -2,6 +2,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -23,12 +24,14 @@ import {
   BarChart,
   Clock,
   MapPin,
+  SendToBack,
 } from 'lucide-react';
 import {
   getAllSessions,
   toggleSessionStatusAction,
   exportAttendanceAction,
   getActiveSession,
+  getStudentsForClassAction,
   type AttendanceSession,
 } from '@/lib/actions';
 import { getStudentById } from '@/lib/constants';
@@ -63,6 +66,7 @@ interface StudentDetails {
 const REP_ID = '24275016'; // Hardcoded for now
 
 export default function RepDashboardPage() {
+  const router = useRouter();
   const [sessions, setSessions] = useState<AttendanceSession[]>([]);
   const [activeSessionDetails, setActiveSessionDetails] = useState<{
     session: AttendanceSession;
@@ -158,6 +162,49 @@ export default function RepDashboardPage() {
         toast({ title: "Success", description: "Report downloaded."});
     } else {
         toast({ variant: 'destructive', title: "Error", description: result.message });
+    }
+  };
+
+  const handleSendToTable = async (session: AttendanceSession) => {
+    try {
+        // 1. Get student details for the class
+        const studentsInClass = await getStudentsForClassAction(session.classId);
+        const studentDetails = studentsInClass.map(s => ({
+            id: s.id,
+            'First Name': s.firstName,
+            'Middle Name': s.middleName || '',
+            'Last Name': s.lastName,
+            'Course Name': s.courseName,
+        }));
+
+        // 2. Format attendance records
+        const date = format(new Date(session.startTime), 'yyyy-MM-dd');
+        const presentStudentIds = session.students
+            .filter(s => s.signedInAt !== null)
+            .map(s => s.studentId);
+        const attendanceRecords = {
+            [date]: presentStudentIds
+        };
+
+        // 3. Serialize and encode for URL
+        const studentDetailsJson = JSON.stringify(studentDetails, null, 2);
+        const attendanceRecordsJson = JSON.stringify(attendanceRecords, null, 2);
+
+        const query = new URLSearchParams({
+            studentDetails: studentDetailsJson,
+            attendanceRecords: attendanceRecordsJson,
+        }).toString();
+        
+        // 4. Navigate to the table page
+        router.push(`/table?${query}`);
+
+    } catch (error) {
+        console.error("Failed to prepare data for table:", error);
+        toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'Could not prepare session data for the table.'
+        });
     }
   };
 
@@ -300,19 +347,24 @@ export default function RepDashboardPage() {
                              <Badge variant={session.active ? 'default' : 'secondary'}>
                                 {session.active ? 'Live' : 'Ended'}
                             </Badge>
-                             <Button variant="ghost" size="icon" onClick={() => handleToggleSession(session.id, session.active)}>
+                             <Button variant="ghost" size="icon" onClick={() => handleToggleSession(session.id, session.active)} title={session.active ? 'End Session' : 'Reactivate Session'}>
                                 {session.active ? <PowerOff className="h-4 w-4" /> : <Power className="h-4 w-4"/>}
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={() => openStatsDialog(session)}>
+                            {!session.active && (
+                                <Button variant="ghost" size="icon" onClick={() => handleSendToTable(session)} title="Send to Table">
+                                    <SendToBack className="h-4 w-4" />
+                                </Button>
+                            )}
+                            <Button variant="ghost" size="icon" onClick={() => openStatsDialog(session)} title="View Stats">
                                 <BarChart className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={() => handleExport(session.classId, session.topic)}>
+                            <Button variant="ghost" size="icon" onClick={() => handleExport(session.classId, session.topic)} title="Download Report">
                                 <Download className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={() => openMessagingDialog(session)}>
+                            <Button variant="ghost" size="icon" onClick={() => openMessagingDialog(session)} title="Open Chat">
                                 <MessageSquare className="h-4 w-4" />
                             </Button>
-                             <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                             <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" title="Delete Session">
                                 <Trash2 className="h-4 w-4" />
                             </Button>
                         </div>
@@ -367,5 +419,3 @@ export default function RepDashboardPage() {
     </div>
   );
 }
-
-    

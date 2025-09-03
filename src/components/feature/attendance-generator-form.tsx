@@ -1,11 +1,13 @@
+
 'use client';
 
 import { useFormState, useFormStatus } from 'react-dom';
+import { useSearchParams } from 'next/navigation';
 import { generateAttendanceAction, type FormState } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Download, AlertCircle } from 'lucide-react';
 import {
@@ -32,6 +34,34 @@ export function AttendanceGeneratorForm() {
   const [state, formAction] = useFormState(generateAttendanceAction, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
+  const searchParams = useSearchParams();
+
+  // Local state for text areas to allow programmatic updates
+  const [studentDetails, setStudentDetails] = useState('');
+  const [attendanceRecords, setAttendanceRecords] = useState('');
+
+  useEffect(() => {
+    const studentDetailsParam = searchParams.get('studentDetails');
+    const attendanceRecordsParam = searchParams.get('attendanceRecords');
+
+    if (studentDetailsParam) {
+      try {
+        const parsed = JSON.parse(studentDetailsParam);
+        setStudentDetails(JSON.stringify(parsed, null, 2));
+      } catch {
+        setStudentDetails(studentDetailsParam);
+      }
+    }
+
+    if (attendanceRecordsParam) {
+      try {
+        const parsed = JSON.parse(attendanceRecordsParam);
+        setAttendanceRecords(JSON.stringify(parsed, null, 2));
+      } catch {
+        setAttendanceRecords(attendanceRecordsParam);
+      }
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (state.status === 'success') {
@@ -39,7 +69,7 @@ export function AttendanceGeneratorForm() {
         title: 'Success!',
         description: state.message,
       });
-      formRef.current?.reset();
+      // Do not reset the form if it was successful, user might want to download
     } else if (state.status === 'error') {
       toast({
         variant: 'destructive',
@@ -78,6 +108,8 @@ export function AttendanceGeneratorForm() {
             placeholder={studentDetailsJsonExample}
             required
             className="font-mono text-sm"
+            value={studentDetails}
+            onChange={(e) => setStudentDetails(e.target.value)}
           />
         </div>
         <div className="space-y-2">
@@ -89,6 +121,8 @@ export function AttendanceGeneratorForm() {
             placeholder={attendanceRecordsJsonExample}
             required
             className="font-mono text-sm"
+            value={attendanceRecords}
+            onChange={(e) => setAttendanceRecords(e.target.value)}
           />
         </div>
       </div>
@@ -104,7 +138,7 @@ export function AttendanceGeneratorForm() {
       )}
 
       {state.csvData && state.status === 'success' && (
-        <div className="space-y-2">
+        <div className="space-y-4">
             <Label htmlFor="csvOutput">Generated CSV Output</Label>
             <Textarea
                 id="csvOutput"
@@ -120,7 +154,7 @@ export function AttendanceGeneratorForm() {
         </div>
       )}
 
-      <div className="flex justify-end">
+      <div className="flex justify-end pt-4">
         <SubmitButton />
       </div>
     </form>
