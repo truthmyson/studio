@@ -12,7 +12,7 @@ import { Student } from './types';
 import { sendMessage, getMessagesForSession, Message, getDirectMessages } from './messaging';
 import * as xlsx from 'xlsx';
 import { convertArrayToCsv } from '@/services/csv-converter';
-import { SavedReport, createReport, getReports, deleteReportById, updateReport, getReportById } from './report-management';
+import { SavedReport, createReport, getReports, deleteReportById, updateReport, getReportById, addColumnToReport } from './report-management';
 
 
 export type { AttendanceSession };
@@ -525,3 +525,30 @@ export async function deleteReportAction(reportId: string): Promise<{ success: b
         return { success: false, message: 'Failed to delete report.' };
     }
 }
+
+export async function addSessionToReportAction(sessionId: string, reportId: string, columnName: string): Promise<{ success: boolean, message: string }> {
+    const session = getSessionById(sessionId);
+    const report = await getReportById(reportId);
+
+    if (!session) {
+        return { success: false, message: "Source session not found." };
+    }
+    if (!report) {
+        return { success: false, message: "Target report not found." };
+    }
+    if (session.classId !== report.classId) {
+        return { success: false, message: "Session and report do not belong to the same class." };
+    }
+
+    try {
+        await addColumnToReport(reportId, session, columnName);
+        return { success: true, message: `Successfully added session data to report "${report.name}".` };
+    } catch (error) {
+        if (error instanceof Error) {
+            return { success: false, message: error.message };
+        }
+        return { success: false, message: "An unexpected error occurred while updating the report." };
+    }
+}
+
+    

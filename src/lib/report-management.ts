@@ -1,6 +1,9 @@
 
 'use server';
 
+import type { AttendanceSession } from "./attendance-session";
+import * as xlsx from 'xlsx';
+
 export interface SavedReport {
     id: string;
     name: string;
@@ -57,3 +60,50 @@ export async function deleteReportById(id: string): Promise<void> {
         throw new Error("Report not found");
     }
 }
+
+function generateNewXlsxData(dataArray: (string | number)[][]): string {
+    const workbook = xlsx.utils.book_new();
+    const worksheet = xlsx.utils.aoa_to_sheet(dataArray);
+    xlsx.utils.book_append_sheet(workbook, worksheet, 'Attendance');
+    const xlsxBuffer = xlsx.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+    return Buffer.from(xlsxBuffer).toString('base64');
+}
+
+export async function addColumnToReport(reportId: string, session: AttendanceSession, columnName: string): Promise<SavedReport> {
+    const report = await getReportById(reportId);
+    if (!report) {
+        throw new Error("Report not found.");
+    }
+
+    const headerRow = report.data[0];
+    if (headerRow.includes(columnName)) {
+        throw new Error(`Column "${columnName}" already exists in the report.`);
+    }
+
+    // Add new column header
+    headerRow.push(columnName);
+
+    // Create a map of student attendance for the session for quick lookup
+    const sessionAttendance = new Map<string, boolean>();
+    session.students.forEach(s => {
+        sessionAttendance.set(s.studentId, s.signedInAt !== null);
+    });
+
+    // Update each data row
+    // Skip the header row by starting at index 1
+    for (let i = 1; i < report.data.length; i++) {
+        const studentRow = report.data[i];
+        const studentId = studentRow[0] as string; // Assuming student ID is always the first column
+        
+        const wasPresent = sessionAttendance.get(studentId) || false;
+        studentRow.push(wasPresent ? 'Present' : 'Absent');
+    }
+    
+    // Regenerate the xlsx data
+    report.xlsxData = generateNewXlsxData(report.data);
+    report.createdAt = Date.now(); // Update the timestamp
+
+    return report;
+}
+
+    

@@ -55,6 +55,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { SessionStatsDialog } from '@/components/feature/session-stats-dialog';
 import { EditTimeDialog } from '@/components/feature/edit-time-dialog';
+import { AddSessionToReportDialog } from '@/components/feature/add-session-to-report-dialog';
 
 interface StudentDetails {
   id: string;
@@ -78,6 +79,7 @@ export default function RepDashboardPage() {
   const [isMessagingDialogOpen, setIsMessagingDialogOpen] = useState(false);
   const [isStatsDialogOpen, setIsStatsDialogOpen] = useState(false);
   const [isEditTimeDialogOpen, setIsEditTimeDialogOpen] = useState(false);
+  const [isAddToReportDialogOpen, setIsAddToReportDialogOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<AttendanceSession | null>(null);
 
   const { toast } = useToast();
@@ -146,47 +148,9 @@ export default function RepDashboardPage() {
     }
   };
 
-  const handleSendToTable = async (session: AttendanceSession) => {
-    try {
-        // 1. Get student details for the class
-        const studentsInClass = await getStudentsForClassAction(session.classId);
-        const studentDetails = studentsInClass.map(s => ({
-            id: s.id,
-            'First Name': s.firstName,
-            'Middle Name': s.middleName || '',
-            'Last Name': s.lastName,
-            'Course Name': s.courseName,
-        }));
-
-        // 2. Format attendance records
-        const date = format(new Date(session.startTime), 'yyyy-MM-dd');
-        const presentStudentIds = session.students
-            .filter(s => s.signedInAt !== null)
-            .map(s => s.studentId);
-        const attendanceRecords = {
-            [date]: presentStudentIds
-        };
-
-        // 3. Serialize and encode for URL
-        const studentDetailsJson = JSON.stringify(studentDetails, null, 2);
-        const attendanceRecordsJson = JSON.stringify(attendanceRecords, null, 2);
-
-        const query = new URLSearchParams({
-            studentDetails: studentDetailsJson,
-            attendanceRecords: attendanceRecordsJson,
-        }).toString();
-        
-        // 4. Navigate to the table page
-        router.push(`/table?${query}`);
-
-    } catch (error) {
-        console.error("Failed to prepare data for table:", error);
-        toast({
-            variant: 'destructive',
-            title: 'Error',
-            description: 'Could not prepare session data for the table.'
-        });
-    }
+  const openAddToReportDialog = (session: AttendanceSession) => {
+    setSelectedSession(session);
+    setIsAddToReportDialogOpen(true);
   };
 
 
@@ -332,7 +296,7 @@ export default function RepDashboardPage() {
                                 {session.active ? <PowerOff className="h-4 w-4" /> : <Power className="h-4 w-4"/>}
                             </Button>
                             {!session.active && (
-                                <Button variant="ghost" size="icon" onClick={() => handleSendToTable(session)} title="Send to Table">
+                                <Button variant="ghost" size="icon" onClick={() => openAddToReportDialog(session)} title="Add Session to Report">
                                     <SendToBack className="h-4 w-4" />
                                 </Button>
                             )}
@@ -392,10 +356,20 @@ export default function RepDashboardPage() {
                 session={selectedSession}
                 onTimeUpdated={fetchDashboardData}
             />
+            <AddSessionToReportDialog
+                isOpen={isAddToReportDialogOpen}
+                onClose={() => {
+                    setIsAddToReportDialogOpen(false);
+                    setSelectedSession(null);
+                }}
+                session={selectedSession}
+            />
         </>
       )}
     </div>
   );
 }
+
+    
 
     
