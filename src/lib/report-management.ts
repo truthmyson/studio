@@ -14,8 +14,36 @@ export interface SavedReport {
     xlsxData: string; // Base64 encoded XLSX data
 }
 
-// In-memory store for saved reports
-let savedReports: SavedReport[] = [];
+// Sample report data to simulate persistence
+const sampleReportData: (string | number)[][] = [
+    ["Student ID", "First Name", "Middle Name", "Last Name", "Course Name", "2024-05-16"],
+    ["24275016", "Chris", "", "Mensah", "Computer Science", "Absent"],
+    ["STU002", "Jane", "", "Smith", "Computer Science", "Present"],
+    ["STU004", "Mary", "", "Johnson", "Computer Science", "Present"]
+];
+
+// Function to generate sample XLSX data on the fly
+function generateSampleXlsxData(): string {
+    const workbook = xlsx.utils.book_new();
+    const worksheet = xlsx.utils.aoa_to_sheet(sampleReportData);
+    xlsx.utils.book_append_sheet(workbook, worksheet, 'Attendance');
+    const xlsxBuffer = xlsx.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+    return Buffer.from(xlsxBuffer).toString('base64');
+}
+
+
+// In-memory store for saved reports, now initialized with sample data
+let savedReports: SavedReport[] = [
+    {
+        id: 'report-1716039400000-sample',
+        name: 'Mid-Semester SWE Report',
+        classId: 'CLS001',
+        className: 'Software Engineering Q',
+        createdAt: new Date('2024-05-18T12:00:00Z').getTime(),
+        data: sampleReportData,
+        xlsxData: generateSampleXlsxData(),
+    }
+];
 
 
 export async function createReport(name: string, classId: string, className: string, data: (string | number)[][], xlsxData: string): Promise<SavedReport> {
@@ -33,7 +61,7 @@ export async function createReport(name: string, classId: string, className: str
 }
 
 export async function getReports(): Promise<SavedReport[]> {
-    return [...savedReports]; // Return a copy
+    return [...savedReports].sort((a, b) => b.createdAt - a.createdAt); // Return a sorted copy
 }
 
 export async function getReportById(id: string): Promise<SavedReport | undefined> {
