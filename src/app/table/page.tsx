@@ -92,7 +92,9 @@ export default function TablePage() {
     };
 
     useEffect(() => {
-        fetchSavedReports();
+        fetchSavedReports(); // Initial fetch
+        const interval = setInterval(fetchSavedReports, 5000); // Poll for updates every 5 seconds
+        return () => clearInterval(interval); // Cleanup on component unmount
     }, []);
 
     const handleOpenDialog = async () => {
