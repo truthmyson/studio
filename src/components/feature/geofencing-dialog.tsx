@@ -14,10 +14,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { startGeofencingAction } from '@/lib/actions';
+import { startGeofencingAction, getClassesByRepAction, type ClassWithStudentCount } from '@/lib/actions';
 import { Loader2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { getAllClasses, type Class } from '@/lib/class-management';
 import { Checkbox } from '../ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { ScrollArea } from '../ui/scroll-area';
@@ -37,19 +36,22 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
   const [venue, setVenue] = useState(''); // New field for location/classroom
   const [selectedClassId, setSelectedClassId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
-  const [classes, setClasses] = useState<Class[]>([]);
+  const [isFetchingClasses, setIsFetchingClasses] = useState(false);
+  const [classes, setClasses] = useState<ClassWithStudentCount[]>([]);
   const [includeSelf, setIncludeSelf] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     async function fetchClasses() {
         if (isOpen) {
-            const allClasses = await getAllClasses();
-            setClasses(allClasses);
+            setIsFetchingClasses(true);
+            const repClasses = await getClassesByRepAction(repId);
+            setClasses(repClasses);
+            setIsFetchingClasses(false);
         }
     }
     fetchClasses();
-  }, [isOpen]);
+  }, [isOpen, repId]);
 
   const handleStartSession = async () => {
     setIsLoading(true);
@@ -75,7 +77,8 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
         setIsLoading(false);
         return;
     }
-    formData.append('studentIds', JSON.stringify(selectedClass.students.map(s => s.studentId)));
+    const studentIds = selectedClass.students.map(s => s.studentId);
+    formData.append('studentIds', JSON.stringify(studentIds));
     formData.append('repId', repId);
     formData.append('includeRep', includeSelf.toString());
     
@@ -148,14 +151,14 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
             <div className="space-y-4 py-4 pr-6 pb-2">
                 <div className="space-y-2">
                     <Label htmlFor="class">Class</Label>
-                    <Select onValueChange={setSelectedClassId} value={selectedClassId} disabled={isLoading}>
+                    <Select onValueChange={setSelectedClassId} value={selectedClassId} disabled={isLoading || isFetchingClasses}>
                     <SelectTrigger id="class">
-                        <SelectValue placeholder="Select a class" />
+                        <SelectValue placeholder={isFetchingClasses ? "Loading classes..." : "Select a class"} />
                     </SelectTrigger>
                     <SelectContent>
                         {classes.map((cls) => (
                         <SelectItem key={cls.id} value={cls.id}>
-                            {cls.name}
+                            {cls.name} ({cls.studentCount} students)
                         </SelectItem>
                         ))}
                     </SelectContent>
@@ -252,7 +255,7 @@ export function GeofencingDialog({ isOpen, onClose, repId }: GeofencingDialogPro
           <Button variant="outline" onClick={onClose} disabled={isLoading}>
             Cancel
           </Button>
-          <Button onClick={handleStartSession} disabled={isLoading}>
+          <Button onClick={handleStartSession} disabled={isLoading || isFetchingClasses}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Start Session
           </Button>

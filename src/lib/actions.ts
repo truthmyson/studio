@@ -482,13 +482,15 @@ export async function createClassAction(formData: FormData): Promise<{ success: 
     }
 }
 
-export type ClassWithStudentCount = Class & { studentCount: number };
+export type ClassWithStudentCount = Omit<Class, 'students'> & { studentCount: number; students: { studentId: string }[] };
+
 
 export async function getClassesByRepAction(repId: string): Promise<ClassWithStudentCount[]> {
     const repClasses = await getClassesByRep(repId);
     return repClasses.map(cls => ({
         ...cls,
         studentCount: cls.students.length,
+        students: cls.students.map(s => ({ studentId: s.studentId })), // Only return IDs to keep payload small
     }));
 }
 
@@ -550,5 +552,3 @@ export async function addSessionToReportAction(sessionId: string, reportId: stri
         return { success: false, message: "An unexpected error occurred while updating the report." };
     }
 }
-
-    

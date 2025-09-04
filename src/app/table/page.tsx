@@ -105,12 +105,12 @@ export default function TablePage() {
         try {
             const repClasses = await getClassesByRepAction(REP_ID);
             setClasses(repClasses);
+            setIsCreateDialogOpen(true);
         } catch (e) {
             setError("Failed to load classes.");
         } finally {
             setIsLoading(false);
         }
-        setIsCreateDialogOpen(true);
     };
 
     const handleCreateTable = async () => {
@@ -249,19 +249,17 @@ export default function TablePage() {
                 </div>
             )}
             
-            {selectedReport && (
-                <Dialog open={!!selectedReport} onOpenChange={(open) => !open && setSelectedReport(null)}>
-                    <DialogContent className="max-w-4xl h-[90vh]">
-                        <DialogHeader>
-                            <DialogTitle>Report: {selectedReport.name}</DialogTitle>
-                             <DialogDescription>
-                                Preview of the generated attendance report. You can download the full Excel file.
-                            </DialogDescription>
-                        </DialogHeader>
-                       <ReportPreview report={selectedReport} />
-                    </DialogContent>
-                </Dialog>
-            )}
+            <Dialog open={!!selectedReport} onOpenChange={(open) => !open && setSelectedReport(null)}>
+                <DialogContent className="max-w-4xl h-[90vh]">
+                    <DialogHeader>
+                        <DialogTitle>Report: {selectedReport?.name}</DialogTitle>
+                         <DialogDescription>
+                            Preview of the generated attendance report. You can download the full Excel file.
+                        </DialogDescription>
+                    </DialogHeader>
+                   {selectedReport && <ReportPreview report={selectedReport} />}
+                </DialogContent>
+            </Dialog>
 
 
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
